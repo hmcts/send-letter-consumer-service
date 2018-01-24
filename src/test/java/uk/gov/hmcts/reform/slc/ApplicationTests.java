@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.slpc;
+package uk.gov.hmcts.reform.slc;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
