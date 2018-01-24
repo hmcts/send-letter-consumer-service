@@ -4,3 +4,6 @@ server:
 management:
   security:
     enabled: ${MANAGEMENT_SECURITY_ENABLED:true}
+
+servicebus:
+  connectionString: ${SERVICE_BUS_CONNECTION_STRING:}
