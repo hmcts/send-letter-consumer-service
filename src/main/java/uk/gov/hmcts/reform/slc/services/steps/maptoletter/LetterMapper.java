@@ -25,7 +25,7 @@ public class LetterMapper {
             }
 
         } catch (IOException exc) {
-            throw new InvalidMessageException("Unable to deserialize message" + msg.getMessageId());
+            throw new InvalidMessageException("Unable to deserialize message " + msg.getMessageId(), exc);
         }
     }
 }

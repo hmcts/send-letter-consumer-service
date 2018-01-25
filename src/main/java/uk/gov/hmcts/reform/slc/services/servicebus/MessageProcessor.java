@@ -31,12 +31,11 @@ public class MessageProcessor {
             return;
         }
 
-        IMessage message;
+        IMessage message = null;
         try {
             message = messageReceiver.receive();
         } catch (InterruptedException | ServiceBusException e) {
             logger.error("Unable to read message from queue", e);
-            return;
         }
 
         if (message != null) {
