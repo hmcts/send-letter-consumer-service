@@ -25,47 +25,52 @@ public class MessageProcessor {
      * Reads message from a queue and passes is as an argument to action.
      */
     public void handle(Function<IMessage, MessageHandlingResult> action) {
-
-        IMessageReceiver messageReceiver;
-
         try {
-            messageReceiver = receiverProvider.get();
+            IMessageReceiver messageReceiver = receiverProvider.get();
+            try {
+                IMessage message = messageReceiver.receive();
+                if (message != null) {
+                    MessageHandlingResult result = action.apply(message);
+                    switch (result) {
+                        case SUCCESS:
+                            complete(messageReceiver, message);
+                            break;
+                        case FAILURE:
+                            deadLetter(messageReceiver, message);
+                            break;
+                        default:
+                            logger.error("Unknown message handling result: " + result);
+                            deadLetter(messageReceiver, message);
+                    }
+                } else {
+                    logger.trace("No messages to process");
+                }
+            } catch (InterruptedException | ServiceBusException e) {
+                logger.error("Unable to read message from queue", e);
+            }
+
+            messageReceiver.close();
+
         } catch (ConnectionException e) {
             logger.error("Unable to connect to Service Bus", e);
-            return;
-        }
-
-        IMessage message = null;
-        try {
-            message = messageReceiver.receive();
-        } catch (InterruptedException | ServiceBusException e) {
-            logger.error("Unable to read message from queue", e);
-        }
-
-        if (message != null) {
-
-            MessageHandlingResult result = action.apply(message);
-            if (result == MessageHandlingResult.SUCCESS) {
-                try {
-                    messageReceiver.complete(message.getLockToken());
-                } catch (InterruptedException | ServiceBusException e) {
-                    logger.error("Unable to mark message " + message.getMessageId() + " as processed");
-                }
-            } else {
-                try {
-                    messageReceiver.deadLetter(message.getLockToken());
-                } catch (InterruptedException | ServiceBusException e) {
-                    logger.error("Unable to send message " + message.getMessageId() + " to deadletter subqueue", e);
-                }
-            }
-        } else {
-            logger.trace("No messages to process");
-        }
-
-        try {
-            messageReceiver.close();
         } catch (ServiceBusException e) {
             logger.error("Error closing connection");
+        }
+    }
+
+    private void complete(IMessageReceiver receiver, IMessage msg) {
+        try {
+            receiver.complete(msg.getLockToken());
+        } catch (InterruptedException | ServiceBusException e) {
+            logger.error("Unable to mark message " + msg.getMessageId() + " as processed");
+        }
+    }
+
+    private void deadLetter(IMessageReceiver receiver, IMessage msg) {
+        try {
+            receiver.deadLetter(msg.getLockToken());
+        } catch (InterruptedException | ServiceBusException e) {
+            logger.error("Unable to send message " + msg.getMessageId() + " to deadletter subqueue", e);
         }
     }
 }

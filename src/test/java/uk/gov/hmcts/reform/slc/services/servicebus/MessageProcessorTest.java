@@ -48,9 +48,22 @@ public class MessageProcessorTest {
     }
 
     @Test
-    public void should_send_message_to_deadletter_if_passed_function_return_failure() throws Exception {
+    public void should_send_message_to_deadletter_if_passed_function_returns_failure() throws Exception {
         // given
         action = (msg) -> FAILURE;
+        given(messageReceiver.receive()).willReturn(message);
+
+        // when
+        processor.handle(action);
+
+        // then
+        verify(messageReceiver, times(1)).deadLetter(any());
+    }
+
+    @Test
+    public void should_send_message_to_deadletter_if_passed_function_returns_unknown_status() throws Exception {
+        // given
+        action = (msg) -> null;
         given(messageReceiver.receive()).willReturn(message);
 
         // when
