@@ -61,19 +61,6 @@ public class MessageProcessorTest {
     }
 
     @Test
-    public void should_send_message_to_deadletter_if_passed_function_returns_unknown_status() throws Exception {
-        // given
-        action = (msg) -> null;
-        given(messageReceiver.receive()).willReturn(message);
-
-        // when
-        processor.handle(action);
-
-        // then
-        verify(messageReceiver, times(1)).deadLetter(any());
-    }
-
-    @Test
     public void should_not_call_action_if_there_are_no_messages_on_queue() throws Exception {
         // given
         action = (Function<IMessage, MessageHandlingResult>) mock(Function.class);

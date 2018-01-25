@@ -31,6 +31,7 @@ public class MessageProcessor {
                 IMessage message = messageReceiver.receive();
                 if (message != null) {
                     MessageHandlingResult result = action.apply(message);
+
                     switch (result) {
                         case SUCCESS:
                             complete(messageReceiver, message);
@@ -41,6 +42,7 @@ public class MessageProcessor {
                         default:
                             logger.error("Unknown message handling result: " + result);
                             deadLetter(messageReceiver, message);
+                            break;
                     }
                 } else {
                     logger.trace("No messages to process");
