@@ -1,13 +1,10 @@
 package uk.gov.hmcts.reform.slc.services.servicebus;
 
-import com.microsoft.azure.servicebus.ClientFactory;
 import com.microsoft.azure.servicebus.IMessage;
 import com.microsoft.azure.servicebus.IMessageReceiver;
-import com.microsoft.azure.servicebus.ReceiveMode;
 import com.microsoft.azure.servicebus.primitives.ServiceBusException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.slc.services.SendLetterJob;
 
@@ -17,18 +14,19 @@ import java.util.function.Function;
 public class MessageProcessor {
     private static final Logger logger = LoggerFactory.getLogger(SendLetterJob.class);
 
-    private final String connString;
+    private final IReceiverProvider receiverProvider;
 
-    public MessageProcessor(@Value("${servicebus.connectionString}") String connString) {
-        this.connString = connString;
+    public MessageProcessor(IReceiverProvider receiverProvider) {
+        this.receiverProvider = receiverProvider;
     }
 
     public void handle(Function<IMessage, MessageHandlingResult> action) {
 
         IMessageReceiver messageReceiver;
+
         try {
-            messageReceiver = ClientFactory.createMessageReceiverFromConnectionString(connString, ReceiveMode.PEEKLOCK);
-        } catch (Exception e) {
+            messageReceiver = receiverProvider.get();
+        } catch (ConnectionException e) {
             logger.error("Unable to connect to Service Bus", e);
             return;
         }
