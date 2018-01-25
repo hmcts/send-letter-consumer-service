@@ -47,7 +47,7 @@ public class LetterMapperTest {
     @Test
     public void should_throw_an_exception_if_message_contains_invalid_json() {
         given(message.getBody())
-            .willReturn(("{\"a\" : \"b\"}").getBytes());
+            .willReturn("{\"a\" : \"b\"}".getBytes());
 
         assertThatThrownBy(() -> letterMapper.from(message))
             .isInstanceOf(InvalidMessageException.class);
