@@ -9,19 +9,20 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.slc.services.SendLetterJob;
 
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 @Component
 public class MessageProcessor {
     private static final Logger logger = LoggerFactory.getLogger(SendLetterJob.class);
 
-    private final IReceiverProvider receiverProvider;
+    private final Supplier<IMessageReceiver> receiverProvider;
 
-    public MessageProcessor(IReceiverProvider receiverProvider) {
+    public MessageProcessor(Supplier<IMessageReceiver> receiverProvider) {
         this.receiverProvider = receiverProvider;
     }
 
     /**
-     * Reads message from a queue and send is as an argument to passed function.
+     * Reads message from a queue and passes is as an argument to action.
      */
     public void handle(Function<IMessage, MessageHandlingResult> action) {
 

@@ -7,8 +7,10 @@ import com.microsoft.azure.servicebus.primitives.ServiceBusException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.util.function.Supplier;
+
 @Component
-public class ReceiverProvider implements IReceiverProvider {
+public class ReceiverProvider implements Supplier<IMessageReceiver> {
 
     private final String connString;
 
