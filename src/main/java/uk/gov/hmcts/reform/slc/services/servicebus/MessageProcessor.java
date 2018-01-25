@@ -6,7 +6,6 @@ import com.microsoft.azure.servicebus.primitives.ServiceBusException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.slc.services.SendLetterJob;
 import uk.gov.hmcts.reform.slc.services.servicebus.exceptions.ConnectionException;
 
 import java.util.function.Function;
