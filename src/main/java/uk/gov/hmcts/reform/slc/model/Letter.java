@@ -22,10 +22,10 @@ public class Letter {
 
     @Override
     public String toString() {
-        return "Letter{" +
-            "template='" + template + '\'' +
-            ", values=" + values +
-            ", type='" + type + '\'' +
-            '}';
+        return "Letter{"
+            + "template='" + template + '\''
+            + ", values=" + values
+            + ", type='" + type + '\''
+            + '}';
     }
 }
