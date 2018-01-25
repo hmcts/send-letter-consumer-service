@@ -5,9 +5,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.slc.model.Letter;
-import uk.gov.hmcts.reform.slc.services.servicebus.MessageHandlingResult;
 import uk.gov.hmcts.reform.slc.services.servicebus.MessageProcessor;
 import uk.gov.hmcts.reform.slc.services.steps.maptoletter.LetterMapper;
+
+import static uk.gov.hmcts.reform.slc.services.servicebus.MessageHandlingResult.FAILURE;
+import static uk.gov.hmcts.reform.slc.services.servicebus.MessageHandlingResult.SUCCESS;
 
 @Component
 public class SendLetterJob {
@@ -33,10 +35,12 @@ public class SendLetterJob {
                 logger.info("Processing letter " + letter);
                 // TODO: generate PDF
                 // TODO: send PDF to Xerox
-                return MessageHandlingResult.SUCCESS;
+
+                return SUCCESS;
+
             } catch (Exception exc) {
                 logger.error(exc.getMessage(), exc.getCause());
-                return MessageHandlingResult.FAILURE;
+                return FAILURE;
             }
         });
     }
