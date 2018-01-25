@@ -14,7 +14,7 @@ import java.util.function.Supplier;
 
 @Component
 public class MessageProcessor {
-    private static final Logger logger = LoggerFactory.getLogger(SendLetterJob.class);
+    private static final Logger logger = LoggerFactory.getLogger(MessageProcessor.class);
 
     private final Supplier<IMessageReceiver> receiverProvider;
 
