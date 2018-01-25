@@ -10,9 +10,6 @@ import uk.gov.hmcts.reform.slc.services.SendLetterJob;
 
 import java.util.function.Function;
 
-/**
- * Reads message from a queue and send is as an argument to passed function.
- */
 @Component
 public class MessageProcessor {
     private static final Logger logger = LoggerFactory.getLogger(SendLetterJob.class);
@@ -23,6 +20,9 @@ public class MessageProcessor {
         this.receiverProvider = receiverProvider;
     }
 
+    /**
+     * Reads message from a queue and send is as an argument to passed function.
+     */
     public void handle(Function<IMessage, MessageHandlingResult> action) {
 
         IMessageReceiver messageReceiver;
