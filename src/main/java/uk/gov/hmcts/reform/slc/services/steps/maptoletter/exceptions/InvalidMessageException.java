@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.slc.services.steps.maptoletter;
+package uk.gov.hmcts.reform.slc.services.steps.maptoletter.exceptions;
 
 public class InvalidMessageException extends RuntimeException {
 

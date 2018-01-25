@@ -6,6 +6,7 @@ import com.microsoft.azure.servicebus.ReceiveMode;
 import com.microsoft.azure.servicebus.primitives.ServiceBusException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.slc.services.servicebus.exceptions.ConnectionException;
 
 import java.util.function.Supplier;
 
