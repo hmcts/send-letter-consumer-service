@@ -48,7 +48,7 @@ public class MessageProcessorTest {
     }
 
     @Test
-    public void should_send_message_to_deadletter_if_passed_function_return_failure() throws Exception {
+    public void should_send_message_to_deadletter_if_passed_function_returns_failure() throws Exception {
         // given
         action = (msg) -> FAILURE;
         given(messageReceiver.receive()).willReturn(message);
