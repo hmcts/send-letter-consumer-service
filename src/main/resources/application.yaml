@@ -5,5 +5,14 @@ management:
   security:
     enabled: ${MANAGEMENT_SECURITY_ENABLED:true}
 
+pdf-service:
+  url: ${PDF_SERVICE_URL}
+
+idam:
+  s2s-auth:
+    url: ${S2S_URL}
+    secret: ${S2S_SECRET}
+    name: ${S2S_NAME:sendletterconsumer}
+
 servicebus:
   connectionString: ${SERVICE_BUS_CONNECTION_STRING:}
