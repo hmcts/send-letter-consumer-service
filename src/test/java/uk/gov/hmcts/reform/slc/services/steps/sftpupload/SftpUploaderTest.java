@@ -33,7 +33,7 @@ public class SftpUploaderTest {
     }
 
     @Test
-    public void should_not_throw_an_exception_if_closing_connection_fails() throws Exception{
+    public void should_not_throw_an_exception_if_closing_connection_fails() throws Exception {
         // given
         doThrow(IOException.class).when(sshClient).close();
         SftpUploader uploader = new SftpUploader("hostname", 22, "user", "pass", sshClient);
