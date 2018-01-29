@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.slc.services.servicebus.MessageProcessor;
 import uk.gov.hmcts.reform.slc.services.steps.getpdf.PdfCreator;
 import uk.gov.hmcts.reform.slc.services.steps.getpdf.PdfDoc;
 import uk.gov.hmcts.reform.slc.services.steps.maptoletter.LetterMapper;
+import uk.gov.hmcts.reform.slc.services.steps.sftpupload.SftpUploader;
 
 import static uk.gov.hmcts.reform.slc.services.servicebus.MessageHandlingResult.FAILURE;
 import static uk.gov.hmcts.reform.slc.services.servicebus.MessageHandlingResult.SUCCESS;
@@ -21,27 +22,30 @@ public class SendLetterJob {
     private final MessageProcessor processor;
     private final LetterMapper letterMapper;
     private final PdfCreator pdfCreator;
+    private final SftpUploader sftpUploader;
 
     public SendLetterJob(
         MessageProcessor processor,
         LetterMapper letterMapper,
-        PdfCreator pdfCreator
+        PdfCreator pdfCreator,
+        SftpUploader sftpUploader
     ) {
         this.processor = processor;
         this.letterMapper = letterMapper;
         this.pdfCreator = pdfCreator;
+        this.sftpUploader = sftpUploader;
     }
 
     @Scheduled(fixedDelayString = "${servicebus.interval}")
     public void run() {
         processor.handle(msg -> {
             try {
+
                 Letter letter = letterMapper.from(msg);
                 logger.info("Processing letter " + letter);
-                PdfDoc pdf = pdfCreator.create(letter); //NOPMD
-
+                PdfDoc pdf = pdfCreator.create(letter);
                 // TODO: encrypt & sign
-                // TODO: send PDF to Xerox
+                sftpUploader.upload(pdf);
 
                 return SUCCESS;
 

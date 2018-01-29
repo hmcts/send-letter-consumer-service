@@ -17,3 +17,8 @@ idam:
 servicebus:
   connectionString: ${SERVICE_BUS_CONNECTION_STRING:}
   interval: ${SERVICE_BUS_INTERVAL:30000}
+
+ftp:
+  hostname: ${FTP_HOSTNAME}
+  user: ${FTP_USER}
+  password: ${FTP_PASSWORD}
