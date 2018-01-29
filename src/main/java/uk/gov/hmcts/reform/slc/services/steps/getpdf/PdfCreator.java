@@ -23,9 +23,8 @@ public class PdfCreator {
             letter.values
         );
 
-        // TODO: retrieve name of the service that requested sending a letter and use it here
         return new PdfDoc(
-            FileNameGenerator.generateFor(letter.type, "TODO", content),
+            FileNameGenerator.generateFor(letter.type, letter.service, content),
             content
         );
     }

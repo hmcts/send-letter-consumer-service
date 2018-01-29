@@ -38,7 +38,7 @@ public class PdfCreatorTest {
         given(client.generateFromHtml(any(), any()))
             .willReturn("hello".getBytes());
 
-        PdfDoc pdfDoc = pdfCreator.create(new Letter("template", emptyMap(), "type"));
+        PdfDoc pdfDoc = pdfCreator.create(new Letter("template", emptyMap(), "type", "service"));
 
         assertThat(pdfDoc).isNotNull();
         assertThat(pdfDoc.content).isEqualTo("hello".getBytes());
