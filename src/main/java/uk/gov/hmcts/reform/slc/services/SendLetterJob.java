@@ -32,7 +32,7 @@ public class SendLetterJob {
         this.pdfCreator = pdfCreator;
     }
 
-    @Scheduled(fixedDelay = 30_000)
+    @Scheduled(fixedDelayString = "${servicebus.interval}")
     public void run() {
         processor.handle(msg -> {
             try {
