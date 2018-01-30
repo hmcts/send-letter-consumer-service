@@ -7,17 +7,20 @@ import java.util.Map;
 public class Letter {
 
     public final String template;
-    public final Map<String, String> values;
+    public final Map<String, Object> values;
     public final String type;
+    public final String service;
 
     public Letter(
         @JsonProperty("template") String template,
-        @JsonProperty("values") Map<String, String> values,
-        @JsonProperty("type") String type
+        @JsonProperty("values") Map<String, Object> values,
+        @JsonProperty("type") String type,
+        @JsonProperty("service") String service
     ) {
         this.template = template;
         this.values = values;
         this.type = type;
+        this.service = service;
     }
 
     @Override
@@ -26,6 +29,7 @@ public class Letter {
             + "template='" + template + '\''
             + ", values=" + values
             + ", type='" + type + '\''
+            + ", service='" + service + '\''
             + '}';
     }
 }
