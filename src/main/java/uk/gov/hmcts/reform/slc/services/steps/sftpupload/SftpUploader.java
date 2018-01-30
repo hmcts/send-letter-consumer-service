@@ -43,9 +43,9 @@ public class SftpUploader {
     public void upload(PdfDoc pdfDoc) {
         try {
 
+            ssh.addHostKeyVerifier(fingerprint);
             ssh.connect(hostname, port);
             ssh.authPassword(username, password);
-            ssh.addHostKeyVerifier(fingerprint);
 
             try (SFTPClient sftp = ssh.newSFTPClient()) {
                 sftp.getFileTransfer().upload(pdfDoc, pdfDoc.filename);
