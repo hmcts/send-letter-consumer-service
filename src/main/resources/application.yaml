@@ -20,5 +20,7 @@ servicebus:
 
 ftp:
   hostname: ${FTP_HOSTNAME}
+  port: ${FTP_PORT}
+  fingerprint: ${FTP_FINGERPRINT}
   user: ${FTP_USER}
   password: ${FTP_PASSWORD}

@@ -26,17 +26,27 @@ public class SftpUploaderTest {
     @Mock private SFTPClient sftpClient;
     @Mock private SFTPFileTransfer sftpFileTransfer;
 
+    private SftpUploader uploader;
+
     @Before
     public void setUp() throws Exception {
         given(sshClient.newSFTPClient()).willReturn(sftpClient);
         given(sftpClient.getFileTransfer()).willReturn(sftpFileTransfer);
+
+        uploader = new SftpUploader(
+            "hostname",
+            22,
+            "d8:2f:cd:a0:ce:d4:a0:c9:93:09:be:43:4b:20:49:b3",
+            "user",
+            "pass",
+            sshClient
+        );
     }
 
     @Test
     public void should_not_throw_an_exception_if_closing_connection_fails() throws Exception {
         // given
         doThrow(IOException.class).when(sshClient).close();
-        SftpUploader uploader = new SftpUploader("hostname", 22, "user", "pass", sshClient);
 
         // when
         Throwable exc = catchThrowable(() -> uploader.upload(new PdfDoc("hello.pdf", "hello".getBytes())));
@@ -49,7 +59,6 @@ public class SftpUploaderTest {
     public void should_thrown_an_exception_if_uploading_file_fails() throws Exception {
         // given
         doThrow(IOException.class).when(sftpFileTransfer).upload(any(LocalSourceFile.class), any());
-        SftpUploader uploader = new SftpUploader("hostname", 22, "user", "pass", sshClient);
 
         // when
         Throwable exc = catchThrowable(() -> uploader.upload(new PdfDoc("hello.pdf", "hello".getBytes())));

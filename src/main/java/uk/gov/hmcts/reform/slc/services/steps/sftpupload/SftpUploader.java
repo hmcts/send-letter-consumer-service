@@ -17,6 +17,7 @@ public class SftpUploader {
 
     private final String hostname;
     private final int port;
+    private final String fingerprint;
     private final String username;
     private final String password;
     private final SSHClient ssh;
@@ -25,12 +26,14 @@ public class SftpUploader {
     public SftpUploader(
         @Value("${sftp.hostname}") String hostname,
         @Value("${sftp.port}") int port,
+        @Value("${sftp.fingerprint}") String fingerprint,
         @Value("${sftp.username}") String username,
         @Value("${sftp.password}") String password,
         SSHClient sshClient
     ) {
         this.hostname = hostname;
         this.port = port;
+        this.fingerprint = fingerprint;
         this.username = username;
         this.password = password;
         this.ssh = sshClient;
@@ -42,6 +45,7 @@ public class SftpUploader {
 
             ssh.connect(hostname, port);
             ssh.authPassword(username, password);
+            ssh.addHostKeyVerifier(fingerprint);
 
             try (SFTPClient sftp = ssh.newSFTPClient()) {
                 sftp.getFileTransfer().upload(pdfDoc, pdfDoc.filename);
