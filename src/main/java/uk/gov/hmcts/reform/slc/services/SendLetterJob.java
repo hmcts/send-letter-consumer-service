@@ -42,7 +42,6 @@ public class SendLetterJob {
             try {
 
                 Letter letter = letterMapper.from(msg);
-                logger.info("Processing letter " + letter);
                 PdfDoc pdf = pdfCreator.create(letter);
                 // TODO: encrypt & sign
                 sftpUploader.upload(pdf);
