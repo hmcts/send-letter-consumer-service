@@ -7,13 +7,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.slc.services.steps.getpdf.PdfDoc;
+import uk.gov.hmcts.reform.slc.services.steps.sftpupload.exceptions.FtpStepException;
 
 import java.io.IOException;
 
 @Component
-public class SftpUploader {
+public class FtpUploader {
 
-    private static final Logger logger = LoggerFactory.getLogger(SftpUploader.class);
+    private static final Logger logger = LoggerFactory.getLogger(FtpUploader.class);
 
     private final String hostname;
     private final int port;
@@ -23,7 +24,7 @@ public class SftpUploader {
     private final SSHClient ssh;
 
     // region constructor
-    public SftpUploader(
+    public FtpUploader(
         @Value("${sftp.hostname}") String hostname,
         @Value("${sftp.port}") int port,
         @Value("${sftp.fingerprint}") String fingerprint,

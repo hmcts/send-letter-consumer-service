@@ -9,7 +9,7 @@ import uk.gov.hmcts.reform.slc.services.servicebus.MessageProcessor;
 import uk.gov.hmcts.reform.slc.services.steps.getpdf.PdfCreator;
 import uk.gov.hmcts.reform.slc.services.steps.getpdf.PdfDoc;
 import uk.gov.hmcts.reform.slc.services.steps.maptoletter.LetterMapper;
-import uk.gov.hmcts.reform.slc.services.steps.sftpupload.SftpUploader;
+import uk.gov.hmcts.reform.slc.services.steps.sftpupload.FtpUploader;
 
 import static uk.gov.hmcts.reform.slc.services.servicebus.MessageHandlingResult.FAILURE;
 import static uk.gov.hmcts.reform.slc.services.servicebus.MessageHandlingResult.SUCCESS;
@@ -22,18 +22,18 @@ public class SendLetterJob {
     private final MessageProcessor processor;
     private final LetterMapper letterMapper;
     private final PdfCreator pdfCreator;
-    private final SftpUploader sftpUploader;
+    private final FtpUploader ftpUploader;
 
     public SendLetterJob(
         MessageProcessor processor,
         LetterMapper letterMapper,
         PdfCreator pdfCreator,
-        SftpUploader sftpUploader
+        FtpUploader ftpUploader
     ) {
         this.processor = processor;
         this.letterMapper = letterMapper;
         this.pdfCreator = pdfCreator;
-        this.sftpUploader = sftpUploader;
+        this.ftpUploader = ftpUploader;
     }
 
     @Scheduled(fixedDelayString = "${servicebus.interval}")
@@ -44,7 +44,7 @@ public class SendLetterJob {
                 Letter letter = letterMapper.from(msg);
                 PdfDoc pdf = pdfCreator.create(letter);
                 // TODO: encrypt & sign
-                sftpUploader.upload(pdf);
+                ftpUploader.upload(pdf);
 
                 return SUCCESS;
 

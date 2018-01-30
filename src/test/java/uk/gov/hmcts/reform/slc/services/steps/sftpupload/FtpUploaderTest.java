@@ -10,6 +10,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import uk.gov.hmcts.reform.slc.services.steps.getpdf.PdfDoc;
+import uk.gov.hmcts.reform.slc.services.steps.sftpupload.exceptions.FtpStepException;
 
 import java.io.IOException;
 
@@ -20,20 +21,20 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doThrow;
 
 @RunWith(MockitoJUnitRunner.class)
-public class SftpUploaderTest {
+public class FtpUploaderTest {
 
     @Mock private SSHClient sshClient;
     @Mock private SFTPClient sftpClient;
     @Mock private SFTPFileTransfer sftpFileTransfer;
 
-    private SftpUploader uploader;
+    private FtpUploader uploader;
 
     @Before
     public void setUp() throws Exception {
         given(sshClient.newSFTPClient()).willReturn(sftpClient);
         given(sftpClient.getFileTransfer()).willReturn(sftpFileTransfer);
 
-        uploader = new SftpUploader(
+        uploader = new FtpUploader(
             "hostname",
             22,
             "d8:2f:cd:a0:ce:d4:a0:c9:93:09:be:43:4b:20:49:b3",
