@@ -7,9 +7,10 @@ public final class FileNameGenerator {
     public static String generateFor(
         String letterType,
         String jurisdiction,
-        byte[] content
+        byte[] content,
+        String extension
     ) {
-        return letterType + "-" + jurisdiction + "-" + md5Hex(content);
+        return letterType + "-" + jurisdiction + "-" + md5Hex(content) + "." + extension;
     }
 
     private FileNameGenerator() {
