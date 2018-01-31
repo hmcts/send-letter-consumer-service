@@ -24,7 +24,7 @@ public class PdfCreator {
         );
 
         return new PdfDoc(
-            FileNameGenerator.generateFor(letter.type, letter.service, content),
+            FileNameGenerator.generateFor(letter.type, letter.service, content, "pdf"),
             content
         );
     }

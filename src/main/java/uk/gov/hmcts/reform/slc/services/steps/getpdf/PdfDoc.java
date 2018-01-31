@@ -1,7 +1,11 @@
 package uk.gov.hmcts.reform.slc.services.steps.getpdf;
 
-// subject to change, we'll see what FTP client needs...
-public class PdfDoc {
+import net.schmizz.sshj.xfer.InMemorySourceFile;
+
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+
+public class PdfDoc extends InMemorySourceFile {
 
     public final String filename;
     public final byte[] content;
@@ -9,5 +13,20 @@ public class PdfDoc {
     public PdfDoc(String filename, byte[] content) {
         this.filename = filename;
         this.content = content;
+    }
+
+    @Override
+    public String getName() {
+        return this.filename;
+    }
+
+    @Override
+    public long getLength() {
+        return this.content.length;
+    }
+
+    @Override
+    public InputStream getInputStream() {
+        return new ByteArrayInputStream(this.content);
     }
 }

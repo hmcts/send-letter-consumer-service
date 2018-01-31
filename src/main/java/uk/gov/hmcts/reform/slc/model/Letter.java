@@ -22,14 +22,4 @@ public class Letter {
         this.type = type;
         this.service = service;
     }
-
-    @Override
-    public String toString() {
-        return "Letter{"
-            + "template='" + template + '\''
-            + ", values=" + values
-            + ", type='" + type + '\''
-            + ", service='" + service + '\''
-            + '}';
-    }
 }
