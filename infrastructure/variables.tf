@@ -16,10 +16,6 @@ variable "ilbIp" {}
 
 # region app config
 
-variable "pdf_service_url" {
-  default = "TBD"
-}
-
 variable "s2s_name" {
   default = "sendletterconsumer"
 }
