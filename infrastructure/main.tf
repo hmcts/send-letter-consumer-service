@@ -1,0 +1,50 @@
+provider "vault" {
+  address = "https://vault.reform.hmcts.net:6200"
+}
+
+data "vault_generic_secret" "s2s_secret" {
+  path = "secret/${var.env}/send_letter_consumer/s2s_secret"
+}
+
+data "vault_generic_secret" "ftp_user" {
+  path = "secret/${var.env}/send_letter_consumer/ftp_user"
+}
+
+data "vault_generic_secret" "ftp_password" {
+  path = "secret/${var.env}/send_letter_consumer/ftp_password"
+}
+
+data "vault_generic_secret" "servicebus_conn_string" {
+  path = "secret/${var.env}/send_letter_consumer/servicebus_conn_string"
+}
+
+module "consumer" {
+  source   = "git@github.com/hmcts/terraform-module-webapp.git"
+  product  = "${var.product}-consumer"
+  location = "${var.location}"
+  env      = "${var.env}"
+  ilbIp    = "${var.ilbIp}"
+
+  app_settings = {
+
+    // pdf
+    PDF_SERVICE_URL = "${var.pdf_service_url}"
+
+    // s2s
+    S2S_URL     = "http://betaDevBccidamAppLB.reform.hmcts.net:4552"
+    S2S_SECRET  = "${data.vault_generic_secret.s2s_secret.data["value"]}"
+    S2S_NAME    = "${var.s2s_name}"
+
+    // azure service bus
+    SERVICE_BUS_CONNECTION_STRING = "${data.vault_generic_secret.servicebus_conn_string.data["value"]}"
+    SERVICE_BUS_INTERVAL          = "${var.service_bus_interval}"
+
+    // ftp
+    FTP_HOSTNAME    = "${var.ftp_hostname}"
+    FTP_PORT        = "${var.ftp_port}}"
+    FTP_FINGERPRINT = "${var.ftp_fingerprint}"
+    FTP_USER        = "${data.vault_generic_secret.ftp_user.data["value"]}"
+    FTP_PASSWORD    = "${data.vault_generic_secret.ftp_password.data["value"]}"
+
+  }
+}
