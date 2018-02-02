@@ -27,18 +27,24 @@ public class LetterMapper {
         try {
             return validate(objectMapper.readValue(msg.getBody(), Letter.class), messageId);
         } catch (IOException exc) {
+            // TODO log invalid message count
+
             throw new InvalidMessageException("Unable to deserialize message " + messageId, exc);
         }
     }
 
     private Letter validate(Letter letter, String messageId) throws InvalidMessageException {
         if (letter == null) {
+            // TODO log empty message count
+
             throw new InvalidMessageException("Empty message " + messageId);
         }
 
         Set<ConstraintViolation<Letter>> violations = validator.validate(letter);
 
         if (!violations.isEmpty()) {
+            // TODO log message invalid count
+
             // can work on building message from violations
             throw new InvalidMessageException("Invalid message body " + messageId);
         }

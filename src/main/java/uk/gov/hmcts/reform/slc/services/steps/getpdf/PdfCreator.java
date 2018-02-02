@@ -3,6 +3,8 @@ package uk.gov.hmcts.reform.slc.services.steps.getpdf;
 import org.apache.http.util.Asserts;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.pdf.service.client.PDFServiceClient;
+import uk.gov.hmcts.reform.pdf.service.client.exception.PDFServiceClientException;
+import uk.gov.hmcts.reform.slc.model.Document;
 import uk.gov.hmcts.reform.slc.model.Letter;
 
 import java.util.List;
@@ -23,11 +25,25 @@ public class PdfCreator {
 
         return letter.documents
             .stream()
-            .map(d -> client.generateFromHtml(d.template.getBytes(), d.values))
+            .map(this::generatePdf)
             .map(content -> new PdfDoc(
                     FileNameGenerator.generateFor(letter.type, letter.service, content, "pdf"),
                     content
                 )
             ).collect(toList());
+    }
+
+    private byte[] generatePdf(Document document) {
+        try {
+            byte[] pdf = client.generateFromHtml(document.template.getBytes(), document.values);
+
+            // TODO log pdf generated counter
+
+            return pdf;
+        } catch (PDFServiceClientException exception) {
+            // TODO log failure to generate counter
+
+            throw exception;
+        }
     }
 }

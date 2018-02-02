@@ -48,9 +48,11 @@ public class FtpUploader {
 
             fileTransfer.upload(pdfDoc, pdfDoc.filename);
 
+            // TODO log success counter
         } catch (IOException exc) {
-            throw new FtpStepException("Unable to upload PDF.", exc);
+            // TODO log fail counter
 
+            throw new FtpStepException("Unable to upload PDF.", exc);
         } finally {
             try {
                 ssh.disconnect();

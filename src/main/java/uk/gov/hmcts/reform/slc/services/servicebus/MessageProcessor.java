@@ -34,14 +34,20 @@ public class MessageProcessor {
                 IMessage message = messageReceiver.receive();
 
                 if (message != null) {
+                    // TODO log message received
+
                     MessageHandlingResult result = sendLetterService.send(message);
 
                     switch (result) {
                         case SUCCESS:
+                            // TODO log message handled successfully
+
                             complete(messageReceiver, message);
 
                             break;
                         case FAILURE:
+                            // TODO log message failed to handle - deadlettering
+
                             deadLetter(messageReceiver, message);
 
                             break;
@@ -55,14 +61,20 @@ public class MessageProcessor {
                     logger.trace("No messages to process");
                 }
             } catch (InterruptedException | ServiceBusException e) {
+                // TODO log count of failed read
+
                 logger.error("Unable to read message from queue", e);
             }
 
             messageReceiver.close();
 
         } catch (ConnectionException e) {
+            // TODO log count of failed connect
+
             logger.error("Unable to connect to Service Bus", e);
         } catch (ServiceBusException e) {
+            // TODO log count of failed close
+
             logger.error("Error closing connection");
         }
     }
@@ -71,6 +83,8 @@ public class MessageProcessor {
         try {
             receiver.complete(msg.getLockToken());
         } catch (InterruptedException | ServiceBusException e) {
+            // TODO log failed to release message lock + count
+
             logger.error("Unable to mark message " + msg.getMessageId() + " as processed");
         }
     }
@@ -79,6 +93,8 @@ public class MessageProcessor {
         try {
             receiver.deadLetter(msg.getLockToken());
         } catch (InterruptedException | ServiceBusException e) {
+            // TODO log failed to dead letter the message + count
+
             logger.error("Unable to send message " + msg.getMessageId() + " to deadletter subqueue", e);
         }
     }
