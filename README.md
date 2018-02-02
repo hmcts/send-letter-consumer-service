@@ -1,4 +1,6 @@
-# send-letter-consumer-service
+# Letter sender
+
+Consumes messages from a queue, generates PDFs and sends them to a third party supplier's SFTP server for postage.
 
 [![Build Status](https://travis-ci.org/hmcts/send-letter-consumer-service.svg?branch=master)](https://travis-ci.org/hmcts/send-letter-consumer-service)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/7c3905b1949948908b9264aa3d85d51c)](https://www.codacy.com/app/HMCTS/send-letter-consumer-service)
