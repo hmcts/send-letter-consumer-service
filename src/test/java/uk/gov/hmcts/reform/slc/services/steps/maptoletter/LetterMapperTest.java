@@ -44,7 +44,6 @@ public class LetterMapperTest {
         assertThat(letter.type).isEqualTo("some_type");
     }
 
-
     @Test
     public void should_throw_an_exception_if_message_contains_invalid_json() {
         given(message.getBody())

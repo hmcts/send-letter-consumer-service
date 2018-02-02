@@ -19,12 +19,12 @@ public class LetterMapper {
     public Letter from(IMessage msg) {
         try {
             Letter letter = objectMapper.readValue(msg.getBody(), Letter.class);
+
             if (letter != null) {
                 return letter;
             } else {
                 throw new InvalidMessageException("Empty message " + msg.getMessageId());
             }
-
         } catch (IOException exc) {
             throw new InvalidMessageException("Unable to deserialize message " + msg.getMessageId(), exc);
         }
