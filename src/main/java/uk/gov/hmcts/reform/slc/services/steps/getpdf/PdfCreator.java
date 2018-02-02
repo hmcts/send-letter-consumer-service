@@ -1,18 +1,25 @@
 package uk.gov.hmcts.reform.slc.services.steps.getpdf;
 
 import org.apache.http.util.Asserts;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.pdf.service.client.PDFServiceClient;
 import uk.gov.hmcts.reform.pdf.service.client.exception.PDFServiceClientException;
+import uk.gov.hmcts.reform.slc.logging.AppInsights;
 import uk.gov.hmcts.reform.slc.model.Document;
 import uk.gov.hmcts.reform.slc.model.Letter;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
 
 import static java.util.stream.Collectors.toList;
 
 @Service
 public class PdfCreator {
+
+    @Autowired
+    private AppInsights insights;
 
     private final PDFServiceClient client;
 
@@ -34,14 +41,17 @@ public class PdfCreator {
     }
 
     private byte[] generatePdf(Document document) {
+        Instant start = Instant.now();
+
         try {
             byte[] pdf = client.generateFromHtml(document.template.getBytes(), document.values);
 
-            // TODO log pdf generated counter
+            insights.trackPdfGenerator(Duration.between(start, Instant.now()).toMillis(), true);
 
             return pdf;
         } catch (PDFServiceClientException exception) {
-            // TODO log failure to generate counter
+            insights.trackPdfGenerator(Duration.between(start, Instant.now()).toMillis(), false);
+            insights.trackException(exception);
 
             throw exception;
         }

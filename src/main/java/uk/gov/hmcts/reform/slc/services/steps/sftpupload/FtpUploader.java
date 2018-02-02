@@ -5,17 +5,24 @@ import net.schmizz.sshj.sftp.SFTPClient;
 import net.schmizz.sshj.sftp.SFTPFileTransfer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.slc.logging.AppInsights;
 import uk.gov.hmcts.reform.slc.services.steps.getpdf.PdfDoc;
 import uk.gov.hmcts.reform.slc.services.steps.sftpupload.exceptions.FtpStepException;
 
 import java.io.IOException;
+import java.time.Duration;
+import java.time.Instant;
 
 @Component
 public class FtpUploader {
 
     private static final Logger logger = LoggerFactory.getLogger(FtpUploader.class);
+
+    @Autowired
+    private AppInsights insights;
 
     private final String hostname;
     private final int port;
@@ -43,14 +50,21 @@ public class FtpUploader {
     // endregion
 
     public void upload(PdfDoc pdfDoc) {
+        Instant start = null;
+
         try {
             SFTPFileTransfer fileTransfer = getSftpFileTransfer();
+            start = Instant.now();
 
             fileTransfer.upload(pdfDoc, pdfDoc.filename);
 
-            // TODO log success counter
+            insights.trackFtpUpload(Duration.between(start, Instant.now()).toMillis(), true);
         } catch (IOException exc) {
-            // TODO log fail counter
+            if (start != null) {
+                insights.trackFtpUpload(Duration.between(start, Instant.now()).toMillis(), false);
+            }
+
+            insights.trackException(exc);
 
             throw new FtpStepException("Unable to upload PDF.", exc);
         } finally {
@@ -72,6 +86,8 @@ public class FtpUploader {
                 return sftp.getFileTransfer();
             }
         } catch (IOException exc) {
+            insights.trackException(exc);
+
             throw new FtpStepException("Unable to connect to sftp", exc);
         }
     }
