@@ -73,6 +73,10 @@ def versions = [
   hystrix: '1.4.0.RELEASE'
 ]
 
+configurations {
+  runtime.exclude group: 'com.microsoft.azure', module: 'applicationinsights-agent'
+}
+
 dependencies {
   compile group: 'org.springframework.boot', name: 'spring-boot-starter-actuator', version: versions.springBoot
   compile group: 'org.springframework.boot', name: 'spring-boot-starter-aop', version: versions.springBoot
