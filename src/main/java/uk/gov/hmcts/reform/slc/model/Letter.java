@@ -1,19 +1,22 @@
 package uk.gov.hmcts.reform.slc.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.hibernate.validator.constraints.NotEmpty;
 
 import java.util.Map;
-import javax.validation.constraints.NotNull;
 
 public class Letter {
 
-    @NotNull
+    @NotEmpty
     public final String template;
-    @NotNull
+
+    @NotEmpty
     public final Map<String, Object> values;
-    @NotNull
+
+    @NotEmpty
     public final String type;
-    @NotNull
+
+    @NotEmpty
     public final String service;
 
     public Letter(
