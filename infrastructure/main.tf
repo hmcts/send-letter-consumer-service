@@ -3,19 +3,19 @@ provider "vault" {
 }
 
 data "vault_generic_secret" "s2s_secret" {
-  path = "secret/${var.env}/send_letter_consumer/s2s_secret"
+  path = "secret/${var.env}/cc/send-letter-consumer/s2s-secret"
 }
 
 data "vault_generic_secret" "ftp_user" {
-  path = "secret/${var.env}/send_letter_consumer/ftp_user"
+  path = "secret/${var.env}/cc/send-letter-consumer/ftp-user"
 }
 
 data "vault_generic_secret" "ftp_password" {
-  path = "secret/${var.env}/send_letter_consumer/ftp_password"
+  path = "secret/${var.env}/cc/send-letter-consumer/ftp-password"
 }
 
 data "vault_generic_secret" "servicebus_conn_string" {
-  path = "secret/${var.env}/send_letter_consumer/servicebus_conn_string"
+  path = "secret/${var.env}/cc/send-letter-consumer/servicebus-conn-string"
 }
 
 locals {
