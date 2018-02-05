@@ -9,7 +9,7 @@ final class AppDependency {
     static final String MESSAGE_RECEIVER_DEPENDENCY = "MessageReceiver";
 
     /**
-     * .. receive message receive from service bus queue.
+     * .. receive message from service bus queue.
      */
     static final String MESSAGE_RECEIVED_COMMAND = "MessageReceived";
 
