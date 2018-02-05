@@ -46,11 +46,11 @@ public class PdfCreator {
         try {
             byte[] pdf = client.generateFromHtml(document.template.getBytes(), document.values);
 
-            insights.trackPdfGenerator(Duration.between(start, Instant.now()).toMillis(), true);
+            insights.trackPdfGenerator(Duration.between(start, Instant.now()), true);
 
             return pdf;
         } catch (PDFServiceClientException exception) {
-            insights.trackPdfGenerator(Duration.between(start, Instant.now()).toMillis(), false);
+            insights.trackPdfGenerator(Duration.between(start, Instant.now()), false);
             insights.trackException(exception);
 
             throw exception;

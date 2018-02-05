@@ -15,12 +15,12 @@ import uk.gov.hmcts.reform.slc.services.steps.getpdf.PdfDoc;
 import uk.gov.hmcts.reform.slc.services.steps.sftpupload.exceptions.FtpStepException;
 
 import java.io.IOException;
+import java.time.Duration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
@@ -64,7 +64,7 @@ public class FtpUploaderTest {
 
         // then
         assertThat(exc).isNull();
-        verify(insights).trackFtpUpload(anyLong(), eq(true));
+        verify(insights).trackFtpUpload(any(Duration.class), eq(true));
         verify(insights, never()).trackException(any(IOException.class));
     }
 
@@ -80,7 +80,7 @@ public class FtpUploaderTest {
         assertThat(exc)
             .isInstanceOf(FtpStepException.class)
             .hasMessageContaining("upload");
-        verify(insights).trackFtpUpload(anyLong(), eq(false));
+        verify(insights).trackFtpUpload(any(Duration.class), eq(false));
         verify(insights).trackException(any(IOException.class));
     }
 

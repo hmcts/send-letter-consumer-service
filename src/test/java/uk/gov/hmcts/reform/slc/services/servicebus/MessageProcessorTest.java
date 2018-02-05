@@ -11,6 +11,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.slc.logging.AppInsights;
 import uk.gov.hmcts.reform.slc.services.SendLetterService;
 
+import java.time.Duration;
 import java.time.Instant;
 
 import static org.mockito.BDDMockito.given;
@@ -54,10 +55,10 @@ public class MessageProcessorTest {
 
         // then
         verify(messageReceiver).complete(any());
-        verify(insights).trackMessageReceivedFromServiceBus(anyLong(), eq(true));
+        verify(insights).trackMessageReceivedFromServiceBus(any(Duration.class), eq(true));
         verify(insights).trackMessageReceived(anyString(), anyLong());
         verify(insights).markMessageHandled(anyString(), anyLong());
-        verify(insights).trackMessageCompletedInServiceBus(anyLong(), eq(true));
+        verify(insights).trackMessageCompletedInServiceBus(any(Duration.class), eq(true));
         verifyNoMoreInteractions(insights);
     }
 
@@ -73,10 +74,10 @@ public class MessageProcessorTest {
 
         // then
         verify(messageReceiver).deadLetter(any());
-        verify(insights).trackMessageReceivedFromServiceBus(anyLong(), eq(true));
+        verify(insights).trackMessageReceivedFromServiceBus(any(Duration.class), eq(true));
         verify(insights).trackMessageReceived(anyString(), anyLong());
         verify(insights).markMessageNotHandled(anyString(), anyLong());
-        verify(insights).trackMessageDeadLetteredInServiceBus(anyLong(), eq(true));
+        verify(insights).trackMessageDeadLetteredInServiceBus(any(Duration.class), eq(true));
         verifyNoMoreInteractions(insights);
     }
 

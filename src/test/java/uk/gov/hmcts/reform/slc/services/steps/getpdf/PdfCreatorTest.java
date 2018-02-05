@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.slc.logging.AppInsights;
 import uk.gov.hmcts.reform.slc.model.Document;
 import uk.gov.hmcts.reform.slc.model.Letter;
 
+import java.time.Duration;
 import java.util.List;
 
 import static java.util.Arrays.asList;
@@ -22,7 +23,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willThrow;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -82,7 +82,7 @@ public class PdfCreatorTest {
         assertThat(pdfs.get(1).content).isEqualTo("hello t2".getBytes());
         assertThat(pdfs.get(1).filename).isNotEmpty();
 
-        verify(insights, times(2)).trackPdfGenerator(anyLong(), eq(true));
+        verify(insights, times(2)).trackPdfGenerator(any(Duration.class), eq(true));
         verifyNoMoreInteractions(insights);
     }
 
@@ -99,7 +99,7 @@ public class PdfCreatorTest {
         assertThatThrownBy(() -> pdfCreator.create(letter))
             .isInstanceOf(PDFServiceClientException.class);
 
-        verify(insights).trackPdfGenerator(anyLong(), eq(false));
+        verify(insights).trackPdfGenerator(any(Duration.class), eq(false));
         verify(insights).trackException(any(PDFServiceClientException.class));
         verifyNoMoreInteractions(insights);
     }

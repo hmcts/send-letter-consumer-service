@@ -58,10 +58,10 @@ public class FtpUploader {
 
             fileTransfer.upload(pdfDoc, pdfDoc.filename);
 
-            insights.trackFtpUpload(Duration.between(start, Instant.now()).toMillis(), true);
+            insights.trackFtpUpload(Duration.between(start, Instant.now()), true);
         } catch (IOException exc) {
             if (start != null) {
-                insights.trackFtpUpload(Duration.between(start, Instant.now()).toMillis(), false);
+                insights.trackFtpUpload(Duration.between(start, Instant.now()), false);
             }
 
             insights.trackException(exc);

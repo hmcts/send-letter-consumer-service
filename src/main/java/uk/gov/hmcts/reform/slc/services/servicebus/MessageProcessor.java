@@ -42,7 +42,7 @@ public class MessageProcessor {
                 IMessage message = messageReceiver.receive();
 
                 if (message != null) {
-                    long tookReceiving = Duration.between(startReceiving, Instant.now()).toMillis();
+                    Duration tookReceiving = Duration.between(startReceiving, Instant.now());
                     long timeInQueue = Duration.between(message.getEnqueuedTimeUtc(), startReceiving).toNanos();
                     String messageId = message.getMessageId();
 
@@ -76,7 +76,7 @@ public class MessageProcessor {
                     logger.trace("No messages to process");
                 }
             } catch (InterruptedException | ServiceBusException e) {
-                long tookReceiving = Duration.between(startReceiving, Instant.now()).toNanos();
+                Duration tookReceiving = Duration.between(startReceiving, Instant.now());
                 insights.trackMessageReceivedFromServiceBus(tookReceiving, false);
                 insights.trackException(e);
 
@@ -102,9 +102,9 @@ public class MessageProcessor {
         try {
             receiver.complete(msg.getLockToken());
 
-            insights.trackMessageCompletedInServiceBus(Duration.between(start, Instant.now()).toMillis(), true);
+            insights.trackMessageCompletedInServiceBus(Duration.between(start, Instant.now()), true);
         } catch (InterruptedException | ServiceBusException e) {
-            insights.trackMessageCompletedInServiceBus(Duration.between(start, Instant.now()).toMillis(), false);
+            insights.trackMessageCompletedInServiceBus(Duration.between(start, Instant.now()), false);
 
             logger.error("Unable to mark message " + msg.getMessageId() + " as processed");
         }
@@ -116,9 +116,9 @@ public class MessageProcessor {
         try {
             receiver.deadLetter(msg.getLockToken());
 
-            insights.trackMessageDeadLetteredInServiceBus(Duration.between(start, Instant.now()).toMillis(), true);
+            insights.trackMessageDeadLetteredInServiceBus(Duration.between(start, Instant.now()), true);
         } catch (InterruptedException | ServiceBusException e) {
-            insights.trackMessageDeadLetteredInServiceBus(Duration.between(start, Instant.now()).toMillis(), false);
+            insights.trackMessageDeadLetteredInServiceBus(Duration.between(start, Instant.now()), false);
 
             logger.error("Unable to send message " + msg.getMessageId() + " to deadletter subqueue", e);
         }
