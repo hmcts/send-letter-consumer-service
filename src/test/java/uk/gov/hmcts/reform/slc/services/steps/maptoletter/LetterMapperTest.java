@@ -32,7 +32,8 @@ public class LetterMapperTest {
                 ("{"
                     + "\"template\": \"whatever\","
                     + "\"values\": { \"a\": \"b\" },"
-                    + "\"type\": \"some_type\""
+                    + "\"type\": \"some_type\","
+                    + "\"service\": \"some_service\""
                     + "}"
                 ).getBytes()
             );
@@ -42,6 +43,7 @@ public class LetterMapperTest {
         assertThat(letter).isNotNull();
         assertThat(letter.template).isEqualTo("whatever");
         assertThat(letter.type).isEqualTo("some_type");
+        assertThat(letter.service).isEqualTo("some_service");
     }
 
     @Test
