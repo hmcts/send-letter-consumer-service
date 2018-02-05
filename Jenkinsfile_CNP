@@ -1,0 +1,13 @@
+#!groovy
+
+@Library("Infrastructure")
+
+def type = "java"
+def product = "send-letter"
+def component = "consumer"
+
+def channel = '#platform-engineering'
+
+withPipeline(type , product, component) {
+    enableSlackNotifications(channel)
+}
