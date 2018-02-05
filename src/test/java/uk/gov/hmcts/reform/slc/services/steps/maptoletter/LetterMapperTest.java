@@ -4,14 +4,22 @@ import com.microsoft.azure.servicebus.IMessage;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.springframework.test.util.ReflectionTestUtils;
+import uk.gov.hmcts.reform.slc.logging.AppInsights;
 import uk.gov.hmcts.reform.slc.model.Letter;
 import uk.gov.hmcts.reform.slc.services.steps.maptoletter.exceptions.InvalidMessageException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 @RunWith(MockitoJUnitRunner.class)
 public class LetterMapperTest {
@@ -19,10 +27,15 @@ public class LetterMapperTest {
     private LetterMapper letterMapper;
     private IMessage message;
 
+    @Mock
+    private AppInsights insights;
+
     @Before
     public void setUp() {
-        this.letterMapper = new LetterMapper();
-        this.message = mock(IMessage.class);
+        letterMapper = new LetterMapper();
+        message = mock(IMessage.class);
+
+        ReflectionTestUtils.setField(letterMapper, "insights", insights);
     }
 
     @Test
@@ -48,6 +61,9 @@ public class LetterMapperTest {
         assertThat(letter.documents).hasSize(1);
         assertThat(letter.type).isEqualTo("some_type");
         assertThat(letter.service).isEqualTo("some_service");
+
+        verify(insights).trackMessageMappedToLetter(anyString(), eq("some_service"), eq("whatever"), anyLong());
+        verifyNoMoreInteractions(insights);
     }
 
     @Test
@@ -58,6 +74,9 @@ public class LetterMapperTest {
         assertThatThrownBy(() -> letterMapper.from(message))
             .isInstanceOf(InvalidMessageException.class)
             .hasMessageStartingWith("Unable to deserialize message");
+
+        verify(insights).trackMessageNotMapped(anyString(), anyLong());
+        verifyNoMoreInteractions(insights);
     }
 
     @Test
@@ -67,6 +86,9 @@ public class LetterMapperTest {
         assertThatThrownBy(() -> letterMapper.from(message))
             .isInstanceOf(InvalidMessageException.class)
             .hasMessageStartingWith("Invalid message body");
+
+        verify(insights).trackMessageMappedToInvalid(anyString(), anyLong());
+        verifyNoMoreInteractions(insights);
     }
 
     @Test
@@ -88,6 +110,9 @@ public class LetterMapperTest {
         assertThatThrownBy(() -> letterMapper.from(message))
             .isInstanceOf(InvalidMessageException.class)
             .hasMessageStartingWith("Invalid message body");
+
+        verify(insights).trackMessageMappedToInvalid(anyString(), anyLong());
+        verifyNoMoreInteractions(insights);
     }
 
     @Test
@@ -97,5 +122,8 @@ public class LetterMapperTest {
         assertThatThrownBy(() -> letterMapper.from(message))
             .isInstanceOf(InvalidMessageException.class)
             .hasMessageStartingWith("Empty message");
+
+        verify(insights).trackMessageMappedToNull(anyString(), anyLong());
+        verifyNoMoreInteractions(insights);
     }
 }

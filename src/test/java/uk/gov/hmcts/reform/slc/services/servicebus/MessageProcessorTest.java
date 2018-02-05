@@ -7,13 +7,15 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.springframework.test.util.ReflectionTestUtils;
+import uk.gov.hmcts.reform.slc.logging.AppInsights;
 import uk.gov.hmcts.reform.slc.services.SendLetterService;
 
+import java.time.Instant;
+
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.reform.slc.services.servicebus.MessageHandlingResult.FAILURE;
 import static uk.gov.hmcts.reform.slc.services.servicebus.MessageHandlingResult.SUCCESS;
 
@@ -25,10 +27,13 @@ public class MessageProcessorTest {
     @Mock private IMessageReceiver messageReceiver;
     @Mock private SendLetterService sendLetterService;
     @Mock private IMessage message;
+    @Mock private AppInsights insights;
 
     @Before
-    public void setUp() throws Exception {
-        this.processor = new MessageProcessor(() -> messageReceiver, sendLetterService);
+    public void setUp() {
+        processor = new MessageProcessor(() -> messageReceiver, sendLetterService);
+
+        ReflectionTestUtils.setField(processor, "insights", insights);
     }
 
     @Test
@@ -36,12 +41,18 @@ public class MessageProcessorTest {
         // given
         given(sendLetterService.send(any())).willReturn(SUCCESS);
         given(messageReceiver.receive()).willReturn(message);
+        given(message.getEnqueuedTimeUtc()).willReturn(Instant.now().minusSeconds(100));
 
         // when
         processor.process();
 
         // then
         verify(messageReceiver, times(1)).complete(any());
+        verify(insights).trackMessageReceivedFromServiceBus(anyLong(), eq(true));
+        verify(insights).trackMessageReceived(anyString(), anyLong());
+        verify(insights).markMessageHandled(anyString(), anyLong());
+        verify(insights).trackMessageCompletedInServiceBus(anyLong(), eq(true));
+        verifyNoMoreInteractions(insights);
     }
 
     @Test
@@ -49,12 +60,18 @@ public class MessageProcessorTest {
         // given
         given(sendLetterService.send(any())).willReturn(FAILURE);
         given(messageReceiver.receive()).willReturn(message);
+        given(message.getEnqueuedTimeUtc()).willReturn(Instant.now().minusSeconds(100));
 
         // when
         processor.process();
 
         // then
         verify(messageReceiver, times(1)).deadLetter(any());
+        verify(insights).trackMessageReceivedFromServiceBus(anyLong(), eq(true));
+        verify(insights).trackMessageReceived(anyString(), anyLong());
+        verify(insights).markMessageNotHandled(anyString(), anyLong());
+        verify(insights).trackMessageDeadLetteredInServiceBus(anyLong(), eq(true));
+        verifyNoMoreInteractions(insights);
     }
 
     @Test
@@ -67,5 +84,6 @@ public class MessageProcessorTest {
 
         // then
         verify(sendLetterService, never()).send(any());
+        verifyNoMoreInteractions(insights);
     }
 }
