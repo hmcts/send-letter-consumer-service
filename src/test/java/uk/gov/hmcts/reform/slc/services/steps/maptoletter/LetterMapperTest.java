@@ -52,6 +52,42 @@ public class LetterMapperTest {
             .willReturn("{\"a\" : \"b\"}".getBytes());
 
         assertThatThrownBy(() -> letterMapper.from(message))
-            .isInstanceOf(InvalidMessageException.class);
+            .isInstanceOf(InvalidMessageException.class)
+            .hasMessageStartingWith("Unable to deserialize message");
+    }
+
+    @Test
+    public void should_throw_an_exception_if_message_contains_null_fields() {
+        given(message.getBody()).willReturn("{}".getBytes());
+
+        assertThatThrownBy(() -> letterMapper.from(message))
+            .isInstanceOf(InvalidMessageException.class)
+            .hasMessageStartingWith("Invalid message body");
+    }
+
+    @Test
+    public void should_throw_an_exception_if_fields_in_letter_are_empty() {
+        given(message.getBody()).willReturn(
+            ("{"
+                + "\"template\": \"\","
+                + "\"values\": {},"
+                + "\"type\": \"\","
+                + "\"service\": \"\""
+                + "}"
+            ).getBytes()
+        );
+
+        assertThatThrownBy(() -> letterMapper.from(message))
+            .isInstanceOf(InvalidMessageException.class)
+            .hasMessageStartingWith("Invalid message body");
+    }
+
+    @Test
+    public void should_throw_aan_exception_if_message_contains_null_fields() {
+        given(message.getBody()).willReturn("null".getBytes());
+
+        assertThatThrownBy(() -> letterMapper.from(message))
+            .isInstanceOf(InvalidMessageException.class)
+            .hasMessageStartingWith("Invalid message body");
     }
 }
