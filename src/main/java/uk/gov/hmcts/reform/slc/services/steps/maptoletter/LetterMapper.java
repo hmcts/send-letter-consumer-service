@@ -6,11 +6,11 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.slc.model.Letter;
 import uk.gov.hmcts.reform.slc.services.steps.maptoletter.exceptions.InvalidMessageException;
 
+import java.io.IOException;
+import java.util.Set;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
-import java.io.IOException;
-import java.util.Set;
 
 /**
  * Maps Service Bus message to a letter instance.
