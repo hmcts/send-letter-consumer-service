@@ -14,8 +14,14 @@ import uk.gov.hmcts.reform.slc.services.SendLetterService;
 import java.time.Instant;
 
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static uk.gov.hmcts.reform.slc.services.servicebus.MessageHandlingResult.FAILURE;
 import static uk.gov.hmcts.reform.slc.services.servicebus.MessageHandlingResult.SUCCESS;
 
@@ -47,7 +53,7 @@ public class MessageProcessorTest {
         processor.process();
 
         // then
-        verify(messageReceiver, times(1)).complete(any());
+        verify(messageReceiver).complete(any());
         verify(insights).trackMessageReceivedFromServiceBus(anyLong(), eq(true));
         verify(insights).trackMessageReceived(anyString(), anyLong());
         verify(insights).markMessageHandled(anyString(), anyLong());
@@ -66,7 +72,7 @@ public class MessageProcessorTest {
         processor.process();
 
         // then
-        verify(messageReceiver, times(1)).deadLetter(any());
+        verify(messageReceiver).deadLetter(any());
         verify(insights).trackMessageReceivedFromServiceBus(anyLong(), eq(true));
         verify(insights).trackMessageReceived(anyString(), anyLong());
         verify(insights).markMessageNotHandled(anyString(), anyLong());

@@ -4,7 +4,6 @@ final class AppDependency {
 
     /**
      * Service bus message receiver dependency.
-     *
      * Used to track dependency of how long in millis did it take to...
      */
     static final String MESSAGE_RECEIVER_DEPENDENCY     = "MessageReceiver";
@@ -26,7 +25,6 @@ final class AppDependency {
 
     /**
      * Pdf service client.
-     *
      * Used to track dependency of how long in millis did it take to...
      */
     static final String PDF_GENERATOR_DEPENDENCY        = "PdfGenerator";
