@@ -19,8 +19,7 @@ import java.util.Set;
 public class LetterMapper {
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
-
-    private Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+    private static final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
     public Letter from(IMessage msg) {
         try {
