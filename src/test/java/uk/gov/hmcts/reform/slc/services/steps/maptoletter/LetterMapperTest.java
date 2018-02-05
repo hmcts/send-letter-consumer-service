@@ -83,11 +83,11 @@ public class LetterMapperTest {
     }
 
     @Test
-    public void should_throw_aan_exception_if_message_contains_null_fields() {
+    public void should_throw_an_exception_if_message_is_null() {
         given(message.getBody()).willReturn("null".getBytes());
 
         assertThatThrownBy(() -> letterMapper.from(message))
             .isInstanceOf(InvalidMessageException.class)
-            .hasMessageStartingWith("Invalid message body");
+            .hasMessageStartingWith("Empty message");
     }
 }

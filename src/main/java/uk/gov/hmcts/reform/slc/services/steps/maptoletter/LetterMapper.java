@@ -22,23 +22,25 @@ public class LetterMapper {
     private static final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
     public Letter from(IMessage msg) {
+        String messageId = msg.getMessageId();
+
         try {
-            return validate(objectMapper.readValue(msg.getBody(), Letter.class));
+            return validate(objectMapper.readValue(msg.getBody(), Letter.class), messageId);
         } catch (IOException exc) {
-            throw new InvalidMessageException("Unable to deserialize message " + msg.getMessageId(), exc);
+            throw new InvalidMessageException("Unable to deserialize message " + messageId, exc);
         }
     }
 
-    private Letter validate(Letter letter) throws InvalidMessageException {
+    private Letter validate(Letter letter, String messageId) throws InvalidMessageException {
         if (letter == null) {
-            throw new InvalidMessageException("Invalid message body");
+            throw new InvalidMessageException("Empty message " + messageId);
         }
 
         Set<ConstraintViolation<Letter>> violations = validator.validate(letter);
 
         if (!violations.isEmpty()) {
             // can work on building message from violations
-            throw new InvalidMessageException("Invalid message body");
+            throw new InvalidMessageException("Invalid message body " + messageId);
         }
 
         return letter;
