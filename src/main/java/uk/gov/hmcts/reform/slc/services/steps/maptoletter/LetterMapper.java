@@ -30,17 +30,17 @@ public class LetterMapper {
     }
 
     private Letter validate(Letter letter) throws InvalidMessageException {
-        if (letter != null) {
-            Set<ConstraintViolation<Letter>> violations = validator.validate(letter);
-
-            if (violations.isEmpty()) {
-                return letter;
-            } else {
-                // can work on building message from violations
-                throw new InvalidMessageException("Invalid message body");
-            }
-        } else {
+        if (letter == null) {
             throw new InvalidMessageException("Invalid message body");
         }
+
+        Set<ConstraintViolation<Letter>> violations = validator.validate(letter);
+
+        if (!violations.isEmpty()) {
+            // can work on building message from violations
+            throw new InvalidMessageException("Invalid message body");
+        }
+
+        return letter;
     }
 }
