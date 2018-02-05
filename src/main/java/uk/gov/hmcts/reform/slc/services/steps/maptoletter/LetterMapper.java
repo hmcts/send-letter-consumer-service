@@ -23,17 +23,24 @@ public class LetterMapper {
 
     public Letter from(IMessage msg) {
         try {
-            Letter letter = objectMapper.readValue(msg.getBody(), Letter.class);
+            return validate(objectMapper.readValue(msg.getBody(), Letter.class));
+        } catch (IOException exc) {
+            throw new InvalidMessageException("Unable to deserialize message " + msg.getMessageId(), exc);
+        }
+    }
+
+    private Letter validate(Letter letter) throws InvalidMessageException {
+        if (letter != null) {
             Set<ConstraintViolation<Letter>> violations = validator.validate(letter);
 
             if (violations.isEmpty()) {
                 return letter;
             } else {
-                // can work on message build from violations
+                // can work on building message from violations
                 throw new InvalidMessageException("Invalid message body");
             }
-        } catch (IOException exc) {
-            throw new InvalidMessageException("Unable to deserialize message " + msg.getMessageId(), exc);
+        } else {
+            throw new InvalidMessageException("Invalid message body");
         }
     }
 }
