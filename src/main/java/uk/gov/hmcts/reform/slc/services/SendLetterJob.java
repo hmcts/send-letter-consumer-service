@@ -20,6 +20,6 @@ public class SendLetterJob {
     @Scheduled(fixedDelayString = "${servicebus.interval}")
     public void run() {
         logger.trace("Running job");
-        processor.handle();
+        processor.process();
     }
 }

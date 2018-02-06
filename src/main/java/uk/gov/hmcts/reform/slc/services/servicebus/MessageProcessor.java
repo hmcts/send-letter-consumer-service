@@ -26,10 +26,7 @@ public class MessageProcessor {
         this.sendLetterService = sendLetterService;
     }
 
-    /**
-     * Reads message from a queue and passes is as an argument to action.
-     */
-    public void handle() {
+    public void process() {
         try {
             IMessageReceiver messageReceiver = receiverProvider.get();
 

@@ -38,7 +38,7 @@ public class MessageProcessorTest {
         given(messageReceiver.receive()).willReturn(message);
 
         // when
-        processor.handle();
+        processor.process();
 
         // then
         verify(messageReceiver, times(1)).complete(any());
@@ -51,7 +51,7 @@ public class MessageProcessorTest {
         given(messageReceiver.receive()).willReturn(message);
 
         // when
-        processor.handle();
+        processor.process();
 
         // then
         verify(messageReceiver, times(1)).deadLetter(any());
@@ -63,7 +63,7 @@ public class MessageProcessorTest {
         given(messageReceiver.receive()).willReturn(null);
 
         // when
-        processor.handle();
+        processor.process();
 
         // then
         verify(sendLetterService, never()).send(any());
