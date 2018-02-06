@@ -6,22 +6,22 @@ final class AppDependency {
      * Service bus message receiver dependency.
      * Used to track dependency of how long in millis did it take to...
      */
-    static final String MESSAGE_RECEIVER_DEPENDENCY = "MessageReceiver";
+    static final String SERVICE_BUS_DEPENDENCY = "ServiceBus";
 
     /**
      * .. receive message from service bus queue.
      */
-    static final String MESSAGE_RECEIVED_COMMAND = "MessageReceived";
+    static final String SERVICE_BUS_MESSAGE_RECEIVED = "MessageReceived";
 
     /**
      * .. release lock and remove message from service bus queue.
      */
-    static final String MESSAGE_COMPLETED_COMMAND = "MessageCompleted";
+    static final String SERVICE_BUS_MESSAGE_COMPLETED = "MessageCompleted";
 
     /**
      * .. release lock and send message to dead letter pool.
      */
-    static final String MESSAGE_DEAD_LETTER_COMMAND = "MessageDeadLettered";
+    static final String SERVICE_BUS_DEAD_LETTERED = "MessageDeadLettered";
 
     /**
      * Pdf service client.

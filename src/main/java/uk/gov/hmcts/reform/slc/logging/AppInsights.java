@@ -20,8 +20,8 @@ public class AppInsights extends AbstractAppInsights {
 
     public void trackMessageReceivedFromServiceBus(java.time.Duration duration, boolean success) {
         telemetry.trackDependency(
-            AppDependency.MESSAGE_RECEIVER_DEPENDENCY,
-            AppDependency.MESSAGE_RECEIVED_COMMAND,
+            AppDependency.SERVICE_BUS_DEPENDENCY,
+            AppDependency.SERVICE_BUS_MESSAGE_RECEIVED,
             new Duration(duration.toMillis()),
             success
         );
@@ -29,8 +29,8 @@ public class AppInsights extends AbstractAppInsights {
 
     public void trackMessageCompletedInServiceBus(java.time.Duration duration, boolean success) {
         telemetry.trackDependency(
-            AppDependency.MESSAGE_RECEIVER_DEPENDENCY,
-            AppDependency.MESSAGE_COMPLETED_COMMAND,
+            AppDependency.SERVICE_BUS_DEPENDENCY,
+            AppDependency.SERVICE_BUS_MESSAGE_COMPLETED,
             new Duration(duration.toMillis()),
             success
         );
@@ -38,8 +38,8 @@ public class AppInsights extends AbstractAppInsights {
 
     public void trackMessageDeadLetteredInServiceBus(java.time.Duration duration, boolean success) {
         telemetry.trackDependency(
-            AppDependency.MESSAGE_RECEIVER_DEPENDENCY,
-            AppDependency.MESSAGE_DEAD_LETTER_COMMAND,
+            AppDependency.SERVICE_BUS_DEPENDENCY,
+            AppDependency.SERVICE_BUS_DEAD_LETTERED,
             new Duration(duration.toMillis()),
             success
         );
