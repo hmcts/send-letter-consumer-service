@@ -32,21 +32,26 @@ public class MessageProcessor {
     public void handle() {
         try {
             IMessageReceiver messageReceiver = receiverProvider.get();
+
             try {
                 IMessage message = messageReceiver.receive();
+
                 if (message != null) {
                     MessageHandlingResult result = sendLetterService.send(message);
 
                     switch (result) {
                         case SUCCESS:
                             complete(messageReceiver, message);
+
                             break;
                         case FAILURE:
                             deadLetter(messageReceiver, message);
+
                             break;
                         default:
                             logger.error("Unknown message handling result: " + result);
                             deadLetter(messageReceiver, message);
+
                             break;
                     }
                 } else {

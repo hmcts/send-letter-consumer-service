@@ -32,7 +32,8 @@ public class LetterMapperTest {
                 ("{"
                     + "\"template\": \"whatever\","
                     + "\"values\": { \"a\": \"b\" },"
-                    + "\"type\": \"some_type\""
+                    + "\"type\": \"some_type\","
+                    + "\"service\": \"some_service\""
                     + "}"
                 ).getBytes()
             );
@@ -42,8 +43,8 @@ public class LetterMapperTest {
         assertThat(letter).isNotNull();
         assertThat(letter.template).isEqualTo("whatever");
         assertThat(letter.type).isEqualTo("some_type");
+        assertThat(letter.service).isEqualTo("some_service");
     }
-
 
     @Test
     public void should_throw_an_exception_if_message_contains_invalid_json() {
@@ -51,6 +52,42 @@ public class LetterMapperTest {
             .willReturn("{\"a\" : \"b\"}".getBytes());
 
         assertThatThrownBy(() -> letterMapper.from(message))
-            .isInstanceOf(InvalidMessageException.class);
+            .isInstanceOf(InvalidMessageException.class)
+            .hasMessageStartingWith("Unable to deserialize message");
+    }
+
+    @Test
+    public void should_throw_an_exception_if_message_contains_empty_json() {
+        given(message.getBody()).willReturn("{}".getBytes());
+
+        assertThatThrownBy(() -> letterMapper.from(message))
+            .isInstanceOf(InvalidMessageException.class)
+            .hasMessageStartingWith("Invalid message body");
+    }
+
+    @Test
+    public void should_throw_an_exception_if_fields_in_letter_are_empty() {
+        given(message.getBody()).willReturn(
+            ("{"
+                + "\"template\": \"\","
+                + "\"values\": {},"
+                + "\"type\": \"\","
+                + "\"service\": \"\""
+                + "}"
+            ).getBytes()
+        );
+
+        assertThatThrownBy(() -> letterMapper.from(message))
+            .isInstanceOf(InvalidMessageException.class)
+            .hasMessageStartingWith("Invalid message body");
+    }
+
+    @Test
+    public void should_throw_an_exception_if_message_is_null() {
+        given(message.getBody()).willReturn("null".getBytes());
+
+        assertThatThrownBy(() -> letterMapper.from(message))
+            .isInstanceOf(InvalidMessageException.class)
+            .hasMessageStartingWith("Empty message");
     }
 }
