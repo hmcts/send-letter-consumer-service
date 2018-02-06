@@ -7,12 +7,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-
-import java.util.function.Function;
+import uk.gov.hmcts.reform.slc.services.SendLetterService;
 
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -24,24 +22,23 @@ public class MessageProcessorTest {
 
     private MessageProcessor processor;
 
-    private Function<IMessage, MessageHandlingResult> action;
-
     @Mock private IMessageReceiver messageReceiver;
+    @Mock private SendLetterService sendLetterService;
     @Mock private IMessage message;
 
     @Before
     public void setUp() throws Exception {
-        this.processor = new MessageProcessor(() -> messageReceiver);
+        this.processor = new MessageProcessor(() -> messageReceiver, sendLetterService);
     }
 
     @Test
     public void should_complete_message_if_passed_function_returns_success() throws Exception {
         // given
-        action = (msg) -> SUCCESS;
+        given(sendLetterService.send(any())).willReturn(SUCCESS);
         given(messageReceiver.receive()).willReturn(message);
 
         // when
-        processor.handle(action);
+        processor.handle();
 
         // then
         verify(messageReceiver, times(1)).complete(any());
@@ -50,11 +47,11 @@ public class MessageProcessorTest {
     @Test
     public void should_send_message_to_deadletter_if_passed_function_returns_failure() throws Exception {
         // given
-        action = (msg) -> FAILURE;
+        given(sendLetterService.send(any())).willReturn(FAILURE);
         given(messageReceiver.receive()).willReturn(message);
 
         // when
-        processor.handle(action);
+        processor.handle();
 
         // then
         verify(messageReceiver, times(1)).deadLetter(any());
@@ -63,13 +60,12 @@ public class MessageProcessorTest {
     @Test
     public void should_not_call_action_if_there_are_no_messages_on_queue() throws Exception {
         // given
-        action = (Function<IMessage, MessageHandlingResult>) mock(Function.class);
         given(messageReceiver.receive()).willReturn(null);
 
         // when
-        processor.handle(action);
+        processor.handle();
 
         // then
-        verify(action, never()).apply(any());
+        verify(sendLetterService, never()).send(any());
     }
 }

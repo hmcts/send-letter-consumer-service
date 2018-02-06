@@ -6,9 +6,9 @@ import com.microsoft.azure.servicebus.primitives.ServiceBusException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.slc.services.SendLetterService;
 import uk.gov.hmcts.reform.slc.services.servicebus.exceptions.ConnectionException;
 
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 @Component
@@ -16,21 +16,26 @@ public class MessageProcessor {
     private static final Logger logger = LoggerFactory.getLogger(MessageProcessor.class);
 
     private final Supplier<IMessageReceiver> receiverProvider;
+    private final SendLetterService sendLetterService;
 
-    public MessageProcessor(Supplier<IMessageReceiver> receiverProvider) {
+    public MessageProcessor(
+        Supplier<IMessageReceiver> receiverProvider,
+        SendLetterService sendLetterService
+    ) {
         this.receiverProvider = receiverProvider;
+        this.sendLetterService = sendLetterService;
     }
 
     /**
      * Reads message from a queue and passes is as an argument to action.
      */
-    public void handle(Function<IMessage, MessageHandlingResult> action) {
+    public void handle() {
         try {
             IMessageReceiver messageReceiver = receiverProvider.get();
             try {
                 IMessage message = messageReceiver.receive();
                 if (message != null) {
-                    MessageHandlingResult result = action.apply(message);
+                    MessageHandlingResult result = sendLetterService.send(message);
 
                     switch (result) {
                         case SUCCESS:
