@@ -40,16 +40,15 @@ public class SendLetterJob {
     public void run() {
         processor.handle(msg -> {
             try {
-
                 Letter letter = letterMapper.from(msg);
                 PdfDoc pdf = pdfCreator.create(letter);
                 // TODO: encrypt & sign
                 ftpUploader.upload(pdf);
 
                 return SUCCESS;
-
             } catch (Exception exc) {
                 logger.error(exc.getMessage(), exc.getCause());
+
                 return FAILURE;
             }
         });

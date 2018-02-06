@@ -15,7 +15,6 @@ public class PdfCreator {
     }
 
     public PdfDoc create(Letter letter) {
-
         Asserts.notNull(letter, "letter");
 
         byte[] content = client.generateFromHtml(
