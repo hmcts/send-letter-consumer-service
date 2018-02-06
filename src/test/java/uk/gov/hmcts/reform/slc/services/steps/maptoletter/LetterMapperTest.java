@@ -57,7 +57,7 @@ public class LetterMapperTest {
     }
 
     @Test
-    public void should_throw_an_exception_if_message_contains_empty_body_representing_all_fields_as_null() {
+    public void should_throw_an_exception_if_message_contains_empty_json() {
         given(message.getBody()).willReturn("{}".getBytes());
 
         assertThatThrownBy(() -> letterMapper.from(message))
