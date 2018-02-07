@@ -20,7 +20,7 @@ public class SendLetterJobTest {
     @Mock private FtpAvailabilityChecker availabilityChecker;
 
     @Test
-    public void should_NOT_process_message_if_ftp_is_not_available() {
+    public void should_not_process_message_if_ftp_is_not_available() {
         given(availabilityChecker.isFtpAvailable(any())).willReturn(false);
         SendLetterJob job = new SendLetterJob(messageProcessor, availabilityChecker);
 
