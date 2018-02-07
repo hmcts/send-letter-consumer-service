@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.slc.services;
 
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
