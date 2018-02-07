@@ -24,3 +24,6 @@ ftp:
   fingerprint: ${FTP_FINGERPRINT}
   user: ${FTP_USER}
   password: ${FTP_PASSWORD}
+  downtime:
+    from: ${FTP_DOWNTIME_FROM:17:00}
+    to: ${FTP_DOWNTIME_TO:18:00}

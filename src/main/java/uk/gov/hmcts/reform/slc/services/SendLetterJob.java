@@ -6,20 +6,32 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.slc.services.servicebus.MessageProcessor;
 
+import static java.time.LocalTime.now;
+
 @Component
 public class SendLetterJob {
 
     private static final Logger logger = LoggerFactory.getLogger(SendLetterJob.class);
 
     private final MessageProcessor processor;
+    private final FtpAvailabilityChecker ftpAvailabilityChecker;
 
-    public SendLetterJob(MessageProcessor processor) {
+    public SendLetterJob(
+        MessageProcessor processor,
+        FtpAvailabilityChecker ftpAvailabilityChecker
+    ) {
         this.processor = processor;
+        this.ftpAvailabilityChecker = ftpAvailabilityChecker;
     }
 
     @Scheduled(fixedDelayString = "${servicebus.interval}")
     public void run() {
         logger.trace("Running job");
-        processor.process();
+
+        if (ftpAvailabilityChecker.ftpAvailable(now())) {
+            processor.process();
+        } else {
+            logger.trace("FTP server not available, job cancelled");
+        }
     }
 }
