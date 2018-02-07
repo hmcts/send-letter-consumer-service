@@ -41,6 +41,7 @@ public class FtpAvailabilityCheckerTest {
             });
     }
 
+    @SuppressWarnings("checkstyle:linelength")
     private void test(String downtimeFrom, String downtimeTo, LocalTime timeToCheck, boolean expectedResult, String desc) {
         // given
         FtpAvailabilityChecker checker = new FtpAvailabilityChecker(downtimeFrom, downtimeTo);
