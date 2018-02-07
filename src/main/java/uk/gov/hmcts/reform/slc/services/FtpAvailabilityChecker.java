@@ -19,7 +19,7 @@ public class FtpAvailabilityChecker {
         this.downtimeEnd = LocalTime.parse(downtimeToHour);
     }
 
-    public boolean ftpAvailable(LocalTime time) {
+    public boolean isFtpAvailable(LocalTime time) {
         if (downtimeStart.isBefore(downtimeEnd)) {
             return time.isBefore(downtimeStart) || time.isAfter(downtimeEnd);
         } else {

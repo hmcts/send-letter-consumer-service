@@ -28,7 +28,7 @@ public class SendLetterJob {
     public void run() {
         logger.trace("Running job");
 
-        if (ftpAvailabilityChecker.ftpAvailable(now())) {
+        if (ftpAvailabilityChecker.isFtpAvailable(now())) {
             processor.process();
         } else {
             logger.trace("FTP server not available, job cancelled");

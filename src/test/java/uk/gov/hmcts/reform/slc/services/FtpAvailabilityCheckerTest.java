@@ -31,12 +31,12 @@ public class FtpAvailabilityCheckerTest {
             .forEach(invalidTime -> {
                 // check with invalid time as 'from'...
                 softly.assertThatThrownBy(
-                    () -> new FtpAvailabilityChecker(invalidTime, "11:00").ftpAvailable(now())
+                    () -> new FtpAvailabilityChecker(invalidTime, "11:00").isFtpAvailable(now())
                 ).isNotNull();
 
                 // ... and 'to' parameter
                 softly.assertThatThrownBy(
-                    () -> new FtpAvailabilityChecker("11:00", invalidTime).ftpAvailable(now())
+                    () -> new FtpAvailabilityChecker("11:00", invalidTime).isFtpAvailable(now())
                 ).isNotNull();
             });
     }
@@ -47,7 +47,7 @@ public class FtpAvailabilityCheckerTest {
         FtpAvailabilityChecker checker = new FtpAvailabilityChecker(downtimeFrom, downtimeTo);
 
         // when
-        boolean result = checker.ftpAvailable(timeToCheck);
+        boolean result = checker.isFtpAvailable(timeToCheck);
 
         // then
         softly.assertThat(result).as(desc).isEqualTo(expectedResult);
