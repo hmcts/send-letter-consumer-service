@@ -30,8 +30,12 @@ public class LetterMapperTest {
         given(message.getBody())
             .willReturn(
                 ("{"
-                    + "\"template\": \"whatever\","
-                    + "\"values\": { \"a\": \"b\" },"
+                    + "\"documents\": ["
+                    + "  {"
+                    + "    \"template\": \"whatever\","
+                    + "    \"values\": { \"a\": \"b\" }"
+                    + "  }"
+                    + "],"
                     + "\"type\": \"some_type\","
                     + "\"service\": \"some_service\""
                     + "}"
@@ -41,7 +45,7 @@ public class LetterMapperTest {
         Letter letter = letterMapper.from(message);
 
         assertThat(letter).isNotNull();
-        assertThat(letter.template).isEqualTo("whatever");
+        assertThat(letter.documents).hasSize(1);
         assertThat(letter.type).isEqualTo("some_type");
         assertThat(letter.service).isEqualTo("some_service");
     }
@@ -66,13 +70,17 @@ public class LetterMapperTest {
     }
 
     @Test
-    public void should_throw_an_exception_if_fields_in_letter_are_empty() {
+    public void should_throw_an_exception_if_required_field_is_empty() {
         given(message.getBody()).willReturn(
             ("{"
-                + "\"template\": \"\","
-                + "\"values\": {},"
+                + "\"documents\": ["
+                + "  {"
+                + "    \"template\": \"whatever\","
+                + "    \"values\": { \"a\": \"b\" }"
+                + "  }"
+                + "],"
                 + "\"type\": \"\","
-                + "\"service\": \"\""
+                + "\"service\": \"some_service\""
                 + "}"
             ).getBytes()
         );

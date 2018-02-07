@@ -7,6 +7,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import uk.gov.hmcts.reform.pdf.service.client.exception.PDFServiceClientException;
+import uk.gov.hmcts.reform.slc.model.Document;
 import uk.gov.hmcts.reform.slc.model.Letter;
 import uk.gov.hmcts.reform.slc.services.servicebus.MessageHandlingResult;
 import uk.gov.hmcts.reform.slc.services.steps.getpdf.PdfCreator;
@@ -15,6 +16,7 @@ import uk.gov.hmcts.reform.slc.services.steps.maptoletter.LetterMapper;
 import uk.gov.hmcts.reform.slc.services.steps.sftpupload.FtpUploader;
 
 import static java.util.Collections.emptyMap;
+import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
@@ -40,9 +42,9 @@ public class SendLetterServiceTest {
     @Test
     public void should_return_success_status_if_all_operations_succeeded() {
         given(letterMapper.from(any()))
-            .willReturn(new Letter("template", emptyMap(), "type", "cmc"));
+            .willReturn(sampleLetter());
         given(pdfCreator.create(any()))
-            .willReturn(new PdfDoc("hello.pdf", "hello".getBytes()));
+            .willReturn(singletonList(new PdfDoc("hello.pdf", "hello".getBytes())));
 
         // when
         MessageHandlingResult result = service.send(message);
@@ -54,7 +56,7 @@ public class SendLetterServiceTest {
     @Test
     public void should_return_failure_status_if_any_of_the_operations_failed() {
         given(letterMapper.from(any()))
-            .willReturn(new Letter("template", emptyMap(), "type", "cmc"));
+            .willReturn(sampleLetter());
         given(pdfCreator.create(any()))
             .willThrow(PDFServiceClientException.class);
 
@@ -63,5 +65,15 @@ public class SendLetterServiceTest {
 
         // then
         assertThat(result).isEqualTo(FAILURE);
+    }
+
+    private Letter sampleLetter() {
+        return new Letter(
+            singletonList(
+                new Document("template", emptyMap())
+            ),
+            "some_type",
+            "cmc"
+        );
     }
 }

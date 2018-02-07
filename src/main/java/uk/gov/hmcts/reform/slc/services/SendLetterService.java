@@ -36,7 +36,7 @@ public class SendLetterService {
     public MessageHandlingResult send(IMessage msg) {
         try {
             Letter letter = letterMapper.from(msg);
-            PdfDoc pdf = pdfCreator.create(letter);
+            PdfDoc pdf = pdfCreator.create(letter).get(0); // TODO: merge all pdfs into one
             // TODO: encrypt & sign
             ftpUploader.upload(pdf);
 
