@@ -3,15 +3,12 @@ package uk.gov.hmcts.reform.slc.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.hibernate.validator.constraints.NotEmpty;
 
-import java.util.Map;
+import java.util.List;
 
 public class Letter {
 
     @NotEmpty
-    public final String template;
-
-    @NotEmpty
-    public final Map<String, Object> values;
+    public final List<Document> documents;
 
     @NotEmpty
     public final String type;
@@ -20,13 +17,11 @@ public class Letter {
     public final String service;
 
     public Letter(
-        @JsonProperty("template") String template,
-        @JsonProperty("values") Map<String, Object> values,
+        @JsonProperty("documents") List<Document> documents,
         @JsonProperty("type") String type,
         @JsonProperty("service") String service
     ) {
-        this.template = template;
-        this.values = values;
+        this.documents = documents;
         this.type = type;
         this.service = service;
     }

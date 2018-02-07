@@ -6,8 +6,12 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import uk.gov.hmcts.reform.pdf.service.client.PDFServiceClient;
+import uk.gov.hmcts.reform.slc.model.Document;
 import uk.gov.hmcts.reform.slc.model.Letter;
 
+import java.util.List;
+
+import static java.util.Arrays.asList;
 import static java.util.Collections.emptyMap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -34,14 +38,27 @@ public class PdfCreatorTest {
     }
 
     @Test
-    public void should_return_pdf_object() {
+    public void should_return_list_of_pdfs() {
         given(client.generateFromHtml(any(), any()))
             .willReturn("hello".getBytes());
 
-        PdfDoc pdfDoc = pdfCreator.create(new Letter("template", emptyMap(), "type", "service"));
+        List<PdfDoc> pdfs = pdfCreator.create(
+            new Letter(
+                asList(
+                    new Document("t1", emptyMap()),
+                    new Document("t2", emptyMap())
+                ),
+                "type",
+                "service"
+            )
+        );
 
-        assertThat(pdfDoc).isNotNull();
-        assertThat(pdfDoc.content).isEqualTo("hello".getBytes());
-        assertThat(pdfDoc.filename).isNotEmpty();
+        assertThat(pdfs).hasSize(2);
+
+        assertThat(pdfs.get(0).content).isEqualTo("hello".getBytes());
+        assertThat(pdfs.get(0).filename).isNotEmpty();
+
+        assertThat(pdfs.get(0).content).isEqualTo("hello".getBytes());
+        assertThat(pdfs.get(0).filename).isNotEmpty();
     }
 }

@@ -5,6 +5,10 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.pdf.service.client.PDFServiceClient;
 import uk.gov.hmcts.reform.slc.model.Letter;
 
+import java.util.List;
+
+import static java.util.stream.Collectors.toList;
+
 @Service
 public class PdfCreator {
 
@@ -14,17 +18,16 @@ public class PdfCreator {
         this.client = client;
     }
 
-    public PdfDoc create(Letter letter) {
+    public List<PdfDoc> create(Letter letter) {
         Asserts.notNull(letter, "letter");
 
-        byte[] content = client.generateFromHtml(
-            letter.template.getBytes(),
-            letter.values
-        );
-
-        return new PdfDoc(
-            FileNameGenerator.generateFor(letter.type, letter.service, content, "pdf"),
-            content
-        );
+        return letter.documents
+            .stream()
+            .map(d -> client.generateFromHtml(d.template.getBytes(), d.values))
+            .map(content -> new PdfDoc(
+                    FileNameGenerator.generateFor(letter.type, letter.service, content, "pdf"),
+                    content
+                )
+            ).collect(toList());
     }
 }
