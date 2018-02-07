@@ -23,7 +23,7 @@ locals {
 }
 
 module "consumer" {
-  source   = "git@github.com/hmcts/terraform-module-webapp.git"
+  source   = "git@github.com:contino/moj-module-webapp.git"
   product  = "${var.product}-consumer"
   location = "${var.location}"
   env      = "${var.env}"
