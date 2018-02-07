@@ -39,26 +39,30 @@ public class PdfCreatorTest {
 
     @Test
     public void should_return_list_of_pdfs() {
-        given(client.generateFromHtml(any(), any()))
-            .willReturn("hello".getBytes());
+        given(client.generateFromHtml("t1".getBytes(), emptyMap()))
+            .willReturn("hello t1".getBytes());
+        given(client.generateFromHtml("t2".getBytes(), emptyMap()))
+            .willReturn("hello t2".getBytes());
 
-        List<PdfDoc> pdfs = pdfCreator.create(
-            new Letter(
-                asList(
-                    new Document("t1", emptyMap()),
-                    new Document("t2", emptyMap())
-                ),
-                "type",
-                "service"
-            )
+        Letter letter = new Letter(
+            asList(
+                new Document("t1", emptyMap()),
+                new Document("t2", emptyMap())
+            ),
+            "type",
+            "service"
         );
 
+        // when
+        List<PdfDoc> pdfs = pdfCreator.create(letter);
+
+        // then
         assertThat(pdfs).hasSize(2);
 
-        assertThat(pdfs.get(0).content).isEqualTo("hello".getBytes());
+        assertThat(pdfs.get(0).content).isEqualTo("hello t1".getBytes());
         assertThat(pdfs.get(0).filename).isNotEmpty();
 
-        assertThat(pdfs.get(0).content).isEqualTo("hello".getBytes());
-        assertThat(pdfs.get(0).filename).isNotEmpty();
+        assertThat(pdfs.get(1).content).isEqualTo("hello t2".getBytes());
+        assertThat(pdfs.get(1).filename).isNotEmpty();
     }
 }
