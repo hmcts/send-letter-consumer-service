@@ -3,37 +3,37 @@ package uk.gov.hmcts.reform.slc.logging;
 final class AppEvent {
 
     /**
-     * Used to track event of message receive from service bus queue.
+     * Message received from service bus queue.
      */
     static final String MESSAGE_RECEIVED = "MessageReceived";
 
     /**
-     * Used to track event of successful message handler process.
+     * Successful message handler process.
      */
     static final String MESSAGE_HANDLED_SUCCESSFULLY = "MessageHandleSuccess";
 
     /**
-     * Used to track event of failed message handler process.
+     * Failed message handler process.
      */
     static final String MESSAGE_HANDLED_UNSUCCESSFULLY = "MessageHandleFailure";
 
     /**
-     * Used to track event of successful message map.
+     * Successful message map.
      */
     static final String MESSAGE_MAPPED_SUCCESSFULLY = "MessageMapSuccess";
 
     /**
-     * Used to track event of attempt to map an empty message.
+     * Attempt to map an empty message.
      */
     static final String MESSAGE_MAPPED_EMPTY = "MessageMapEmpty";
 
     /**
-     * Used to track event of attempt to map an invalid message..
+     * Attempt to map an invalid message..
      */
     static final String MESSAGE_MAPPED_INVALID = "MessageMapInvalid";
 
     /**
-     * Used to track event of failed message map.
+     * Failed message map.
      */
     static final String MESSAGE_MAPPED_UNSUCCESSFULLY = "MessageMapFailure";
 

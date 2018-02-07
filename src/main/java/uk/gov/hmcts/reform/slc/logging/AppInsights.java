@@ -20,8 +20,8 @@ public class AppInsights extends AbstractAppInsights {
 
     public void trackMessageReceivedFromServiceBus(java.time.Duration duration, boolean success) {
         telemetry.trackDependency(
-            AppDependency.SERVICE_BUS_DEPENDENCY,
-            AppDependency.SERVICE_BUS_MESSAGE_RECEIVED,
+            AppDependency.SERVICE_BUS,
+            AppDependencyCommand.SERVICE_BUS_MESSAGE_RECEIVED,
             new Duration(duration.toMillis()),
             success
         );
@@ -29,8 +29,8 @@ public class AppInsights extends AbstractAppInsights {
 
     public void trackMessageCompletedInServiceBus(java.time.Duration duration, boolean success) {
         telemetry.trackDependency(
-            AppDependency.SERVICE_BUS_DEPENDENCY,
-            AppDependency.SERVICE_BUS_MESSAGE_COMPLETED,
+            AppDependency.SERVICE_BUS,
+            AppDependencyCommand.SERVICE_BUS_MESSAGE_COMPLETED,
             new Duration(duration.toMillis()),
             success
         );
@@ -38,8 +38,8 @@ public class AppInsights extends AbstractAppInsights {
 
     public void trackMessageDeadLetteredInServiceBus(java.time.Duration duration, boolean success) {
         telemetry.trackDependency(
-            AppDependency.SERVICE_BUS_DEPENDENCY,
-            AppDependency.SERVICE_BUS_DEAD_LETTERED,
+            AppDependency.SERVICE_BUS,
+            AppDependencyCommand.SERVICE_BUS_DEAD_LETTERED,
             new Duration(duration.toMillis()),
             success
         );
@@ -47,8 +47,8 @@ public class AppInsights extends AbstractAppInsights {
 
     public void trackPdfGenerator(java.time.Duration duration, boolean success) {
         telemetry.trackDependency(
-            AppDependency.PDF_GENERATOR_DEPENDENCY,
-            AppDependency.GENERATE_PDF_FROM_HTML_COMMAND,
+            AppDependency.PDF_GENERATOR,
+            AppDependencyCommand.GENERATED_PDF_FROM_HTML,
             new Duration(duration.toMillis()),
             success
         );
@@ -56,8 +56,8 @@ public class AppInsights extends AbstractAppInsights {
 
     public void trackFtpUpload(java.time.Duration duration, boolean success) {
         telemetry.trackDependency(
-            AppDependency.FTP_DEPENDENCY,
-            AppDependency.FTP_FILE_UPLOAD_COMMAND,
+            AppDependency.FTP_CLIENT,
+            AppDependencyCommand.FTP_FILE_UPLOADED,
             new Duration(duration.toMillis()),
             success
         );
