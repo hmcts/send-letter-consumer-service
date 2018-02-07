@@ -28,17 +28,17 @@ public class FtpAvailabilityCheckerTest {
 
     @Test
     public void should_throw_an_exception_if_times_are_invalid() {
-        asList("", "foo", "11am", "midnight", null)
+        asList("", "foo", "11am", "midnight", "1234", "34:12", null)
             .forEach(invalidTime -> {
-                // check with invalid time as 'from'...
-                softly.assertThatThrownBy(
-                    () -> new FtpAvailabilityChecker(invalidTime, "11:00").isFtpAvailable(now())
-                ).isNotNull();
+                softly
+                    .assertThatThrownBy(() -> new FtpAvailabilityChecker(invalidTime, "11:00").isFtpAvailable(now()))
+                    .as("using <" + invalidTime + "> as 'from' time")
+                    .isNotNull();
 
-                // ... and 'to' parameter
-                softly.assertThatThrownBy(
-                    () -> new FtpAvailabilityChecker("11:00", invalidTime).isFtpAvailable(now())
-                ).isNotNull();
+                softly
+                    .assertThatThrownBy(() -> new FtpAvailabilityChecker("11:00", invalidTime).isFtpAvailable(now()))
+                    .as("using <" + invalidTime + "> as 'to' time")
+                    .isNotNull();
             });
     }
 
