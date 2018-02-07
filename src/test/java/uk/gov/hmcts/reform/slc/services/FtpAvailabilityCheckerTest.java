@@ -22,7 +22,8 @@ public class FtpAvailabilityCheckerTest {
         test("17:30", "18:30", time(17, 30), false, "Exactly at downtime start");
         test("17:30", "18:30", time(18, 30), false, "Exactly at downtime end");
         test("23:00", "01:00", time(14, 15), true, "Outside of overnight downtime");
-        test("23:00", "01:00", time(23, 59), false, "During overnight downtime");
+        test("23:00", "01:00", time(23, 59), false, "During overnight downtime before midnight");
+        test("23:00", "01:00", time(0, 30), false, "During overnight downtime after midnight");
     }
 
     @Test
