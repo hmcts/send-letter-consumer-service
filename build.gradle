@@ -69,15 +69,20 @@ repositories {
 
 def versions = [
   springBoot: plugins.getPlugin('org.springframework.boot').class.package.implementationVersion,
-  logging: '1.4.0',
+  logging: '1.5.0',
   hystrix: '1.4.0.RELEASE'
 ]
+
+configurations {
+  runtime.exclude group: 'com.microsoft.azure', module: 'applicationinsights-agent'
+}
 
 dependencies {
   compile group: 'org.springframework.boot', name: 'spring-boot-starter-actuator', version: versions.springBoot
   compile group: 'org.springframework.boot', name: 'spring-boot-starter-aop', version: versions.springBoot
   compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: versions.springBoot
 
+  compile group: 'uk.gov.hmcts.reform', name: 'java-logging-appinsights', version: versions.logging
   compile group: 'uk.gov.hmcts.reform', name: 'java-logging-httpcomponents', version: versions.logging
   compile group: 'uk.gov.hmcts.reform', name: 'java-logging-spring', version: versions.logging
   compile group: 'uk.gov.hmcts.reform', name: 'http-proxy-spring-boot-autoconfigure', version: '1.1.0'

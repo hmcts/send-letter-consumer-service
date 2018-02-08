@@ -9,16 +9,23 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.springframework.test.util.ReflectionTestUtils;
+import uk.gov.hmcts.reform.slc.logging.AppInsights;
 import uk.gov.hmcts.reform.slc.services.steps.getpdf.PdfDoc;
 import uk.gov.hmcts.reform.slc.services.steps.sftpupload.exceptions.FtpStepException;
 
 import java.io.IOException;
+import java.time.Duration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.verify;
 
 @RunWith(MockitoJUnitRunner.class)
 public class FtpUploaderTest {
@@ -26,6 +33,7 @@ public class FtpUploaderTest {
     @Mock private SSHClient sshClient;
     @Mock private SFTPClient sftpClient;
     @Mock private SFTPFileTransfer sftpFileTransfer;
+    @Mock private AppInsights insights;
 
     private FtpUploader uploader;
 
@@ -42,6 +50,8 @@ public class FtpUploaderTest {
             "pass",
             sshClient
         );
+
+        ReflectionTestUtils.setField(uploader, "insights", insights);
     }
 
     @Test
@@ -54,6 +64,8 @@ public class FtpUploaderTest {
 
         // then
         assertThat(exc).isNull();
+        verify(insights).trackFtpUpload(any(Duration.class), eq(true));
+        verify(insights, never()).trackException(any(IOException.class));
     }
 
     @Test
@@ -68,5 +80,23 @@ public class FtpUploaderTest {
         assertThat(exc)
             .isInstanceOf(FtpStepException.class)
             .hasMessageContaining("upload");
+        verify(insights).trackFtpUpload(any(Duration.class), eq(false));
+        verify(insights).trackException(any(IOException.class));
+    }
+
+    @Test
+    public void should_thrown_an_exception_while_getting_sftp_client() throws Exception {
+        // given
+        reset(sshClient);
+        doThrow(IOException.class).when(sshClient).newSFTPClient();
+
+        // when
+        Throwable exc = catchThrowable(() -> uploader.upload(new PdfDoc("hello.pdf", "hello".getBytes())));
+
+        // then
+        assertThat(exc)
+            .isInstanceOf(FtpStepException.class)
+            .hasMessageContaining("Unable to connect to sftp");
+        verify(insights).trackException(any(IOException.class));
     }
 }

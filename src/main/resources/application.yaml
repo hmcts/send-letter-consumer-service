@@ -27,3 +27,6 @@ ftp:
   downtime:
     from: ${FTP_DOWNTIME_FROM:17:00}
     to: ${FTP_DOWNTIME_TO:18:00}
+
+app-insights:
+  request-component: off
