@@ -23,8 +23,8 @@ public class DuplexPreparator {
             } else {
                 return pdf;
             }
-        } catch (IOException e) {
-            throw new DuplexException();
+        } catch (IOException exc) {
+            throw new DuplexException(exc);
         }
     }
 }
