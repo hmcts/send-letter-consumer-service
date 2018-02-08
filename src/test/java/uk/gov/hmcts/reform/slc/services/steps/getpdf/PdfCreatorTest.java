@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.pdf.service.client.exception.PDFServiceClientExceptio
 import uk.gov.hmcts.reform.slc.logging.AppInsights;
 import uk.gov.hmcts.reform.slc.model.Document;
 import uk.gov.hmcts.reform.slc.model.Letter;
+import uk.gov.hmcts.reform.slc.services.steps.getpdf.duplex.DuplexPreparator;
 
 import java.time.Duration;
 
@@ -30,17 +31,15 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 @RunWith(MockitoJUnitRunner.class)
 public class PdfCreatorTest {
 
-    @Mock
-    private PDFServiceClient client;
-
-    @Mock
-    private AppInsights insights;
+    @Mock private PDFServiceClient client;
+    @Mock private DuplexPreparator duplexPreparator;
+    @Mock private AppInsights insights;
 
     private PdfCreator pdfCreator;
 
     @Before
     public void setUp() {
-        pdfCreator = new PdfCreator(this.client);
+        pdfCreator = new PdfCreator(this.client, this.duplexPreparator);
 
         ReflectionTestUtils.setField(pdfCreator, "insights", insights);
     }
@@ -55,10 +54,8 @@ public class PdfCreatorTest {
 
     @Test
     public void should_return_a_pdf_object() {
-        given(client.generateFromHtml("t1".getBytes(), emptyMap()))
-            .willReturn("hello t1".getBytes());
-        given(client.generateFromHtml("t2".getBytes(), emptyMap()))
-            .willReturn("hello t2".getBytes());
+        given(client.generateFromHtml(any(), any())).willReturn("hello".getBytes());
+        given(duplexPreparator.prepare(any())).willReturn("duplexed hello".getBytes());
 
         Letter letter = new Letter(
             asList(
