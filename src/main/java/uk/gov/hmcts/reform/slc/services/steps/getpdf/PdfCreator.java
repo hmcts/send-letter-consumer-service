@@ -27,17 +27,22 @@ public class PdfCreator {
         this.client = client;
     }
 
-    public List<PdfDoc> create(Letter letter) {
+    public PdfDoc create(Letter letter) {
         Asserts.notNull(letter, "letter");
 
-        return letter.documents
-            .stream()
-            .map(this::generatePdf)
-            .map(content -> new PdfDoc(
-                    FileNameGenerator.generateFor(letter.type, letter.service, content, "pdf"),
-                    content
-                )
-            ).collect(toList());
+        List<byte[]> docs =
+            letter.documents
+                .stream()
+                .map(this::generatePdf)
+                .map(this::prepareForDuplex)
+                .collect(toList());
+
+        byte[] finalContent = docs.get(0); // TODO: merge into one
+
+        return new PdfDoc(
+            FileNameGenerator.generateFor(letter.type, letter.service, finalContent, "pdf"),
+            finalContent
+        );
     }
 
     private byte[] generatePdf(Document document) {
@@ -55,5 +60,10 @@ public class PdfCreator {
 
             throw exception;
         }
+    }
+
+    private byte[] prepareForDuplex(byte[] doc) {
+        // TODO: add extra blank page if needed.
+        return doc;
     }
 }

@@ -44,7 +44,7 @@ public class SendLetterServiceTest {
         given(letterMapper.from(any()))
             .willReturn(sampleLetter());
         given(pdfCreator.create(any()))
-            .willReturn(singletonList(new PdfDoc("hello.pdf", "hello".getBytes())));
+            .willReturn(new PdfDoc("hello.pdf", "hello".getBytes()));
 
         // when
         MessageHandlingResult result = service.send(message);
