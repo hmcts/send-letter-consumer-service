@@ -17,7 +17,6 @@ import java.util.List;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyMap;
-import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
@@ -38,6 +37,15 @@ public class PdfCreatorTest {
     private AppInsights insights;
 
     private PdfCreator pdfCreator;
+
+    private final Letter letter = new Letter(
+        asList(
+            new Document("t1", emptyMap()),
+            new Document("t2", emptyMap())
+        ),
+        "type",
+        "service"
+    );
 
     @Before
     public void setUp() {
@@ -61,15 +69,6 @@ public class PdfCreatorTest {
         given(client.generateFromHtml("t2".getBytes(), emptyMap()))
             .willReturn("hello t2".getBytes());
 
-        Letter letter = new Letter(
-            asList(
-                new Document("t1", emptyMap()),
-                new Document("t2", emptyMap())
-            ),
-            "type",
-            "service"
-        );
-
         // when
         List<PdfDoc> pdfs = pdfCreator.create(letter);
 
@@ -87,20 +86,29 @@ public class PdfCreatorTest {
     }
 
     @Test
-    public void should_throw_exception_when_unable_to_generate_pdf() {
-        willThrow(PDFServiceClientException.class).given(client).generateFromHtml(any(), any());
-
-        Letter letter = new Letter(
-            singletonList(new Document("template", emptyMap())),
-            "type",
-            "service"
-        );
+    public void should_throw_exception_when_unable_to_generate_one_pdf() {
+        willThrow(PDFServiceClientException.class)
+            .willReturn("hello template".getBytes())
+            .given(client).generateFromHtml(any(), any());
 
         assertThatThrownBy(() -> pdfCreator.create(letter))
             .isInstanceOf(PDFServiceClientException.class);
 
+        verify(insights).trackPdfGenerator(any(Duration.class), eq(true));
         verify(insights).trackPdfGenerator(any(Duration.class), eq(false));
         verify(insights).trackException(any(PDFServiceClientException.class));
+        verifyNoMoreInteractions(insights);
+    }
+
+    @Test
+    public void should_throw_exception_when_unable_to_generate_all_pdfs() {
+        willThrow(PDFServiceClientException.class).given(client).generateFromHtml(any(), any());
+
+        assertThatThrownBy(() -> pdfCreator.create(letter))
+            .isInstanceOf(PDFServiceClientException.class);
+
+        verify(insights, times(2)).trackPdfGenerator(any(Duration.class), eq(false));
+        verify(insights, times(2)).trackException(any(PDFServiceClientException.class));
         verifyNoMoreInteractions(insights);
     }
 }

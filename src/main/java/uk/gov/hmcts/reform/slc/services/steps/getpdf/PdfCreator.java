@@ -23,37 +23,87 @@ public class PdfCreator {
 
     private final PDFServiceClient client;
 
+    private Letter letter;
+
     public PdfCreator(PDFServiceClient client) {
         this.client = client;
     }
 
     public List<PdfDoc> create(Letter letter) {
         Asserts.notNull(letter, "letter");
+        this.letter = letter;
 
-        return letter.documents
+        List<GeneratorResult> results = letter.documents
             .stream()
             .map(this::generatePdf)
-            .map(content -> new PdfDoc(
-                    FileNameGenerator.generateFor(letter.type, letter.service, content, "pdf"),
-                    content
-                )
-            ).collect(toList());
+            .peek(this::trackGeneratorResult)
+            .collect(toList());
+
+        return results
+            .stream()
+            .peek(this::checkForException)
+            .map(this::getPdfDoc)
+            .collect(toList());
     }
 
-    private byte[] generatePdf(Document document) {
+    private GeneratorResult generatePdf(Document document) {
+        GeneratorResult result = new GeneratorResult();
         Instant start = Instant.now();
 
         try {
             byte[] pdf = client.generateFromHtml(document.template.getBytes(), document.values);
 
-            insights.trackPdfGenerator(Duration.between(start, Instant.now()), true);
-
-            return pdf;
+            result.successful(Duration.between(start, Instant.now()), pdf);
         } catch (PDFServiceClientException exception) {
-            insights.trackPdfGenerator(Duration.between(start, Instant.now()), false);
-            insights.trackException(exception);
+            result.failed(Duration.between(start, Instant.now()), exception);
+        }
 
-            throw exception;
+        return result;
+    }
+
+    private void trackGeneratorResult(GeneratorResult result) {
+        insights.trackPdfGenerator(result.timeTookGenerating, result.isSuccess);
+
+        if (!result.isSuccess) {
+            insights.trackException(result.exception);
+        }
+    }
+
+    private void checkForException(GeneratorResult result) {
+        if (!result.isSuccess) {
+            throw result.exception;
+        }
+    }
+
+    private PdfDoc getPdfDoc(GeneratorResult result) {
+        return new PdfDoc(
+            FileNameGenerator.generateFor(letter.type, letter.service, result.result, "pdf"),
+            result.result
+        );
+    }
+
+    private final class GeneratorResult {
+
+        Duration timeTookGenerating;
+
+        boolean isSuccess;
+
+        byte[] result;
+
+        PDFServiceClientException exception;
+
+        void failed(Duration timeTookGenerating, PDFServiceClientException exception) {
+            this.timeTookGenerating = timeTookGenerating;
+            this.isSuccess = false;
+            this.result = null;
+            this.exception = exception;
+        }
+
+        void successful(Duration timeTookGenerating, byte[] result) {
+            this.timeTookGenerating = timeTookGenerating;
+            this.isSuccess = true;
+            this.result = result;
+            this.exception = null;
         }
     }
 }
