@@ -10,8 +10,10 @@ import java.io.IOException;
 @Component
 public class DuplexPreparator {
 
+    /**
+     * Adds an extra blank page if the total number of pages is odd.
+     */
     public byte[] prepare(byte[] pdf) {
-
         try (PDDocument pdDoc = PDDocument.load(pdf)) {
             if (pdDoc.getNumberOfPages() % 2 == 1) {
                 pdDoc.addPage(new PDPage());
