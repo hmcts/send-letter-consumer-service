@@ -36,4 +36,7 @@ variable "ftp_fingerprint" {
   default = "TBD"
 }
 
+variable "subscription" {
+}
+
 # endregion
