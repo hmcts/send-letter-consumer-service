@@ -73,7 +73,7 @@ public class PdfCreatorTest {
         PdfDoc pdf = pdfCreator.create(letter);
 
         // then
-        assertThat(pdf.content).isNotEmpty();
+        assertThat(pdf.content).isNotEmpty(); //TODO: update when merger is ready
         assertThat(pdf.filename).isNotEmpty();
 
         verify(insights, times(2)).trackPdfGenerator(any(Duration.class), eq(true));
