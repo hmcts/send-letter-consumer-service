@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.pdf.service.client.exception.PDFServiceClientExceptio
 import uk.gov.hmcts.reform.slc.logging.AppInsights;
 import uk.gov.hmcts.reform.slc.model.Document;
 import uk.gov.hmcts.reform.slc.model.Letter;
+import uk.gov.hmcts.reform.slc.services.steps.getpdf.duplex.DuplexPreparator;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -22,9 +23,11 @@ public class PdfCreator {
     private AppInsights insights;
 
     private final PDFServiceClient client;
+    private final DuplexPreparator duplexPreparator;
 
-    public PdfCreator(PDFServiceClient client) {
+    public PdfCreator(PDFServiceClient client, DuplexPreparator duplexPreparator) {
         this.client = client;
+        this.duplexPreparator = duplexPreparator;
     }
 
     public PdfDoc create(Letter letter) {
@@ -34,7 +37,7 @@ public class PdfCreator {
             letter.documents
                 .stream()
                 .map(this::generatePdf)
-                .map(this::prepareForDuplex)
+                .map(duplexPreparator::prepare)
                 .collect(toList());
 
         byte[] finalContent = docs.get(0); // TODO: merge into one
@@ -60,10 +63,5 @@ public class PdfCreator {
 
             throw exception;
         }
-    }
-
-    private byte[] prepareForDuplex(byte[] doc) {
-        // TODO: add extra blank page if needed.
-        return doc;
     }
 }
