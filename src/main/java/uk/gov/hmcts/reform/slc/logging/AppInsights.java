@@ -1,12 +1,12 @@
 package uk.gov.hmcts.reform.slc.logging;
 
+import com.google.common.collect.ImmutableMap;
 import com.microsoft.applicationinsights.TelemetryClient;
 import com.microsoft.applicationinsights.telemetry.Duration;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.logging.appinsights.AbstractAppInsights;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 
 @Component
@@ -69,7 +69,8 @@ public class AppInsights extends AbstractAppInsights {
         telemetry.trackEvent(
             AppEvent.MESSAGE_RECEIVED,
             Collections.singletonMap("messageId", messageId),
-            Collections.singletonMap("enqueuedInNanos", (double) enqueuedInNanos));
+            Collections.singletonMap("enqueuedInNanos", (double) enqueuedInNanos)
+        );
     }
 
     public void markMessageHandled(String messageId, long handlingInNanos) {
@@ -89,11 +90,11 @@ public class AppInsights extends AbstractAppInsights {
     }
 
     public void trackMessageMappedToLetter(String messageId, String serviceName, String template, long bodyLength) {
-        Map<String, String> properties = new HashMap<>();
-
-        properties.put("messageId", messageId);
-        properties.put("service", serviceName);
-        properties.put("template", template);
+        Map<String, String> properties = ImmutableMap.of(
+            "messageId", messageId,
+            "service", serviceName,
+            "template", template
+        );
 
         telemetry.trackEvent(
             AppEvent.MESSAGE_MAPPED_SUCCESSFULLY,
@@ -102,11 +103,11 @@ public class AppInsights extends AbstractAppInsights {
         );
     }
 
-    public void trackMessageMappedToNull(String messageId, long bodyLength) {
+    public void trackMessageMappedToNull(String messageId) {
         telemetry.trackEvent(
             AppEvent.MESSAGE_MAPPED_EMPTY,
             Collections.singletonMap("messageId", messageId),
-            Collections.singletonMap("messageSize", (double) bodyLength)
+            null
         );
     }
 

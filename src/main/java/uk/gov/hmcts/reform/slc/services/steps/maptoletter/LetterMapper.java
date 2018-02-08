@@ -41,7 +41,7 @@ public class LetterMapper {
 
     private Letter validate(Letter letter, String messageId, int bodyLength) throws InvalidMessageException {
         if (letter == null) {
-            insights.trackMessageMappedToNull(messageId, bodyLength);
+            insights.trackMessageMappedToNull(messageId);
 
             throw new InvalidMessageException("Empty message " + messageId);
         }
