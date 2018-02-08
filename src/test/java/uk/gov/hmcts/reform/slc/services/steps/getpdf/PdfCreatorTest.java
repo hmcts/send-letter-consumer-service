@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.slc.model.Document;
 import uk.gov.hmcts.reform.slc.model.Letter;
 
 import java.time.Duration;
-import java.util.List;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyMap;
@@ -55,7 +54,7 @@ public class PdfCreatorTest {
     }
 
     @Test
-    public void should_return_list_of_pdfs() {
+    public void should_return_a_pdf_object() {
         given(client.generateFromHtml("t1".getBytes(), emptyMap()))
             .willReturn("hello t1".getBytes());
         given(client.generateFromHtml("t2".getBytes(), emptyMap()))
@@ -71,16 +70,11 @@ public class PdfCreatorTest {
         );
 
         // when
-        List<PdfDoc> pdfs = pdfCreator.create(letter);
+        PdfDoc pdf = pdfCreator.create(letter);
 
         // then
-        assertThat(pdfs).hasSize(2);
-
-        assertThat(pdfs.get(0).content).isEqualTo("hello t1".getBytes());
-        assertThat(pdfs.get(0).filename).isNotEmpty();
-
-        assertThat(pdfs.get(1).content).isEqualTo("hello t2".getBytes());
-        assertThat(pdfs.get(1).filename).isNotEmpty();
+        assertThat(pdf.content).isNotEmpty(); //TODO: update when merger is ready
+        assertThat(pdf.filename).isNotEmpty();
 
         verify(insights, times(2)).trackPdfGenerator(any(Duration.class), eq(true));
         verifyNoMoreInteractions(insights);
