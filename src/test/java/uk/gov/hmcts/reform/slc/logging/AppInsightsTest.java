@@ -10,9 +10,9 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import java.util.Collections;
 import java.util.Map;
 
+import static java.util.Collections.singletonMap;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.eq;
@@ -129,8 +129,8 @@ public class AppInsightsTest {
 
         verify(client).trackEvent(
             AppEvent.MESSAGE_RECEIVED,
-            Collections.singletonMap(MESSAGE_ID_KEY, MESSAGE_ID),
-            Collections.singletonMap("enqueuedInNanos", (double) NOT_MANY_NANOS)
+            singletonMap(MESSAGE_ID_KEY, MESSAGE_ID),
+            singletonMap("enqueuedInNanos", (double) NOT_MANY_NANOS)
         );
     }
 
@@ -140,8 +140,8 @@ public class AppInsightsTest {
 
         verify(client).trackEvent(
             AppEvent.MESSAGE_HANDLED_SUCCESSFULLY,
-            Collections.singletonMap(MESSAGE_ID_KEY, MESSAGE_ID),
-            Collections.singletonMap("handledInNanos", (double) NOT_MANY_NANOS)
+            singletonMap(MESSAGE_ID_KEY, MESSAGE_ID),
+            singletonMap("handledInNanos", (double) NOT_MANY_NANOS)
         );
     }
 
@@ -151,8 +151,8 @@ public class AppInsightsTest {
 
         verify(client).trackEvent(
             AppEvent.MESSAGE_HANDLED_UNSUCCESSFULLY,
-            Collections.singletonMap(MESSAGE_ID_KEY, MESSAGE_ID),
-            Collections.singletonMap("handledInNanos", (double) NOT_MANY_NANOS)
+            singletonMap(MESSAGE_ID_KEY, MESSAGE_ID),
+            singletonMap("handledInNanos", (double) NOT_MANY_NANOS)
         );
     }
 
@@ -169,7 +169,7 @@ public class AppInsightsTest {
         verify(client).trackEvent(
             AppEvent.MESSAGE_MAPPED_SUCCESSFULLY,
             properties,
-            Collections.singletonMap(MESSAGE_SIZE_KEY, (double) BODY_LENGTH)
+            singletonMap(MESSAGE_SIZE_KEY, (double) BODY_LENGTH)
         );
     }
 
@@ -179,7 +179,7 @@ public class AppInsightsTest {
 
         verify(client).trackEvent(
             AppEvent.MESSAGE_MAPPED_EMPTY,
-            Collections.singletonMap(MESSAGE_ID_KEY, MESSAGE_ID),
+            singletonMap(MESSAGE_ID_KEY, MESSAGE_ID),
             null
         );
     }
@@ -190,8 +190,8 @@ public class AppInsightsTest {
 
         verify(client).trackEvent(
             AppEvent.MESSAGE_MAPPED_INVALID,
-            Collections.singletonMap(MESSAGE_ID_KEY, MESSAGE_ID),
-            Collections.singletonMap(MESSAGE_SIZE_KEY, (double) BODY_LENGTH)
+            singletonMap(MESSAGE_ID_KEY, MESSAGE_ID),
+            singletonMap(MESSAGE_SIZE_KEY, (double) BODY_LENGTH)
         );
     }
 
@@ -201,8 +201,8 @@ public class AppInsightsTest {
 
         verify(client).trackEvent(
             AppEvent.MESSAGE_MAPPED_UNSUCCESSFULLY,
-            Collections.singletonMap(MESSAGE_ID_KEY, MESSAGE_ID),
-            Collections.singletonMap(MESSAGE_SIZE_KEY, (double) BODY_LENGTH)
+            singletonMap(MESSAGE_ID_KEY, MESSAGE_ID),
+            singletonMap(MESSAGE_SIZE_KEY, (double) BODY_LENGTH)
         );
     }
 
