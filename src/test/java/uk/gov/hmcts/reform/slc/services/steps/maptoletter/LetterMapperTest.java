@@ -123,7 +123,7 @@ public class LetterMapperTest {
             .isInstanceOf(InvalidMessageException.class)
             .hasMessageStartingWith("Empty message");
 
-        verify(insights).trackMessageMappedToNull(anyString(), anyLong());
+        verify(insights).trackMessageMappedToNull(anyString());
         verifyNoMoreInteractions(insights);
     }
 }

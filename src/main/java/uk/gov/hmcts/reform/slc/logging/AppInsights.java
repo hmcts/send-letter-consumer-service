@@ -1,13 +1,14 @@
 package uk.gov.hmcts.reform.slc.logging;
 
+import com.google.common.collect.ImmutableMap;
 import com.microsoft.applicationinsights.TelemetryClient;
 import com.microsoft.applicationinsights.telemetry.Duration;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.logging.appinsights.AbstractAppInsights;
 
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
+
+import static java.util.Collections.singletonMap;
 
 @Component
 public class AppInsights extends AbstractAppInsights {
@@ -68,61 +69,62 @@ public class AppInsights extends AbstractAppInsights {
     public void trackMessageReceived(String messageId, long enqueuedInNanos) {
         telemetry.trackEvent(
             AppEvent.MESSAGE_RECEIVED,
-            Collections.singletonMap("messageId", messageId),
-            Collections.singletonMap("enqueuedInNanos", (double) enqueuedInNanos));
+            singletonMap("messageId", messageId),
+            singletonMap("enqueuedInNanos", (double) enqueuedInNanos)
+        );
     }
 
     public void markMessageHandled(String messageId, long handlingInNanos) {
         telemetry.trackEvent(
             AppEvent.MESSAGE_HANDLED_SUCCESSFULLY,
-            Collections.singletonMap("messageId", messageId),
-            Collections.singletonMap("handledInNanos", (double) handlingInNanos)
+            singletonMap("messageId", messageId),
+            singletonMap("handledInNanos", (double) handlingInNanos)
         );
     }
 
     public void markMessageNotHandled(String messageId, long handlingInNanos) {
         telemetry.trackEvent(
             AppEvent.MESSAGE_HANDLED_UNSUCCESSFULLY,
-            Collections.singletonMap("messageId", messageId),
-            Collections.singletonMap("handledInNanos", (double) handlingInNanos)
+            singletonMap("messageId", messageId),
+            singletonMap("handledInNanos", (double) handlingInNanos)
         );
     }
 
     public void trackMessageMappedToLetter(String messageId, String serviceName, String template, long bodyLength) {
-        Map<String, String> properties = new HashMap<>();
-
-        properties.put("messageId", messageId);
-        properties.put("service", serviceName);
-        properties.put("template", template);
+        Map<String, String> properties = ImmutableMap.of(
+            "messageId", messageId,
+            "service", serviceName,
+            "template", template
+        );
 
         telemetry.trackEvent(
             AppEvent.MESSAGE_MAPPED_SUCCESSFULLY,
             properties,
-            Collections.singletonMap("messageSize", (double) bodyLength)
+            singletonMap("messageSize", (double) bodyLength)
         );
     }
 
-    public void trackMessageMappedToNull(String messageId, long bodyLength) {
+    public void trackMessageMappedToNull(String messageId) {
         telemetry.trackEvent(
             AppEvent.MESSAGE_MAPPED_EMPTY,
-            Collections.singletonMap("messageId", messageId),
-            Collections.singletonMap("messageSize", (double) bodyLength)
+            singletonMap("messageId", messageId),
+            null
         );
     }
 
     public void trackMessageMappedToInvalid(String messageId, long bodyLength) {
         telemetry.trackEvent(
             AppEvent.MESSAGE_MAPPED_INVALID,
-            Collections.singletonMap("messageId", messageId),
-            Collections.singletonMap("messageSize", (double) bodyLength)
+            singletonMap("messageId", messageId),
+            singletonMap("messageSize", (double) bodyLength)
         );
     }
 
     public void trackMessageNotMapped(String messageId, long bodyLength) {
         telemetry.trackEvent(
             AppEvent.MESSAGE_MAPPED_UNSUCCESSFULLY,
-            Collections.singletonMap("messageId", messageId),
-            Collections.singletonMap("messageSize", (double) bodyLength)
+            singletonMap("messageId", messageId),
+            singletonMap("messageSize", (double) bodyLength)
         );
     }
 
