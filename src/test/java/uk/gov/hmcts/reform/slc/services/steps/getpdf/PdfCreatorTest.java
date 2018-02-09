@@ -13,8 +13,11 @@ import uk.gov.hmcts.reform.slc.model.Document;
 import uk.gov.hmcts.reform.slc.model.Letter;
 import uk.gov.hmcts.reform.slc.services.steps.getpdf.duplex.DuplexPreparator;
 
+import java.io.IOException;
 import java.time.Duration;
 
+import static com.google.common.io.Resources.getResource;
+import static com.google.common.io.Resources.toByteArray;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonList;
@@ -53,9 +56,19 @@ public class PdfCreatorTest {
     }
 
     @Test
-    public void should_return_a_pdf_object() {
-        given(client.generateFromHtml(any(), any())).willReturn("hello".getBytes());
-        given(duplexPreparator.prepare(any())).willReturn("duplexed hello".getBytes());
+    public void should_return_a_merged_pdf_when_letter_consists_of_multiple_documents() throws IOException {
+        byte[] test1PDF = toByteArray(getResource("test1.pdf"));
+        byte[] test2PDF = toByteArray(getResource("test1.pdf"));
+        byte[] test1Test2MergedPDF = toByteArray(getResource("test1-test2-merged.pdf"));
+
+        given(client.generateFromHtml("t1".getBytes(), emptyMap()))
+            .willReturn(test1PDF);
+        given(client.generateFromHtml("t2".getBytes(), emptyMap()))
+            .willReturn(test2PDF);
+        given(duplexPreparator.prepare(test1PDF))
+            .willReturn(test1PDF);
+        given(duplexPreparator.prepare(test2PDF))
+            .willReturn(test2PDF);
 
         Letter letter = new Letter(
             asList(
@@ -70,11 +83,16 @@ public class PdfCreatorTest {
         PdfDoc pdf = pdfCreator.create(letter);
 
         // then
-        assertThat(pdf.content).isNotEmpty(); //TODO: update when merger is ready
-        assertThat(pdf.filename).isNotEmpty();
+        assertThat(pdf.content).contains(test1Test2MergedPDF);
+        assertThat(pdf.filename).startsWith("type-service");
+
+        verify(client).generateFromHtml("t1".getBytes(), emptyMap());
+        verify(client).generateFromHtml("t2".getBytes(), emptyMap());
+
+        verify(duplexPreparator,times(2)).prepare(any(byte[].class));
 
         verify(insights, times(2)).trackPdfGenerator(any(Duration.class), eq(true));
-        verifyNoMoreInteractions(insights);
+        verifyNoMoreInteractions(client,duplexPreparator,insights);
     }
 
     @Test
