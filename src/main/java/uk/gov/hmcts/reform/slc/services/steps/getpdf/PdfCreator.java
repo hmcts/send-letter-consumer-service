@@ -40,7 +40,7 @@ public class PdfCreator {
                 .map(duplexPreparator::prepare)
                 .collect(toList());
 
-        byte[] finalContent = PDFMerger.mergeDocuments(docs);
+        byte[] finalContent = PdfMerger.mergeDocuments(docs);
 
         return new PdfDoc(
             FileNameGenerator.generateFor(letter.type, letter.service, finalContent, "pdf"),

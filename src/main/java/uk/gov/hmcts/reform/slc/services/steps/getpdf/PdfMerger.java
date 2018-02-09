@@ -12,9 +12,9 @@ import java.util.List;
 import static java.util.stream.Collectors.toList;
 import static org.apache.pdfbox.io.MemoryUsageSetting.setupMainMemoryOnly;
 
-public final class PDFMerger {
+public final class PdfMerger {
 
-    private PDFMerger() {
+    private PdfMerger() {
         // utility class constructor
     }
 
