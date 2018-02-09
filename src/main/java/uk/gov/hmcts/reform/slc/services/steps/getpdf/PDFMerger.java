@@ -15,6 +15,7 @@ import static org.apache.pdfbox.io.MemoryUsageSetting.setupMainMemoryOnly;
 public final class PDFMerger {
 
     private PDFMerger() {
+        // utility class constructor
     }
 
     public static byte[] mergeDocuments(List<byte[]> documents) {
