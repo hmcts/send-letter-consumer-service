@@ -60,17 +60,17 @@ public class PdfCreatorTest {
 
     @Test
     public void should_return_a_merged_pdf_when_letter_consists_of_multiple_documents() throws IOException {
-        byte[] test1PDF = toByteArray(getResource("test1.pdf"));
-        byte[] test2PDF = toByteArray(getResource("test2.pdf"));
+        byte[] test1Pdf = toByteArray(getResource("test1.pdf"));
+        byte[] test2Pdf = toByteArray(getResource("test2.pdf"));
 
         given(client.generateFromHtml("t1".getBytes(), emptyMap()))
-            .willReturn(test1PDF);
+            .willReturn(test1Pdf);
         given(client.generateFromHtml("t2".getBytes(), emptyMap()))
-            .willReturn(test2PDF);
-        given(duplexPreparator.prepare(test1PDF))
-            .willReturn(test1PDF);
-        given(duplexPreparator.prepare(test2PDF))
-            .willReturn(test2PDF);
+            .willReturn(test2Pdf);
+        given(duplexPreparator.prepare(test1Pdf))
+            .willReturn(test1Pdf);
+        given(duplexPreparator.prepare(test2Pdf))
+            .willReturn(test2Pdf);
 
         Letter letter = new Letter(
             asList(

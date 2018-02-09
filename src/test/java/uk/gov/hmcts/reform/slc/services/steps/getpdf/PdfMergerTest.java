@@ -20,14 +20,14 @@ public class PdfMergerTest {
     @Test
     public void should_return_a_merged_pdf_when_multiple_documents_are_sent() throws IOException {
         //given
-        byte[] test1PDF = toByteArray(getResource("test1.pdf"));
-        byte[] test2PDF = toByteArray(getResource("test2.pdf"));
+        byte[] test1Pdf = toByteArray(getResource("test1.pdf"));
+        byte[] test2Pdf = toByteArray(getResource("test2.pdf"));
 
         //when
-        byte[] mergedPDF = PdfMerger.mergeDocuments(asList(test1PDF, test2PDF));
+        byte[] mergedPdf = PdfMerger.mergeDocuments(asList(test1Pdf, test2Pdf));
 
         // then
-        assertThat(extractPdfText(mergedPDF))
+        assertThat(extractPdfText(mergedPdf))
             .contains("test1")
             .contains("test2");
     }
@@ -35,18 +35,18 @@ public class PdfMergerTest {
     @Test
     public void should_return_a_merged_pdf_same_as_original_pdf_when_single_pdf_is_sent() throws IOException {
         //given
-        byte[] testPDF = toByteArray(getResource("test1.pdf"));
+        byte[] testPdf = toByteArray(getResource("test1.pdf"));
 
         //when
-        byte[] actualMergedPDF = PdfMerger.mergeDocuments(singletonList(testPDF));
+        byte[] actualMergedPdf = PdfMerger.mergeDocuments(singletonList(testPdf));
 
         // then
-        assertThat(extractPdfText(actualMergedPDF)).contains("test1");
+        assertThat(extractPdfText(actualMergedPdf)).contains("test1");
     }
 
     @Test
     public void should_throw_pdf_merge_exception_when_doc_is_not_pdf_stream() {
-        assertThatThrownBy(() -> PdfMerger.mergeDocuments(singletonList("test".getBytes())))
+        assertThatThrownBy(() -> PdfMerger.mergeDocuments(asList("test1".getBytes(), "test2".getBytes())))
             .isInstanceOf(PdfMergeException.class);
     }
 

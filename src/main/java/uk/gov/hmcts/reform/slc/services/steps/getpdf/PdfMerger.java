@@ -19,6 +19,10 @@ public final class PdfMerger {
     }
 
     public static byte[] mergeDocuments(List<byte[]> documents) {
+        if (documents.size() == 1) {
+            return documents.get(0);
+        }
+
         ByteArrayOutputStream docOutputStream = new ByteArrayOutputStream();
 
         List<InputStream> inputStreams = documents.stream()
