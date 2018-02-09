@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.slc.services.steps.getpdf;
 
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
-import uk.gov.hmcts.reform.slc.services.servicebus.exceptions.PDFMergeException;
+import uk.gov.hmcts.reform.slc.services.servicebus.exceptions.PdfMergeException;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -32,7 +32,7 @@ public final class PdfMerger {
         try {
             pdfMergerUtility.mergeDocuments(setupMainMemoryOnly());
         } catch (IOException e) {
-            throw new PDFMergeException("Exception occurred while merging PDF files", e);
+            throw new PdfMergeException("Exception occurred while merging PDF files", e);
         }
         return docOutputStream.toByteArray();
     }

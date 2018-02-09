@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.slc.services.steps.getpdf;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.junit.Test;
-import uk.gov.hmcts.reform.slc.services.servicebus.exceptions.PDFMergeException;
+import uk.gov.hmcts.reform.slc.services.servicebus.exceptions.PdfMergeException;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -47,7 +47,7 @@ public class PdfMergerTest {
     @Test
     public void should_throw_pdf_merge_exception_when_doc_is_not_pdf_stream() {
         assertThatThrownBy(() -> PdfMerger.mergeDocuments(singletonList("test".getBytes())))
-            .isInstanceOf(PDFMergeException.class);
+            .isInstanceOf(PdfMergeException.class);
     }
 
     private static String extractPdfText(byte[] pdfData) throws IOException {
