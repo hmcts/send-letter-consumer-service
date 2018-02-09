@@ -45,7 +45,7 @@ module "consumer" {
 
     // ftp
     FTP_HOSTNAME    = "${var.ftp_hostname}"
-    FTP_PORT        = "${var.ftp_port}}"
+    FTP_PORT        = "${var.ftp_port}"
     FTP_FINGERPRINT = "${var.ftp_fingerprint}"
     FTP_USER        = "${data.vault_generic_secret.ftp_user.data["value"]}"
     FTP_PASSWORD    = "${data.vault_generic_secret.ftp_password.data["value"]}"
