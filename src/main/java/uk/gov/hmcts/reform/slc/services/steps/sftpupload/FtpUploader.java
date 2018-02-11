@@ -33,11 +33,11 @@ public class FtpUploader {
 
     // region constructor
     public FtpUploader(
-        @Value("${sftp.hostname}") String hostname,
-        @Value("${sftp.port}") int port,
-        @Value("${sftp.fingerprint}") String fingerprint,
-        @Value("${sftp.username}") String username,
-        @Value("${sftp.password}") String password,
+        @Value("${ftp.hostname}") String hostname,
+        @Value("${ftp.port}") int port,
+        @Value("${ftp.fingerprint}") String fingerprint,
+        @Value("${ftp.user}") String username,
+        @Value("${ftp.password}") String password,
         SSHClient sshClient
     ) {
         this.hostname = hostname;
