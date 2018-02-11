@@ -35,9 +35,9 @@ public final class PdfMerger {
 
         try {
             pdfMergerUtility.mergeDocuments(setupMainMemoryOnly());
+            return docOutputStream.toByteArray();
         } catch (IOException e) {
             throw new PdfMergeException("Exception occurred while merging PDF files", e);
         }
-        return docOutputStream.toByteArray();
     }
 }

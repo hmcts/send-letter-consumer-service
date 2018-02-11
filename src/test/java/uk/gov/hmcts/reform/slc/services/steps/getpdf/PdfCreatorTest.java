@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.slc.services.steps.getpdf;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.text.PDFTextStripper;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -15,8 +14,8 @@ import uk.gov.hmcts.reform.slc.model.Document;
 import uk.gov.hmcts.reform.slc.model.Letter;
 import uk.gov.hmcts.reform.slc.services.steps.getpdf.duplex.DuplexPreparator;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.time.Duration;
 
 import static com.google.common.io.Resources.getResource;
@@ -62,6 +61,7 @@ public class PdfCreatorTest {
     public void should_return_a_merged_pdf_when_letter_consists_of_multiple_documents() throws IOException {
         byte[] test1Pdf = toByteArray(getResource("test1.pdf"));
         byte[] test2Pdf = toByteArray(getResource("test2.pdf"));
+        byte[] expectedMergedPdf = toByteArray(getResource("merged.pdf"));
 
         given(client.generateFromHtml("t1".getBytes(), emptyMap()))
             .willReturn(test1Pdf);
@@ -85,11 +85,10 @@ public class PdfCreatorTest {
         PdfDoc pdf = pdfCreator.create(letter);
 
         // then
-        assertThat(extractPdfText(pdf.content))
-            .contains("test1")
-            .contains("test2");
+        InputStream actualContents = PDDocument.load(pdf.content).getPage(0).getContents();
+        InputStream expectedContents = PDDocument.load(expectedMergedPdf).getPage(0).getContents();
 
-        assertThat(pdf.filename).startsWith("type-service");
+        assertThat(actualContents).hasSameContentAs(expectedContents);
 
         verify(client).generateFromHtml("t1".getBytes(), emptyMap());
         verify(client).generateFromHtml("t2".getBytes(), emptyMap());
@@ -116,11 +115,5 @@ public class PdfCreatorTest {
         verify(insights).trackPdfGenerator(any(Duration.class), eq(false));
         verify(insights).trackException(any(PDFServiceClientException.class));
         verifyNoMoreInteractions(insights);
-    }
-
-    private static String extractPdfText(byte[] pdfData) throws IOException {
-        try (PDDocument pdfDocument = PDDocument.load(new ByteArrayInputStream(pdfData))) {
-            return new PDFTextStripper().getText(pdfDocument);
-        }
     }
 }
