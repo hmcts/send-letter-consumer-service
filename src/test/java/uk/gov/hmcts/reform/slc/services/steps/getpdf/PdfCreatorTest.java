@@ -85,10 +85,14 @@ public class PdfCreatorTest {
         PdfDoc pdf = pdfCreator.create(letter);
 
         // then
-        InputStream actualContents = PDDocument.load(pdf.content).getPage(0).getContents();
-        InputStream expectedContents = PDDocument.load(expectedMergedPdf).getPage(0).getContents();
+        InputStream actualPdfPage1 = getPdfPageContents(pdf.content, 0);
+        InputStream actualPdfPage2 = getPdfPageContents(pdf.content, 1);
 
-        assertThat(actualContents).hasSameContentAs(expectedContents);
+        InputStream expectedPdfPage1 = getPdfPageContents(expectedMergedPdf, 0);
+        InputStream expectedPdfPage2 = getPdfPageContents(expectedMergedPdf, 1);
+
+        assertThat(actualPdfPage1).hasSameContentAs(expectedPdfPage1);
+        assertThat(actualPdfPage2).hasSameContentAs(expectedPdfPage2);
 
         verify(client).generateFromHtml("t1".getBytes(), emptyMap());
         verify(client).generateFromHtml("t2".getBytes(), emptyMap());
@@ -115,5 +119,9 @@ public class PdfCreatorTest {
         verify(insights).trackPdfGenerator(any(Duration.class), eq(false));
         verify(insights).trackException(any(PDFServiceClientException.class));
         verifyNoMoreInteractions(insights);
+    }
+
+    private InputStream getPdfPageContents(byte[] pdf, int pageNumber) throws IOException {
+        return PDDocument.load(pdf).getPage(pageNumber).getContents();
     }
 }

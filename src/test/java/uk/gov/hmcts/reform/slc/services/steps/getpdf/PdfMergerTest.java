@@ -27,10 +27,14 @@ public class PdfMergerTest {
         byte[] actualMergedPdf = PdfMerger.mergeDocuments(asList(test1Pdf, test2Pdf));
 
         // then
-        InputStream actualContents = PDDocument.load(actualMergedPdf).getPage(0).getContents();
-        InputStream expectedContents = PDDocument.load(expectedMergedPdf).getPage(0).getContents();
+        InputStream actualPdfPage1 = getPdfPageContents(actualMergedPdf, 0);
+        InputStream actualPdfPage2 = getPdfPageContents(actualMergedPdf, 1);
 
-        assertThat(actualContents).hasSameContentAs(expectedContents);
+        InputStream expectedPdfPage1 = getPdfPageContents(expectedMergedPdf, 0);
+        InputStream expectedPdfPage2 = getPdfPageContents(expectedMergedPdf, 1);
+
+        assertThat(actualPdfPage1).hasSameContentAs(expectedPdfPage1);
+        assertThat(actualPdfPage2).hasSameContentAs(expectedPdfPage2);
     }
 
     @Test
@@ -49,5 +53,9 @@ public class PdfMergerTest {
     public void should_throw_pdf_merge_exception_when_doc_is_not_pdf_stream() {
         assertThatThrownBy(() -> PdfMerger.mergeDocuments(asList("test1".getBytes(), "test2".getBytes())))
             .isInstanceOf(PdfMergeException.class);
+    }
+
+    private InputStream getPdfPageContents(byte[] pdf, int pageNumber) throws IOException {
+        return PDDocument.load(pdf).getPage(pageNumber).getContents();
     }
 }
