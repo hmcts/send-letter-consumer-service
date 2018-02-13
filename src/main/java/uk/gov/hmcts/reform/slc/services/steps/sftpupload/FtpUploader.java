@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.slc.services.steps.sftpupload;
 
 import net.schmizz.sshj.SSHClient;
 import net.schmizz.sshj.sftp.SFTPClient;
-import net.schmizz.sshj.sftp.SFTPFileTransfer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,45 +49,32 @@ public class FtpUploader {
     // endregion
 
     public void upload(PdfDoc pdfDoc) {
-        Instant start = null;
+        Instant start = Instant.now();
 
         try {
-            SFTPFileTransfer fileTransfer = getSftpFileTransfer();
-            start = Instant.now();
 
-            fileTransfer.upload(pdfDoc, pdfDoc.filename);
+            ssh.addHostKeyVerifier(fingerprint);
+            ssh.connect(hostname, port);
+            ssh.authPassword(username, password);
 
-            insights.trackFtpUpload(Duration.between(start, Instant.now()), true);
-        } catch (IOException exc) {
-            if (start != null) {
-                insights.trackFtpUpload(Duration.between(start, Instant.now()), false);
+            try (SFTPClient sftp = ssh.newSFTPClient()) {
+                sftp.getFileTransfer().upload(pdfDoc, pdfDoc.filename);
             }
 
+            insights.trackFtpUpload(Duration.between(start, Instant.now()), true);
+
+        } catch (IOException exc) {
+            insights.trackFtpUpload(Duration.between(start, Instant.now()), false);
             insights.trackException(exc);
 
             throw new FtpStepException("Unable to upload PDF.", exc);
+
         } finally {
             try {
                 ssh.disconnect();
             } catch (IOException e) {
                 logger.warn("Error closing ssh connection.");
             }
-        }
-    }
-
-    private SFTPFileTransfer getSftpFileTransfer() {
-        try {
-            ssh.addHostKeyVerifier(fingerprint);
-            ssh.connect(hostname, port);
-            ssh.authPassword(username, password);
-
-            try (SFTPClient sftp = ssh.newSFTPClient()) {
-                return sftp.getFileTransfer();
-            }
-        } catch (IOException exc) {
-            insights.trackException(exc);
-
-            throw new FtpStepException("Unable to connect to sftp", exc);
         }
     }
 }
