@@ -15,7 +15,7 @@ data "vault_generic_secret" "ftp_password" {
 }
 
 data "vault_generic_secret" "servicebus_conn_string" {
-  path = "secret/${var.env}/cc/send-letter-consumer/servicebus-conn-string"
+  path = "secret/${var.env}/cc/send-letter/servicebus-listen-conn-string"
 }
 
 locals {
