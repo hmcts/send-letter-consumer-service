@@ -49,11 +49,9 @@ public class FtpUploader {
     // endregion
 
     public void upload(PdfDoc pdfDoc) {
-        Instant start = null;
+        Instant start = Instant.now();
 
         try {
-
-            start = Instant.now();
 
             ssh.addHostKeyVerifier(fingerprint);
             ssh.connect(hostname, port);
@@ -66,10 +64,7 @@ public class FtpUploader {
             insights.trackFtpUpload(Duration.between(start, Instant.now()), true);
 
         } catch (IOException exc) {
-            if (start != null) {
-                insights.trackFtpUpload(Duration.between(start, Instant.now()), false);
-            }
-
+            insights.trackFtpUpload(Duration.between(start, Instant.now()), false);
             insights.trackException(exc);
 
             throw new FtpStepException("Unable to upload PDF.", exc);
