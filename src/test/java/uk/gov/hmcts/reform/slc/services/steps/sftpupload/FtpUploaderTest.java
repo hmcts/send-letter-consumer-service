@@ -47,8 +47,10 @@ public class FtpUploaderTest {
             22,
             "d8:2f:cd:a0:ce:d4:a0:c9:93:09:be:43:4b:20:49:b3",
             "user",
-            "pass",
-            sshClient
+            sshClient,
+            null,
+            null,
+            null
         );
 
         ReflectionTestUtils.setField(uploader, "insights", insights);

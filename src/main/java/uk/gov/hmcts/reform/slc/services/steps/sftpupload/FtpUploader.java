@@ -27,8 +27,11 @@ public class FtpUploader {
     private final int port;
     private final String fingerprint;
     private final String username;
-    private final String password;
     private final SSHClient ssh;
+    private final String publicKey;
+    private final String privateKey;
+    private final String targetFolder;
+
 
     // region constructor
     public FtpUploader(
@@ -36,15 +39,19 @@ public class FtpUploader {
         @Value("${ftp.port}") int port,
         @Value("${ftp.fingerprint}") String fingerprint,
         @Value("${ftp.user}") String username,
-        @Value("${ftp.password}") String password,
-        SSHClient sshClient
+        SSHClient sshClient,
+        @Value("${ftp.keys.public}") String publicKey,
+        @Value("@{ftp.keys.private}") String privateKey,
+        @Value("@{ftp.target-folder}") String targetFolder
     ) {
         this.hostname = hostname;
         this.port = port;
         this.fingerprint = fingerprint;
         this.username = username;
-        this.password = password;
         this.ssh = sshClient;
+        this.publicKey = publicKey;
+        this.privateKey = privateKey;
+        this.targetFolder = targetFolder;
     }
     // endregion
 
@@ -55,10 +62,21 @@ public class FtpUploader {
 
             ssh.addHostKeyVerifier(fingerprint);
             ssh.connect(hostname, port);
-            ssh.authPassword(username, password);
+
+            ssh.authPublickey(
+                username,
+                ssh.loadKeys(
+                    privateKey,
+                    publicKey,
+                    null
+                )
+            );
 
             try (SFTPClient sftp = ssh.newSFTPClient()) {
-                sftp.getFileTransfer().upload(pdfDoc, pdfDoc.filename);
+                sftp.getFileTransfer().upload(
+                    pdfDoc,
+                    String.join("/", this.targetFolder, pdfDoc.filename)
+                );
             }
 
             insights.trackFtpUpload(Duration.between(start, Instant.now()), true);
