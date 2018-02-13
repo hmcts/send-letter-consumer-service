@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.slc.services.steps.getpdf;
 
+import org.apache.pdfbox.pdmodel.PDDocument;
 import com.google.common.collect.ImmutableMap;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
@@ -16,8 +17,12 @@ import uk.gov.hmcts.reform.slc.model.Document;
 import uk.gov.hmcts.reform.slc.model.Letter;
 import uk.gov.hmcts.reform.slc.services.steps.getpdf.duplex.DuplexPreparator;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.time.Duration;
 
+import static com.google.common.io.Resources.getResource;
+import static com.google.common.io.Resources.toByteArray;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonList;
@@ -56,9 +61,19 @@ public class PdfCreatorTest {
     }
 
     @Test
-    public void should_return_a_pdf_object() {
-        given(client.generateFromHtml(any(), any())).willReturn("hello".getBytes());
-        given(duplexPreparator.prepare(any())).willReturn("duplexed hello".getBytes());
+    public void should_return_a_merged_pdf_when_letter_consists_of_multiple_documents() throws IOException {
+        byte[] test1Pdf = toByteArray(getResource("test1.pdf"));
+        byte[] test2Pdf = toByteArray(getResource("test2.pdf"));
+        byte[] expectedMergedPdf = toByteArray(getResource("merged.pdf"));
+
+        given(client.generateFromHtml("t1".getBytes(), emptyMap()))
+            .willReturn(test1Pdf);
+        given(client.generateFromHtml("t2".getBytes(), emptyMap()))
+            .willReturn(test2Pdf);
+        given(duplexPreparator.prepare(test1Pdf))
+            .willReturn(test1Pdf);
+        given(duplexPreparator.prepare(test2Pdf))
+            .willReturn(test2Pdf);
 
         Letter letter = new Letter(
             "a9uda9sd",
@@ -78,11 +93,22 @@ public class PdfCreatorTest {
         PdfDoc pdf = pdfCreator.create(letter);
 
         // then
-        assertThat(pdf.content).isNotEmpty(); //TODO: update when merger is ready
-        assertThat(pdf.filename).isNotEmpty();
+        InputStream actualPdfPage1 = getPdfPageContents(pdf.content, 0);
+        InputStream actualPdfPage2 = getPdfPageContents(pdf.content, 1);
+
+        InputStream expectedPdfPage1 = getPdfPageContents(expectedMergedPdf, 0);
+        InputStream expectedPdfPage2 = getPdfPageContents(expectedMergedPdf, 1);
+
+        assertThat(actualPdfPage1).hasSameContentAs(expectedPdfPage1);
+        assertThat(actualPdfPage2).hasSameContentAs(expectedPdfPage2);
+
+        verify(client).generateFromHtml("t1".getBytes(), emptyMap());
+        verify(client).generateFromHtml("t2".getBytes(), emptyMap());
+
+        verify(duplexPreparator, times(2)).prepare(any(byte[].class));
 
         verify(insights, times(2)).trackPdfGenerator(any(Duration.class), eq(true));
-        verifyNoMoreInteractions(insights);
+        verifyNoMoreInteractions(client, duplexPreparator, insights);
     }
 
     @Test
@@ -108,5 +134,9 @@ public class PdfCreatorTest {
         verify(insights).trackPdfGenerator(any(Duration.class), eq(false));
         verify(insights).trackException(any(PDFServiceClientException.class));
         verifyNoMoreInteractions(insights);
+    }
+
+    private InputStream getPdfPageContents(byte[] pdf, int pageNumber) throws IOException {
+        return PDDocument.load(pdf).getPage(pageNumber).getContents();
     }
 }
