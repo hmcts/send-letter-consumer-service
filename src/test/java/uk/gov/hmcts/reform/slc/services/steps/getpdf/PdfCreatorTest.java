@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.slc.services.steps.getpdf;
 
+import com.google.common.collect.ImmutableMap;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.junit.Before;
 import org.junit.Test;
@@ -73,12 +74,17 @@ public class PdfCreatorTest {
             .willReturn(test2Pdf);
 
         Letter letter = new Letter(
+            "a9uda9sd",
             asList(
                 new Document("t1", emptyMap()),
                 new Document("t2", emptyMap())
             ),
             "type",
-            "service"
+            "service",
+            "3h9j8e",
+            ImmutableMap.of(
+                "case_id", "asd38r"
+            )
         );
 
         // when
@@ -108,9 +114,16 @@ public class PdfCreatorTest {
         willThrow(PDFServiceClientException.class).given(client).generateFromHtml(any(), any());
 
         Letter letter = new Letter(
-            singletonList(new Document("template", emptyMap())),
+            "9asd8asf7g",
+            singletonList(
+                new Document("template", emptyMap())
+            ),
             "type",
-            "service"
+            "service",
+            "a97gss8as",
+            ImmutableMap.of(
+                "foo", "bar"
+            )
         );
 
         assertThatThrownBy(() -> pdfCreator.create(letter))

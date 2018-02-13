@@ -43,6 +43,7 @@ public class LetterMapperTest {
         given(message.getBody())
             .willReturn(
                 ("{"
+                    + "\"id\": \"923rjff2032h998sdhfs98d\","
                     + "\"documents\": ["
                     + "  {"
                     + "    \"template\": \"whatever\","
@@ -50,7 +51,11 @@ public class LetterMapperTest {
                     + "  }"
                     + "],"
                     + "\"type\": \"some_type\","
-                    + "\"service\": \"some_service\""
+                    + "\"service\": \"some_service\","
+                    + "\"message_id\": \"syf8f7\","
+                    + "\"additional_data\": {"
+                    + "  \"document_type\": \"claim\""
+                    + "}"
                     + "}"
                 ).getBytes()
             );
