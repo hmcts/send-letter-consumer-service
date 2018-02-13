@@ -1,9 +1,7 @@
 package uk.gov.hmcts.reform.slc.services.steps.getpdf;
 
-import org.apache.pdfbox.pdmodel.PDDocument;
 import com.google.common.collect.ImmutableMap;
 import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.text.PDFTextStripper;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
