@@ -21,9 +21,12 @@ servicebus:
 ftp:
   hostname: ${FTP_HOSTNAME}
   port: ${FTP_PORT}
+  target-folder: ${FTP_TARGET_FOLDER}
   fingerprint: ${FTP_FINGERPRINT}
   user: ${FTP_USER}
-  password: ${FTP_PASSWORD}
+  keys:
+    private: ${FTP_PRIVATE_KEY}
+    public: ${FTP_PUBLIC_KEY}
   downtime:
     from: ${FTP_DOWNTIME_FROM:17:00}
     to: ${FTP_DOWNTIME_TO:18:00}
