@@ -94,9 +94,7 @@ public class FtpUploaderTest {
         Throwable exc = catchThrowable(() -> uploader.upload(new PdfDoc("hello.pdf", "hello".getBytes())));
 
         // then
-        assertThat(exc)
-            .isInstanceOf(FtpStepException.class)
-            .hasMessageContaining("Unable to connect to sftp");
+        assertThat(exc).isInstanceOf(FtpStepException.class);
         verify(insights).trackException(any(IOException.class));
     }
 }
