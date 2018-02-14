@@ -16,6 +16,8 @@ import uk.gov.hmcts.reform.slc.services.steps.getpdf.PdfDoc;
 import uk.gov.hmcts.reform.slc.services.steps.maptoletter.LetterMapper;
 import uk.gov.hmcts.reform.slc.services.steps.sftpupload.FtpClient;
 
+import java.util.UUID;
+
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -30,6 +32,7 @@ public class SendLetterServiceTest {
     @Mock private LetterMapper letterMapper;
     @Mock private PdfCreator pdfCreator;
     @Mock private FtpClient ftpClient;
+    @Mock private SendLetterClient sendLetterClient;
 
     @Mock private IMessage message;
 
@@ -37,7 +40,7 @@ public class SendLetterServiceTest {
 
     @Before
     public void setUp() throws Exception {
-        service = new SendLetterService(letterMapper, pdfCreator, ftpClient);
+        service = new SendLetterService(letterMapper, pdfCreator, ftpClient, sendLetterClient);
     }
 
     @Test
@@ -70,7 +73,7 @@ public class SendLetterServiceTest {
 
     private Letter sampleLetter() {
         return new Letter(
-            "abc123",
+            UUID.randomUUID(),
             singletonList(
                 new Document("template", emptyMap())
             ),

@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.slc.services.steps.getpdf.duplex.DuplexPreparator;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.Duration;
+import java.util.UUID;
 
 import static com.google.common.io.Resources.getResource;
 import static com.google.common.io.Resources.toByteArray;
@@ -74,7 +75,7 @@ public class PdfCreatorTest {
             .willReturn(test2Pdf);
 
         Letter letter = new Letter(
-            "a9uda9sd",
+            UUID.randomUUID(),
             asList(
                 new Document("t1", emptyMap()),
                 new Document("t2", emptyMap())
@@ -114,7 +115,7 @@ public class PdfCreatorTest {
         willThrow(PDFServiceClientException.class).given(client).generateFromHtml(any(), any());
 
         Letter letter = new Letter(
-            "9asd8asf7g",
+            UUID.randomUUID(),
             singletonList(
                 new Document("template", emptyMap())
             ),

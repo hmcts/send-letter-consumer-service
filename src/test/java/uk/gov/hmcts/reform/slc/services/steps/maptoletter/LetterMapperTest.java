@@ -43,7 +43,7 @@ public class LetterMapperTest {
         given(message.getBody())
             .willReturn(
                 ("{"
-                    + "\"id\": \"923rjff2032h998sdhfs98d\","
+                    + "\"id\": \"9903ED01-A73C-4874-8ABF-D2678E3AE23D\","
                     + "\"documents\": ["
                     + "  {"
                     + "    \"template\": \"whatever\","

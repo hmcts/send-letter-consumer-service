@@ -22,15 +22,18 @@ public class SendLetterService {
     private final LetterMapper letterMapper;
     private final PdfCreator pdfCreator;
     private final FtpClient ftpClient;
+    private final SendLetterClient sendLetterClient;
 
     public SendLetterService(
         LetterMapper letterMapper,
         PdfCreator pdfCreator,
-        FtpClient ftpClient
+        FtpClient ftpClient,
+        SendLetterClient sendLetterClient
     ) {
         this.letterMapper = letterMapper;
         this.pdfCreator = pdfCreator;
         this.ftpClient = ftpClient;
+        this.sendLetterClient = sendLetterClient;
     }
 
     public MessageHandlingResult send(IMessage msg) {
@@ -39,6 +42,9 @@ public class SendLetterService {
             PdfDoc pdf = pdfCreator.create(letter);
             // TODO: encrypt & sign
             ftpClient.upload(pdf);
+
+            //update producer with sent to print at time for reporting
+            sendLetterClient.updateSentToPrintAt(letter.id.toString());
 
             return SUCCESS;
 
