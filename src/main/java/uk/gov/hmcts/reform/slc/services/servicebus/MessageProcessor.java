@@ -36,47 +36,12 @@ public class MessageProcessor {
     public void process() {
         try {
             IMessageReceiver messageReceiver = receiverProvider.get();
-            Instant startReceiving = Instant.now();
+            Instant receiveStartTime = Instant.now();
 
             try {
-                IMessage message = messageReceiver.receive();
-
-                if (message != null) {
-                    Duration tookReceiving = Duration.between(startReceiving, Instant.now());
-                    long timeInQueue = Duration.between(message.getEnqueuedTimeUtc(), startReceiving).toNanos();
-                    String messageId = message.getMessageId();
-
-                    insights.trackMessageReceivedFromServiceBus(tookReceiving, true);
-                    insights.trackMessageReceived(messageId, timeInQueue);
-
-                    Instant startHandling = Instant.now();
-                    MessageHandlingResult result = sendLetterService.send(message);
-                    long tookHandling = Duration.between(startHandling, Instant.now()).toNanos();
-
-                    switch (result) {
-                        case SUCCESS:
-                            insights.markMessageHandled(messageId, tookHandling);
-
-                            complete(messageReceiver, message);
-
-                            break;
-                        case FAILURE:
-                            insights.markMessageNotHandled(messageId, tookHandling);
-
-                            deadLetter(messageReceiver, message);
-
-                            break;
-                        default:
-                            logger.error("Unknown message handling result: " + result);
-                            deadLetter(messageReceiver, message);
-
-                            break;
-                    }
-                } else {
-                    logger.trace("No messages to process");
-                }
+                processNextMessage(messageReceiver, receiveStartTime);
             } catch (InterruptedException | ServiceBusException e) {
-                Duration tookReceiving = Duration.between(startReceiving, Instant.now());
+                Duration tookReceiving = Duration.between(receiveStartTime, Instant.now());
                 insights.trackMessageReceivedFromServiceBus(tookReceiving, false);
                 insights.trackException(e);
 
@@ -93,6 +58,48 @@ public class MessageProcessor {
             insights.trackException(e);
 
             logger.error("Error closing connection");
+        }
+    }
+
+    private void processNextMessage(
+        IMessageReceiver messageReceiver,
+        Instant receiveStartTime
+    ) throws InterruptedException, ServiceBusException {
+
+        IMessage message = messageReceiver.receive();
+
+        if (message != null) {
+            Duration tookReceiving = Duration.between(receiveStartTime, Instant.now());
+            long timeInQueue = Duration.between(message.getEnqueuedTimeUtc(), receiveStartTime).toNanos();
+            String messageId = message.getMessageId();
+
+            insights.trackMessageReceivedFromServiceBus(tookReceiving, true);
+            insights.trackMessageReceived(messageId, timeInQueue);
+
+            sendLetter(messageReceiver, message);
+        } else {
+            logger.trace("No messages to process");
+        }
+    }
+
+    private void sendLetter(IMessageReceiver messageReceiver, IMessage message) {
+        Instant startHandling = Instant.now();
+        MessageHandlingResult result = sendLetterService.send(message);
+        long tookHandling = Duration.between(startHandling, Instant.now()).toNanos();
+
+        switch (result) {
+            case SUCCESS:
+                insights.markMessageHandled(message.getMessageId(), tookHandling);
+                complete(messageReceiver, message);
+                break;
+            case FAILURE:
+                insights.markMessageNotHandled(message.getMessageId(), tookHandling);
+                deadLetter(messageReceiver, message);
+                break;
+            default:
+                logger.error("Unknown message handling result: " + result);
+                deadLetter(messageReceiver, message);
+                break;
         }
     }
 
