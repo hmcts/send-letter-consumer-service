@@ -11,6 +11,8 @@ import uk.gov.hmcts.reform.slc.logging.AppInsights;
 import uk.gov.hmcts.reform.slc.model.Letter;
 import uk.gov.hmcts.reform.slc.services.steps.maptoletter.exceptions.InvalidMessageException;
 
+import java.util.UUID;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
@@ -66,6 +68,7 @@ public class LetterMapperTest {
         assertThat(letter.documents).hasSize(1);
         assertThat(letter.type).isEqualTo("some_type");
         assertThat(letter.service).isEqualTo("some_service");
+        assertThat(letter.id).isExactlyInstanceOf(UUID.class);
 
         verify(insights).trackMessageMappedToLetter(anyString(), eq("some_service"), eq("whatever"), anyLong());
         verifyNoMoreInteractions(insights);
@@ -129,6 +132,35 @@ public class LetterMapperTest {
             .hasMessageStartingWith("Empty message");
 
         verify(insights).trackMessageMappedToNull(anyString());
+        verifyNoMoreInteractions(insights);
+    }
+
+    @Test
+    public void should_throw_an_exception_if_letter_contains_invalid_uuid() {
+        given(message.getBody()).willReturn(
+            ("{"
+                + "\"id\": \"test\","
+                + "\"documents\": ["
+                + "  {"
+                + "    \"template\": \"whatever\","
+                + "    \"values\": { \"a\": \"b\" }"
+                + "  }"
+                + "],"
+                + "\"type\": \"some_type\","
+                + "\"service\": \"some_service\","
+                + "\"message_id\": \"syf8f7\","
+                + "\"additional_data\": {"
+                + "  \"document_type\": \"claim\""
+                + "}"
+                + "}"
+            ).getBytes()
+        );
+
+        assertThatThrownBy(() -> letterMapper.from(message))
+            .isInstanceOf(InvalidMessageException.class)
+            .hasMessageStartingWith("Unable to deserialize message");
+
+        verify(insights).trackMessageNotMapped(anyString(), anyLong());
         verifyNoMoreInteractions(insights);
     }
 }
