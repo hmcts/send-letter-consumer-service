@@ -22,16 +22,16 @@ public class SendLetterClient {
 
     private final RestTemplate restTemplate;
     private final String sendLetterProducerUrl;
-    private final Supplier<ZonedDateTime> supplier;
+    private final Supplier<ZonedDateTime> currentDateTimeSupplier;
 
     public SendLetterClient(
         RestTemplate restTemplate,
         @Value("${sendletter.producer.url}") String sendLetterProducerUrl,
-        Supplier<ZonedDateTime> supplier
+        Supplier<ZonedDateTime> currentDateTimeSupplier
     ) {
         this.restTemplate = restTemplate;
         this.sendLetterProducerUrl = sendLetterProducerUrl;
-        this.supplier = supplier;
+        this.currentDateTimeSupplier = currentDateTimeSupplier;
     }
 
     public void updateSentToPrintAt(UUID letterId) {
@@ -39,7 +39,7 @@ public class SendLetterClient {
             restTemplate.put(normalizedUrl(letterId),
                 ImmutableMap.of(
                     "sent_to_print_at",
-                    supplier.get().format(DateTimeFormatter.ISO_INSTANT)));
+                    currentDateTimeSupplier.get().format(DateTimeFormatter.ISO_INSTANT)));
         } catch (URISyntaxException | RestClientException exception) {
             //If updating timestamp fails just log the message as the letter is already uploaded
             logger.error(

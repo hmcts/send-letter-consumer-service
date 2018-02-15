@@ -6,7 +6,7 @@ import java.time.ZonedDateTime;
 import java.util.function.Supplier;
 
 @Component
-public class ZonedDateTimeSupplier implements Supplier<ZonedDateTime> {
+public class CurrentDateTimeSupplier implements Supplier<ZonedDateTime> {
     @Override
     public ZonedDateTime get() {
         return ZonedDateTime.now();
