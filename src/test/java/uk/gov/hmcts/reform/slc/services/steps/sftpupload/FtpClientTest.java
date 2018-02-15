@@ -82,7 +82,7 @@ public class FtpClientTest {
         assertThat(exc)
             .isInstanceOf(FtpStepException.class)
             .hasMessageContaining("upload");
-        verify(insights).trackFtpUpload(any(Duration.class), eq(false));
+
         verify(insights).trackException(any(IOException.class));
     }
 
