@@ -28,21 +28,21 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 
 @RunWith(MockitoJUnitRunner.class)
-public class FtpUploaderTest {
+public class FtpClientTest {
 
     @Mock private SSHClient sshClient;
     @Mock private SFTPClient sftpClient;
     @Mock private SFTPFileTransfer sftpFileTransfer;
     @Mock private AppInsights insights;
 
-    private FtpUploader uploader;
+    private FtpClient client;
 
     @Before
     public void setUp() throws Exception {
         given(sshClient.newSFTPClient()).willReturn(sftpClient);
         given(sftpClient.getFileTransfer()).willReturn(sftpFileTransfer);
 
-        uploader = new FtpUploader(
+        client = new FtpClient(
             "hostname",
             22,
             "d8:2f:cd:a0:ce:d4:a0:c9:93:09:be:43:4b:20:49:b3",
@@ -53,7 +53,7 @@ public class FtpUploaderTest {
             null
         );
 
-        ReflectionTestUtils.setField(uploader, "insights", insights);
+        ReflectionTestUtils.setField(client, "insights", insights);
     }
 
     @Test
@@ -62,7 +62,7 @@ public class FtpUploaderTest {
         doThrow(IOException.class).when(sshClient).close();
 
         // when
-        Throwable exc = catchThrowable(() -> uploader.upload(new PdfDoc("hello.pdf", "hello".getBytes())));
+        Throwable exc = catchThrowable(() -> client.upload(new PdfDoc("hello.pdf", "hello".getBytes())));
 
         // then
         assertThat(exc).isNull();
@@ -76,7 +76,7 @@ public class FtpUploaderTest {
         doThrow(IOException.class).when(sftpFileTransfer).upload(any(LocalSourceFile.class), any());
 
         // when
-        Throwable exc = catchThrowable(() -> uploader.upload(new PdfDoc("hello.pdf", "hello".getBytes())));
+        Throwable exc = catchThrowable(() -> client.upload(new PdfDoc("hello.pdf", "hello".getBytes())));
 
         // then
         assertThat(exc)
@@ -93,7 +93,7 @@ public class FtpUploaderTest {
         doThrow(IOException.class).when(sshClient).newSFTPClient();
 
         // when
-        Throwable exc = catchThrowable(() -> uploader.upload(new PdfDoc("hello.pdf", "hello".getBytes())));
+        Throwable exc = catchThrowable(() -> client.upload(new PdfDoc("hello.pdf", "hello".getBytes())));
 
         // then
         assertThat(exc).isInstanceOf(FtpStepException.class);

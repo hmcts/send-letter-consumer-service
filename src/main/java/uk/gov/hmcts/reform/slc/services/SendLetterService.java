@@ -9,7 +9,7 @@ import uk.gov.hmcts.reform.slc.services.servicebus.MessageHandlingResult;
 import uk.gov.hmcts.reform.slc.services.steps.getpdf.PdfCreator;
 import uk.gov.hmcts.reform.slc.services.steps.getpdf.PdfDoc;
 import uk.gov.hmcts.reform.slc.services.steps.maptoletter.LetterMapper;
-import uk.gov.hmcts.reform.slc.services.steps.sftpupload.FtpUploader;
+import uk.gov.hmcts.reform.slc.services.steps.sftpupload.FtpClient;
 
 import static uk.gov.hmcts.reform.slc.services.servicebus.MessageHandlingResult.FAILURE;
 import static uk.gov.hmcts.reform.slc.services.servicebus.MessageHandlingResult.SUCCESS;
@@ -21,16 +21,16 @@ public class SendLetterService {
 
     private final LetterMapper letterMapper;
     private final PdfCreator pdfCreator;
-    private final FtpUploader ftpUploader;
+    private final FtpClient ftpClient;
 
     public SendLetterService(
         LetterMapper letterMapper,
         PdfCreator pdfCreator,
-        FtpUploader ftpUploader
+        FtpClient ftpClient
     ) {
         this.letterMapper = letterMapper;
         this.pdfCreator = pdfCreator;
-        this.ftpUploader = ftpUploader;
+        this.ftpClient = ftpClient;
     }
 
     public MessageHandlingResult send(IMessage msg) {
@@ -38,7 +38,7 @@ public class SendLetterService {
             Letter letter = letterMapper.from(msg);
             PdfDoc pdf = pdfCreator.create(letter);
             // TODO: encrypt & sign
-            ftpUploader.upload(pdf);
+            ftpClient.upload(pdf);
 
             return SUCCESS;
 
