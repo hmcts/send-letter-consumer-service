@@ -44,7 +44,7 @@ public class SendLetterService {
             ftpClient.upload(pdf);
 
             //update producer with sent to print at time for reporting
-            sendLetterClient.updateSentToPrintAt(letter.id.toString());
+            sendLetterClient.updateSentToPrintAt(letter.id);
 
             return SUCCESS;
 
