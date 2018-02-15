@@ -10,8 +10,12 @@ data "vault_generic_secret" "ftp_user" {
   path = "secret/${var.env}/cc/send-letter-consumer/ftp-user"
 }
 
-data "vault_generic_secret" "ftp_password" {
-  path = "secret/${var.env}/cc/send-letter-consumer/ftp-password"
+data "vault_generic_secret" "ftp_private_key" {
+  path = "secret/${var.env}/cc/send-letter-consumer/ftp-private-key"
+}
+
+data "vault_generic_secret" "ftp_public_key" {
+  path = "secret/${var.env}/cc/send-letter-consumer/ftp-public-key"
 }
 
 data "vault_generic_secret" "servicebus_conn_string" {
@@ -44,11 +48,12 @@ module "consumer" {
     SERVICE_BUS_INTERVAL          = "${var.service_bus_interval}"
 
     // ftp
-    FTP_HOSTNAME    = "${var.ftp_hostname}"
-    FTP_PORT        = "${var.ftp_port}"
-    FTP_FINGERPRINT = "${var.ftp_fingerprint}"
-    FTP_USER        = "${data.vault_generic_secret.ftp_user.data["value"]}"
-    FTP_PASSWORD    = "${data.vault_generic_secret.ftp_password.data["value"]}"
-
+    FTP_HOSTNAME      = "${var.ftp_hostname}"
+    FTP_PORT          = "${var.ftp_port}"
+    FTP_FINGERPRINT   = "${var.ftp_fingerprint}"
+    FTP_TARGET_FOLDER = "${var.ftp_target_folder}"
+    FTP_USER          = "${data.vault_generic_secret.ftp_user.data["value"]}"
+    FTP_PRIVATE_KEY   = "${data.vault_generic_secret.ftp_private_key.data["value"]}"
+    FTP_PUBLIC_KEY    = "${data.vault_generic_secret.ftp_public_key.data["value"]}"
   }
 }

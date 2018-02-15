@@ -33,7 +33,11 @@ variable "ftp_port" {
 }
 
 variable "ftp_fingerprint" {
-  default = "TBD"
+  default = "SHA256:gYzreAtWAraVRFsOrcP9SPJq9atn7QxXh9pAauKud2U"
+}
+
+variable "ftp_target_folder" {
+  default = "TO_XEROX"
 }
 
 variable "subscription" {
