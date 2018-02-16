@@ -13,6 +13,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 
 import static org.apache.commons.lang3.StringUtils.removeEnd;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.ThrowableAssert.catchThrowable;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.content;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
@@ -82,20 +84,22 @@ public class SendLetterClientTest {
     }
 
     @Test
-    public void should_fail_to_put_sent_to_print_at_attribute_to_letter_service() {
+    public void should_not_throw_exception_when_rest_template_throw_server_error() {
         //given
         SendLetterClient sendLetterClient = new SendLetterClient(restTemplate, sendLetterProducerUrl, () -> now);
 
         mockServer.expect(requestTo(sendLetterProducerUrl + letterId + SENT_TO_PRINT_AT))
-            .andExpect(content().string("{\"sent_to_print_at\":\"" + isoDate + "\"}"))
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
             .andExpect(method(HttpMethod.PUT))
             .andRespond(withServerError());
 
         //when
-        sendLetterClient.updateSentToPrintAt(letterId);
+        Throwable exception = catchThrowable(() -> {
+            sendLetterClient.updateSentToPrintAt(letterId);
+        });
 
         //then
+        assertThat(exception).isNull();
+
         mockServer.verify();
     }
 }
