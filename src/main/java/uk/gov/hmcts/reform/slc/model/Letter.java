@@ -5,11 +5,13 @@ import org.hibernate.validator.constraints.NotEmpty;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
+import javax.validation.constraints.NotNull;
 
 public class Letter {
 
-    @NotEmpty
-    public final String id;
+    @NotNull
+    public final UUID id;
 
     @NotEmpty
     public final List<Document> documents;
@@ -26,7 +28,7 @@ public class Letter {
     public final Map<String, Object> additionalData;
 
     public Letter(
-        @JsonProperty("id") String id,
+        @JsonProperty("id") UUID id,
         @JsonProperty("documents") List<Document> documents,
         @JsonProperty("type") String type,
         @JsonProperty("service") String service,
