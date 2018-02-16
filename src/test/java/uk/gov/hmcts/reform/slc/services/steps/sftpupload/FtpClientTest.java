@@ -17,7 +17,9 @@ import uk.gov.hmcts.reform.slc.services.steps.sftpupload.exceptions.FtpStepExcep
 
 import java.io.IOException;
 import java.time.Duration;
+import java.util.List;
 
+import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
@@ -110,6 +112,19 @@ public class FtpClientTest {
         assertThat(exc)
             .isInstanceOf(FtpStepException.class)
             .hasMessageContaining("download");
+    }
+
+    @Test
+    public void download_should_return_an_empty_list_if_there_are_no_reports() throws Exception {
+        // given
+        given(sftpClient.ls(anyString()))
+            .willReturn(emptyList());
+
+        // when
+        List<byte[]> reports = client.downloadReports();
+
+        // then
+        assertThat(reports).isEmpty();
     }
 
     @Test
