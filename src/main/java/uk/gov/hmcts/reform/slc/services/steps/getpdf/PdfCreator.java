@@ -43,7 +43,7 @@ public class PdfCreator {
         byte[] finalContent = PdfMerger.mergeDocuments(docs);
 
         return new PdfDoc(
-            FileNameGenerator.generateFor(letter.type, letter.service, finalContent, "pdf"),
+            FileNameGenerator.generateFor(letter, "pdf"),
             finalContent
         );
     }

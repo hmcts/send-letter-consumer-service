@@ -1,16 +1,14 @@
 package uk.gov.hmcts.reform.slc.services.steps.getpdf;
 
-import static org.apache.commons.codec.digest.DigestUtils.md5Hex;
+import uk.gov.hmcts.reform.slc.model.Letter;
 
 public final class FileNameGenerator {
 
     public static String generateFor(
-        String letterType,
-        String jurisdiction,
-        byte[] content,
+        Letter letter,
         String extension
     ) {
-        return letterType + "-" + jurisdiction + "-" + md5Hex(content) + "." + extension;
+        return letter.type + "_" + letter.service + "_" + letter.id + "." + extension;
     }
 
     private FileNameGenerator() {
