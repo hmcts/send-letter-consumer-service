@@ -12,6 +12,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 
+import static org.apache.commons.lang3.StringUtils.removeEnd;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.content;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
@@ -19,8 +20,6 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 
 public class SendLetterClientTest {
-
-    private SendLetterClient sendLetterClient;
 
     private MockRestServiceServer mockServer;
 
@@ -34,54 +33,21 @@ public class SendLetterClientTest {
 
     private static final ZonedDateTime now = ZonedDateTime.now();
 
-    private String dateInISOFormat;
+    private String isoDate;
 
     @Before
     public void setUp() {
-        dateInISOFormat = now.format(DateTimeFormatter.ISO_INSTANT);
+        isoDate = now.format(DateTimeFormatter.ISO_INSTANT);
         mockServer = MockRestServiceServer.bindTo(restTemplate).build();
-        sendLetterClient = new SendLetterClient(restTemplate, sendLetterProducerUrl, () -> now);
     }
 
     @Test
-    public void should_successfully_put_sent_to_print_at_attribute_to_letter_service() {
+    public void should_successfully_put_sent_to_print_at_attribute_when_base_url_contains_slash_suffixed() {
         //given
+        SendLetterClient sendLetterClient = new SendLetterClient(restTemplate, sendLetterProducerUrl, () -> now);
+
         mockServer.expect(requestTo(sendLetterProducerUrl + letterId + SENT_TO_PRINT_AT))
-            .andExpect(content().string("{\"sent_to_print_at\":\"" + dateInISOFormat + "\"}"))
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-            .andExpect(method(HttpMethod.PUT));
-
-        //when
-        sendLetterClient.updateSentToPrintAt(letterId);
-
-        //then
-        mockServer.verify();
-    }
-
-    @Test
-    public void should_successfully_put_sent_to_print_at_attribute_when_base_url_contains_duplicate_slash_suffixed() {
-        //given
-        sendLetterClient = new SendLetterClient(restTemplate, "http://localhost:5432/", () -> now);
-
-        mockServer.expect(requestTo("http://localhost:5432/" + letterId + SENT_TO_PRINT_AT))
-            .andExpect(content().string("{\"sent_to_print_at\":\"" + dateInISOFormat + "\"}"))
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-            .andExpect(method(HttpMethod.PUT));
-
-        //when
-        sendLetterClient.updateSentToPrintAt(letterId);
-
-        //then
-        mockServer.verify();
-    }
-
-    @Test
-    public void should_successfully_put_sent_to_print_at_attribute_when_base_url_contains_no_slash_suffixed() {
-        //given
-        sendLetterClient = new SendLetterClient(restTemplate, "http://localhost:5432", () -> now);
-
-        mockServer.expect(requestTo("http://localhost:5432/" + letterId + SENT_TO_PRINT_AT))
-            .andExpect(content().string("{\"sent_to_print_at\":\"" + dateInISOFormat + "\"}"))
+            .andExpect(content().string("{\"sent_to_print_at\":\"" + isoDate + "\"}"))
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
             .andExpect(method(HttpMethod.PUT))
             .andRespond(withStatus(HttpStatus.OK));
@@ -94,21 +60,34 @@ public class SendLetterClientTest {
     }
 
     @Test
-    public void should_fail_to_put_sent_to_print_at_attribute_when_producer_base_url_contains_space() {
+    public void should_successfully_put_sent_to_print_at_attribute_when_base_url_contains_no_slash_suffixed() {
         //given
-        sendLetterClient = new SendLetterClient(restTemplate, "http:// localhost:5432", () -> now);
+        SendLetterClient sendLetterClient = new SendLetterClient(
+            restTemplate,
+            removeEnd(sendLetterProducerUrl, "/"),
+            () -> now
+        );
+
+        mockServer.expect(requestTo(sendLetterProducerUrl + letterId + SENT_TO_PRINT_AT))
+            .andExpect(content().string("{\"sent_to_print_at\":\"" + isoDate + "\"}"))
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+            .andExpect(method(HttpMethod.PUT))
+            .andRespond(withStatus(HttpStatus.OK));
 
         //when
         sendLetterClient.updateSentToPrintAt(letterId);
 
-        //then Exception is thrown and logged.
+        //then
+        mockServer.verify();
     }
 
     @Test
     public void should_fail_to_put_sent_to_print_at_attribute_to_letter_service() {
         //given
+        SendLetterClient sendLetterClient = new SendLetterClient(restTemplate, sendLetterProducerUrl, () -> now);
+
         mockServer.expect(requestTo(sendLetterProducerUrl + letterId + SENT_TO_PRINT_AT))
-            .andExpect(content().string("{\"sent_to_print_at\":\"" + dateInISOFormat + "\"}"))
+            .andExpect(content().string("{\"sent_to_print_at\":\"" + isoDate + "\"}"))
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
             .andExpect(method(HttpMethod.PUT))
             .andRespond(withServerError());
