@@ -34,11 +34,11 @@ public class SendLetterClientTest {
 
     private static final ZonedDateTime now = ZonedDateTime.now();
 
-    private String isoDateFormat;
+    private String dateInISOFormat;
 
     @Before
     public void setUp() {
-        isoDateFormat = now.format(DateTimeFormatter.ISO_INSTANT);
+        dateInISOFormat = now.format(DateTimeFormatter.ISO_INSTANT);
         mockServer = MockRestServiceServer.bindTo(restTemplate).build();
         sendLetterClient = new SendLetterClient(restTemplate, sendLetterProducerUrl, () -> now);
     }
@@ -47,10 +47,9 @@ public class SendLetterClientTest {
     public void should_successfully_put_sent_to_print_at_attribute_to_letter_service() {
         //given
         mockServer.expect(requestTo(sendLetterProducerUrl + letterId + SENT_TO_PRINT_AT))
-            .andExpect(content().string("{\"sent_to_print_at\":\"" + isoDateFormat + "\"}"))
+            .andExpect(content().string("{\"sent_to_print_at\":\"" + dateInISOFormat + "\"}"))
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-            .andExpect(method(HttpMethod.PUT))
-            .andRespond(withStatus(HttpStatus.OK));
+            .andExpect(method(HttpMethod.PUT));
 
         //when
         sendLetterClient.updateSentToPrintAt(letterId);
@@ -65,10 +64,9 @@ public class SendLetterClientTest {
         sendLetterClient = new SendLetterClient(restTemplate, "http://localhost:5432/", () -> now);
 
         mockServer.expect(requestTo("http://localhost:5432/" + letterId + SENT_TO_PRINT_AT))
-            .andExpect(content().string("{\"sent_to_print_at\":\"" + isoDateFormat + "\"}"))
+            .andExpect(content().string("{\"sent_to_print_at\":\"" + dateInISOFormat + "\"}"))
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-            .andExpect(method(HttpMethod.PUT))
-            .andRespond(withStatus(HttpStatus.OK));
+            .andExpect(method(HttpMethod.PUT));
 
         //when
         sendLetterClient.updateSentToPrintAt(letterId);
@@ -83,7 +81,7 @@ public class SendLetterClientTest {
         sendLetterClient = new SendLetterClient(restTemplate, "http://localhost:5432", () -> now);
 
         mockServer.expect(requestTo("http://localhost:5432/" + letterId + SENT_TO_PRINT_AT))
-            .andExpect(content().string("{\"sent_to_print_at\":\"" + isoDateFormat + "\"}"))
+            .andExpect(content().string("{\"sent_to_print_at\":\"" + dateInISOFormat + "\"}"))
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
             .andExpect(method(HttpMethod.PUT))
             .andRespond(withStatus(HttpStatus.OK));
@@ -110,7 +108,7 @@ public class SendLetterClientTest {
     public void should_fail_to_put_sent_to_print_at_attribute_to_letter_service() {
         //given
         mockServer.expect(requestTo(sendLetterProducerUrl + letterId + SENT_TO_PRINT_AT))
-            .andExpect(content().string("{\"sent_to_print_at\":\"" + isoDateFormat + "\"}"))
+            .andExpect(content().string("{\"sent_to_print_at\":\"" + dateInISOFormat + "\"}"))
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
             .andExpect(method(HttpMethod.PUT))
             .andRespond(withServerError());
