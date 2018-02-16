@@ -8,7 +8,7 @@ public final class FileNameGenerator {
         Letter letter,
         String extension
     ) {
-        return letter.type + "-" + letter.service + "-" + letter.messageId + "." + extension;
+        return letter.type + "-" + letter.service + "-" + letter.id + "." + extension;
     }
 
     private FileNameGenerator() {

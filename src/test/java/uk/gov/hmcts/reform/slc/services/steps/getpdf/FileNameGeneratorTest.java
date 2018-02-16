@@ -14,7 +14,7 @@ public class FileNameGeneratorTest {
     @Test
     public void should_generate_file_name_in_expected_format() {
         // given
-        Letter letter = createLetter("typeA", "cmc", "098F6BCD4621D373CADE4E832627B4F6");
+        Letter letter = createLetter(UUID.randomUUID(), "typeA", "cmc", "098F6BCD4621D373CADE4E832627B4F6");
 
         // when
         String result = FileNameGenerator.generateFor(letter, "pdf");
@@ -24,10 +24,11 @@ public class FileNameGeneratorTest {
     }
 
     @Test
-    public void should_always_generate_the_same_name_for_same_input() {
+    public void should_always_generate_the_same_name_for_same_letter() {
         // given
-        Letter letter1 = createLetter("A", "B", "098F6BCD4621D373CADE4E832627B4F6");
-        Letter letter2 = createLetter("A", "B", "098F6BCD4621D373CADE4E832627B4F6");
+        UUID letterId = UUID.randomUUID();
+        Letter letter1 = createLetter(letterId, "A", "B", "098F6BCD4621D373CADE4E832627B4F6");
+        Letter letter2 = createLetter(letterId, "A", "B", "098F6BCD4621D373CADE4E832627B4F6");
 
         String result1 = FileNameGenerator.generateFor(letter1, "pdf");
         String result2 = FileNameGenerator.generateFor(letter2, "pdf");
@@ -37,10 +38,10 @@ public class FileNameGeneratorTest {
     }
 
     @Test
-    public void should_generate_different_names_for_different_message_id() {
+    public void should_generate_different_names_for_different_letters() {
         // given
-        Letter letter1 = createLetter("A", "B", "5A105E8B9D40E1329780D62EA2265D8A");
-        Letter letter2 = createLetter("A", "B", "AD0234829205B9033196BA818F7A872B");
+        Letter letter1 = createLetter(UUID.randomUUID(), "A", "B", "5A105E8B9D40E1329780D62EA2265D8A");
+        Letter letter2 = createLetter(UUID.randomUUID(), "A", "B", "AD0234829205B9033196BA818F7A872B");
 
         String result1 = FileNameGenerator.generateFor(letter1, "pdf");
         String result2 = FileNameGenerator.generateFor(letter2, "pdf");
@@ -49,9 +50,22 @@ public class FileNameGeneratorTest {
         assertThat(result1).isNotEqualTo(result2);
     }
 
-    private Letter createLetter(String type, String service, String messageId) {
+    @Test
+    public void should_generate_different_names_for_same_letters_with_different_id() {
+        // given
+        Letter letter1 = createLetter(UUID.randomUUID(), "A", "B", "5A105E8B9D40E1329780D62EA2265D8A");
+        Letter letter2 = createLetter(UUID.randomUUID(), "A", "B", "5A105E8B9D40E1329780D62EA2265D8A");
+
+        String result1 = FileNameGenerator.generateFor(letter1, "pdf");
+        String result2 = FileNameGenerator.generateFor(letter2, "pdf");
+
+        // then
+        assertThat(result1).isNotEqualTo(result2);
+    }
+
+    private Letter createLetter(UUID id, String type, String service, String messageId) {
         return new Letter(
-            UUID.randomUUID(),
+            id,
             emptyList(),
             type,
             service,
