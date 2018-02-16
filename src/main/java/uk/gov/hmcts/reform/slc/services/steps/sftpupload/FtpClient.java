@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.slc.services.steps.sftpupload;
 
 import net.schmizz.sshj.SSHClient;
 import net.schmizz.sshj.sftp.SFTPClient;
+import net.schmizz.sshj.sftp.SFTPFileTransfer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,11 +15,12 @@ import uk.gov.hmcts.reform.slc.services.steps.sftpupload.exceptions.FtpStepExcep
 import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.function.Function;
 
 @Component
-public class FtpUploader {
+public class FtpClient {
 
-    private static final Logger logger = LoggerFactory.getLogger(FtpUploader.class);
+    private static final Logger logger = LoggerFactory.getLogger(FtpClient.class);
 
     @Autowired
     private AppInsights insights;
@@ -34,7 +36,7 @@ public class FtpUploader {
 
 
     // region constructor
-    public FtpUploader(
+    public FtpClient(
         @Value("${ftp.hostname}") String hostname,
         @Value("${ftp.port}") int port,
         @Value("${ftp.fingerprint}") String fingerprint,
@@ -58,8 +60,25 @@ public class FtpUploader {
     public void upload(PdfDoc pdfDoc) {
         Instant start = Instant.now();
 
-        try {
+        runWith(fileTransfer -> {
+            try {
+                String path = String.join("/", this.targetFolder, pdfDoc.filename);
+                fileTransfer.upload(pdfDoc, path);
+                insights.trackFtpUpload(Duration.between(start, Instant.now()), true);
 
+                return null;
+
+            } catch (IOException exc) {
+                insights.trackFtpUpload(Duration.between(start, Instant.now()), false);
+                insights.trackException(exc);
+
+                throw new FtpStepException("Unable to upload PDF.", exc);
+            }
+        });
+    }
+
+    private <T> T runWith(Function<SFTPFileTransfer, T> action) {
+        try {
             ssh.addHostKeyVerifier(fingerprint);
             ssh.connect(hostname, port);
 
@@ -73,20 +92,12 @@ public class FtpUploader {
             );
 
             try (SFTPClient sftp = ssh.newSFTPClient()) {
-                sftp.getFileTransfer().upload(
-                    pdfDoc,
-                    String.join("/", this.targetFolder, pdfDoc.filename)
-                );
+                return action.apply(sftp.getFileTransfer());
             }
-
-            insights.trackFtpUpload(Duration.between(start, Instant.now()), true);
-
         } catch (IOException exc) {
-            insights.trackFtpUpload(Duration.between(start, Instant.now()), false);
             insights.trackException(exc);
 
             throw new FtpStepException("Unable to upload PDF.", exc);
-
         } finally {
             try {
                 ssh.disconnect();

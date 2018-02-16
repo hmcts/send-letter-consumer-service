@@ -14,7 +14,7 @@ import uk.gov.hmcts.reform.slc.services.servicebus.MessageHandlingResult;
 import uk.gov.hmcts.reform.slc.services.steps.getpdf.PdfCreator;
 import uk.gov.hmcts.reform.slc.services.steps.getpdf.PdfDoc;
 import uk.gov.hmcts.reform.slc.services.steps.maptoletter.LetterMapper;
-import uk.gov.hmcts.reform.slc.services.steps.sftpupload.FtpUploader;
+import uk.gov.hmcts.reform.slc.services.steps.sftpupload.FtpClient;
 
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonList;
@@ -29,7 +29,7 @@ public class SendLetterServiceTest {
 
     @Mock private LetterMapper letterMapper;
     @Mock private PdfCreator pdfCreator;
-    @Mock private FtpUploader ftpUploader;
+    @Mock private FtpClient ftpClient;
 
     @Mock private IMessage message;
 
@@ -37,7 +37,7 @@ public class SendLetterServiceTest {
 
     @Before
     public void setUp() throws Exception {
-        service = new SendLetterService(letterMapper, pdfCreator, ftpUploader);
+        service = new SendLetterService(letterMapper, pdfCreator, ftpClient);
     }
 
     @Test
