@@ -4,7 +4,6 @@ import net.schmizz.sshj.SSHClient;
 import net.schmizz.sshj.sftp.RemoteResourceInfo;
 import net.schmizz.sshj.sftp.SFTPClient;
 import net.schmizz.sshj.sftp.SFTPFileTransfer;
-import net.schmizz.sshj.xfer.LocalDestFile;
 import net.schmizz.sshj.xfer.LocalSourceFile;
 import org.junit.Before;
 import org.junit.Test;
@@ -18,7 +17,6 @@ import uk.gov.hmcts.reform.slc.services.steps.sftpupload.exceptions.FtpStepExcep
 
 import java.io.IOException;
 import java.time.Duration;
-import java.util.Collections;
 
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
