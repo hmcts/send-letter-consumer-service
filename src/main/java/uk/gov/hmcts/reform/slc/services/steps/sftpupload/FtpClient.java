@@ -69,7 +69,9 @@ public class FtpClient {
                 return null;
 
             } catch (IOException exc) {
+                insights.trackFtpUpload(Duration.between(start, Instant.now()), false);
                 insights.trackException(exc);
+
                 throw new FtpStepException("Unable to upload PDF.", exc);
             }
         });
