@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.slc.services.steps.sftpupload;
 
 import net.schmizz.sshj.SSHClient;
+import net.schmizz.sshj.sftp.RemoteResourceInfo;
 import net.schmizz.sshj.sftp.SFTPClient;
 import net.schmizz.sshj.sftp.SFTPFileTransfer;
 import net.schmizz.sshj.xfer.LocalSourceFile;
@@ -16,13 +17,18 @@ import uk.gov.hmcts.reform.slc.services.steps.sftpupload.exceptions.FtpStepExcep
 
 import java.io.IOException;
 import java.time.Duration;
+import java.util.List;
 
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
@@ -50,7 +56,8 @@ public class FtpClientTest {
             sshClient,
             null,
             null,
-            null
+            "target_folder",
+            "reports_folder"
         );
 
         ReflectionTestUtils.setField(client, "insights", insights);
@@ -85,6 +92,39 @@ public class FtpClientTest {
 
         verify(insights).trackFtpUpload(any(Duration.class), eq(false));
         verify(insights).trackException(any(IOException.class));
+    }
+
+    @Test
+    public void should_throw_a_custom_exception_if_downloading_fails() throws Exception {
+        // given
+        RemoteResourceInfo rri = mock(RemoteResourceInfo.class);
+        given(rri.isRegularFile()).willReturn(true);
+        given(sftpClient.ls(anyString()))
+            .willReturn(singletonList(rri));
+
+        doThrow(IOException.class)
+            .when(sftpFileTransfer).download(anyString(), any(InMemoryDownloadedFile.class));
+
+        // when
+        Throwable exc = catchThrowable(() -> client.downloadReports());
+
+        // then
+        assertThat(exc)
+            .isInstanceOf(FtpStepException.class)
+            .hasMessageContaining("download");
+    }
+
+    @Test
+    public void download_should_return_an_empty_list_if_there_are_no_reports() throws Exception {
+        // given
+        given(sftpClient.ls(anyString()))
+            .willReturn(emptyList());
+
+        // when
+        List<byte[]> reports = client.downloadReports();
+
+        // then
+        assertThat(reports).isEmpty();
     }
 
     @Test

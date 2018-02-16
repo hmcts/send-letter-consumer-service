@@ -40,6 +40,10 @@ variable "ftp_target_folder" {
   default = "TO_XEROX"
 }
 
+variable "ftp_reports_folder" {
+  default = "FROM_XEROX"
+}
+
 variable "subscription" {
 }
 
