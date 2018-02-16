@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.slc.services.steps.sftpupload;
 
 import net.schmizz.sshj.SSHClient;
+import net.schmizz.sshj.sftp.RemoteResourceInfo;
 import net.schmizz.sshj.sftp.SFTPClient;
 import net.schmizz.sshj.sftp.SFTPFileTransfer;
 import org.slf4j.Logger;
@@ -15,7 +16,10 @@ import uk.gov.hmcts.reform.slc.services.steps.sftpupload.exceptions.FtpStepExcep
 import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.List;
 import java.util.function.Function;
+
+import static java.util.stream.Collectors.toList;
 
 @Component
 public class FtpClient {
@@ -33,6 +37,7 @@ public class FtpClient {
     private final String publicKey;
     private final String privateKey;
     private final String targetFolder;
+    private final String reportsFolder;
 
 
     // region constructor
@@ -44,7 +49,8 @@ public class FtpClient {
         SSHClient sshClient,
         @Value("${ftp.keys.public}") String publicKey,
         @Value("@{ftp.keys.private}") String privateKey,
-        @Value("@{ftp.target-folder}") String targetFolder
+        @Value("@{ftp.target-folder}") String targetFolder,
+        @Value("@{ftp.reports-folder}") String reportsFolder
     ) {
         this.hostname = hostname;
         this.port = port;
@@ -54,16 +60,17 @@ public class FtpClient {
         this.publicKey = publicKey;
         this.privateKey = privateKey;
         this.targetFolder = targetFolder;
+        this.reportsFolder = reportsFolder;
     }
     // endregion
 
     public void upload(PdfDoc pdfDoc) {
         Instant start = Instant.now();
 
-        runWith(fileTransfer -> {
+        runWith(sftp -> {
             try {
                 String path = String.join("/", this.targetFolder, pdfDoc.filename);
-                fileTransfer.upload(pdfDoc, path);
+                sftp.getFileTransfer().upload(pdfDoc, path);
                 insights.trackFtpUpload(Duration.between(start, Instant.now()), true);
 
                 return null;
@@ -77,7 +84,35 @@ public class FtpClient {
         });
     }
 
-    private <T> T runWith(Function<SFTPFileTransfer, T> action) {
+    /**
+     * Downloads ALL files from reports directory.
+     */
+    public List<byte[]> downloadReports() {
+        return runWith(sftp -> {
+            try {
+                SFTPFileTransfer transfer = sftp.getFileTransfer();
+
+                return sftp.ls(reportsFolder)
+                    .stream()
+                    .filter(RemoteResourceInfo::isRegularFile)
+                    .map(file -> {
+                        InMemoryDownloadedFile inMemoryFile = new InMemoryDownloadedFile();
+                        try {
+                            transfer.download(file.getPath(), inMemoryFile);
+                            return inMemoryFile.getBytes();
+                        } catch (IOException exc) {
+                            throw new FtpStepException("Unable to download file " + file.getName(), exc);
+                        }
+                    })
+                    .collect(toList());
+
+            } catch (IOException exc) {
+                throw new FtpStepException("Error while downloading reports", exc);
+            }
+        });
+    }
+
+    private <T> T runWith(Function<SFTPClient, T> action) {
         try {
             ssh.addHostKeyVerifier(fingerprint);
             ssh.connect(hostname, port);
@@ -92,7 +127,7 @@ public class FtpClient {
             );
 
             try (SFTPClient sftp = ssh.newSFTPClient()) {
-                return action.apply(sftp.getFileTransfer());
+                return action.apply(sftp);
             }
         } catch (IOException exc) {
             insights.trackException(exc);
