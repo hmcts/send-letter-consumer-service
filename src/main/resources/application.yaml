@@ -33,3 +33,7 @@ ftp:
 
 app-insights:
   request-component: off
+
+sendletter:
+  producer:
+    url: ${SEND_LETTER_PRODUCER_URL}
