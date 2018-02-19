@@ -23,6 +23,7 @@ ftp:
   port: ${FTP_PORT}
   target-folder: ${FTP_TARGET_FOLDER}
   reports-folder: ${FTP_REPORTS_FOLDER}
+  reports-cron: ${FTP_REPORTS_CRON:0 30 * * * *}
   fingerprint: ${FTP_FINGERPRINT}
   user: ${FTP_USER}
   keys:

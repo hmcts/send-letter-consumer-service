@@ -44,6 +44,10 @@ variable "ftp_reports_folder" {
   default = "FROM_XEROX"
 }
 
+variable "ftp_reports_cron" {
+  default = "0 30 * * * *"
+}
+
 variable "subscription" {
 }
 
