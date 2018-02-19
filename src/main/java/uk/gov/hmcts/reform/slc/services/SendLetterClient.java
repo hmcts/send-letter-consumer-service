@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
+import uk.gov.hmcts.reform.slc.model.LetterPrintStatus;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -48,5 +49,9 @@ public class SendLetterClient {
                 exception
             );
         }
+    }
+
+    public void updatePrintedAt(LetterPrintStatus status) {
+        // TODO: call API
     }
 }
