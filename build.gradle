@@ -69,7 +69,7 @@ repositories {
 
 def versions = [
   springBoot: plugins.getPlugin('org.springframework.boot').class.package.implementationVersion,
-  logging: '1.5.0',
+  logging: '1.6.1',
   hystrix: '1.4.0.RELEASE'
 ]
 
