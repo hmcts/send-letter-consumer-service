@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.slc.services;
 
-
 import org.junit.Test;
 import uk.gov.hmcts.reform.slc.model.LetterPrintStatus;
 
@@ -25,7 +24,7 @@ public class ReportParserTest {
             .containsExactlyInAnyOrder(
                 new LetterPrintStatus("9364001", ZonedDateTime.parse("2018-01-01T10:30:53Z")),
                 new LetterPrintStatus("9364002", ZonedDateTime.parse("2018-01-01T10:30:53Z"))
-        );
+            );
     }
 
     @Test
@@ -41,6 +40,7 @@ public class ReportParserTest {
             .usingFieldByFieldElementComparator()
             .containsExactly(new LetterPrintStatus("9364002", ZonedDateTime.parse("2018-01-01T10:30:53Z")));
     }
+
     @Test
     public void should_filter_out_rows_with_invalid_date() {
         String report =
