@@ -7,7 +7,7 @@ import java.io.OutputStream;
 
 public class InMemoryDownloadedFile extends InMemoryDestFile {
 
-    private ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+    private final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
     @Override
     public OutputStream getOutputStream() {
