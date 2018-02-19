@@ -22,6 +22,10 @@ data "vault_generic_secret" "servicebus_conn_string" {
   path = "secret/${var.env}/cc/send-letter/servicebus-listen-conn-string"
 }
 
+data "vault_generic_secret" "send_letter_producer_url" {
+  path = "secret/${var.env}/cc/send-letter/producer-url"
+}
+
 locals {
   aseName = "${data.terraform_remote_state.core_apps_compute.ase_name[0]}"
 }
@@ -48,14 +52,15 @@ module "consumer" {
     SERVICE_BUS_INTERVAL          = "${var.service_bus_interval}"
 
     // ftp
-    FTP_HOSTNAME      = "${var.ftp_hostname}"
-    FTP_PORT          = "${var.ftp_port}"
-    FTP_FINGERPRINT   = "${var.ftp_fingerprint}"
-    FTP_TARGET_FOLDER = "${var.ftp_target_folder}"
-    FTP_REPORTS_FOLDER = "${var.ftp_reports_folder}"
-    FTP_REPORTS_CRON  = "${var.ftp_reports_cron}"
-    FTP_USER          = "${data.vault_generic_secret.ftp_user.data["value"]}"
-    FTP_PRIVATE_KEY   = "${data.vault_generic_secret.ftp_private_key.data["value"]}"
-    FTP_PUBLIC_KEY    = "${data.vault_generic_secret.ftp_public_key.data["value"]}"
+    FTP_HOSTNAME              = "${var.ftp_hostname}"
+    FTP_PORT                  = "${var.ftp_port}"
+    FTP_FINGERPRINT           = "${var.ftp_fingerprint}"
+    FTP_TARGET_FOLDER         = "${var.ftp_target_folder}"
+    FTP_REPORTS_FOLDER        = "${var.ftp_reports_folder}"
+    FTP_REPORTS_CRON          = "${var.ftp_reports_cron}"
+    FTP_USER                  = "${data.vault_generic_secret.ftp_user.data["value"]}"
+    FTP_PRIVATE_KEY           = "${data.vault_generic_secret.ftp_private_key.data["value"]}"
+    FTP_PUBLIC_KEY            = "${data.vault_generic_secret.ftp_public_key.data["value"]}"
+    SEND_LETTER_PRODUCER_URL  = "${data.vault_generic_secret.send_letter_producer_url.data["value"]}"
   }
 }
