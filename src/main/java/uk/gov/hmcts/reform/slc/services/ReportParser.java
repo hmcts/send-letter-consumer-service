@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.slc.services;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -15,7 +16,6 @@ import java.io.InputStreamReader;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.List;
-import java.util.Objects;
 
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.StreamSupport.stream;
@@ -26,27 +26,37 @@ public class ReportParser {
     private static final Logger logger = LoggerFactory.getLogger(ReportParser.class);
 
     public List<LetterPrintStatus> parse(byte[] report) {
-        try (CSVParser parser = CSVFormat.DEFAULT.withHeader().parse(new InputStreamReader(new ByteArrayInputStream(report)))) {
+        try (CSVParser parser = parserFor(report)) {
+
             return stream(parser.spliterator(), false)
-                .map(row -> {
-                    try {
-                        return new LetterPrintStatus(
-                            FileNameHelper.extractId(row.get("Filename")),
-                            ZonedDateTime.parse(row.get("Date") + "T" + row.get("Time") + "Z")
-                        );
-                    } catch (UnableToExtractIdFromFileNameException exc) {
-                        logger.error("Error extracting id", exc);
-                        return null;
-                    } catch (DateTimeParseException exc) {
-                        logger.error("Error parsing datetime.", exc);
-                        return null;
-                    }
-                })
-                .filter(Objects::nonNull)
+                .map(row -> toPrintStatus(row))
+                .filter(status -> status != null)
                 .collect(toList());
 
         } catch (IOException exc) {
             throw new ReportParsingException(exc);
+        }
+    }
+
+    private CSVParser parserFor(byte[] csv) throws IOException {
+        return CSVFormat
+            .DEFAULT
+            .withHeader()
+            .parse(new InputStreamReader(new ByteArrayInputStream(csv)));
+    }
+
+    private LetterPrintStatus toPrintStatus(CSVRecord record) {
+        try {
+            return new LetterPrintStatus(
+                FileNameHelper.extractId(record.get("Filename")),
+                ZonedDateTime.parse(record.get("Date") + "T" + record.get("Time") + "Z")
+            );
+        } catch (UnableToExtractIdFromFileNameException exc) {
+            logger.error("Error extracting id", exc);
+            return null;
+        } catch (DateTimeParseException exc) {
+            logger.error("Error parsing datetime.", exc);
+            return null;
         }
     }
 
