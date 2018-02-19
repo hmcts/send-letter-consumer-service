@@ -5,14 +5,14 @@ import uk.gov.hmcts.reform.slc.model.Letter;
 
 public final class FileNameHelper {
 
-    private static final String separator = "_";
+    private static final String SEPARATOR = "_";
 
     public static String generateName(Letter letter, String extension) {
-        return letter.type + separator + letter.service + separator + letter.id + "." + extension;
+        return letter.type + SEPARATOR + letter.service + SEPARATOR + letter.id + "." + extension;
     }
 
     public static String extractId(String fileName) {
-        String[] parts = FilenameUtils.removeExtension(fileName).split(separator);
+        String[] parts = FilenameUtils.removeExtension(fileName).split(SEPARATOR);
         if (parts.length != 3) {
             throw new UnableToExtractIdFromFileNameException();
         } else {
