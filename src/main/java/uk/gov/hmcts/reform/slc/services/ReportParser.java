@@ -45,6 +45,10 @@ public class ReportParser {
             .parse(new InputStreamReader(new ByteArrayInputStream(csv)));
     }
 
+    /**
+     * Converts cvs row into a letter print status object.
+     * Returns null if conversion fails.
+     */
     private LetterPrintStatus toPrintStatus(CSVRecord record) {
         try {
             return new LetterPrintStatus(
