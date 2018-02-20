@@ -8,13 +8,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.slc.model.LetterPrintStatus;
 import uk.gov.hmcts.reform.slc.services.steps.getpdf.FileNameHelper;
-import uk.gov.hmcts.reform.slc.services.steps.getpdf.FileNameHelper.UnableToExtractIdFromFileNameException;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeParseException;
 import java.util.List;
 
 import static java.util.stream.Collectors.toList;
@@ -55,11 +53,8 @@ public class ReportParser {
                 FileNameHelper.extractId(record.get("Filename")),
                 ZonedDateTime.parse(record.get("Date") + "T" + record.get("Time") + "Z")
             );
-        } catch (UnableToExtractIdFromFileNameException exc) {
-            logger.error("Error extracting id", exc);
-            return null;
-        } catch (DateTimeParseException exc) {
-            logger.error("Error parsing datetime.", exc);
+        } catch (Exception exc) {
+            logger.error("Error parsing row: " + record, exc);
             return null;
         }
     }
