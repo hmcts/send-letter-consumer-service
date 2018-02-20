@@ -69,7 +69,7 @@ repositories {
 
 def versions = [
   springBoot: plugins.getPlugin('org.springframework.boot').class.package.implementationVersion,
-  logging: '1.6.1',
+  reformLogging: '1.6.1',
   hystrix: '1.4.0.RELEASE',
   logback: '1.2.3'
 ]
@@ -83,9 +83,9 @@ dependencies {
   compile group: 'org.springframework.boot', name: 'spring-boot-starter-aop', version: versions.springBoot
   compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: versions.springBoot
 
-  compile group: 'uk.gov.hmcts.reform', name: 'java-logging-appinsights', version: versions.logging
-  compile group: 'uk.gov.hmcts.reform', name: 'java-logging-httpcomponents', version: versions.logging
-  compile group: 'uk.gov.hmcts.reform', name: 'java-logging-spring', version: versions.logging
+  compile group: 'uk.gov.hmcts.reform', name: 'java-logging-appinsights', version: versions.reformLogging
+  compile group: 'uk.gov.hmcts.reform', name: 'java-logging-httpcomponents', version: versions.reformLogging
+  compile group: 'uk.gov.hmcts.reform', name: 'java-logging-spring', version: versions.reformLogging
   compile group: 'uk.gov.hmcts.reform', name: 'http-proxy-spring-boot-autoconfigure', version: '1.1.0'
 
   compile group: 'uk.gov.hmcts.reform', name: 'pdf-service-client', version: '5.0.0'
