@@ -6,6 +6,8 @@ import uk.gov.hmcts.reform.slc.model.LetterPrintStatus;
 import java.time.ZonedDateTime;
 import java.util.List;
 
+import static com.google.common.io.Resources.getResource;
+import static com.google.common.io.Resources.toByteArray;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class ReportParserTest {
@@ -53,5 +55,14 @@ public class ReportParserTest {
         assertThat(result)
             .usingFieldByFieldElementComparator()
             .containsExactly(new LetterPrintStatus("9364002", ZonedDateTime.parse("2018-01-01T10:30:53Z")));
+    }
+
+    @Test
+    public void should_parse_sample_report() throws Exception {
+        byte[] report = toByteArray(getResource("report.csv"));
+
+        List<LetterPrintStatus> result = new ReportParser().parse(report);
+
+        assertThat(result).hasSize(11);
     }
 }
