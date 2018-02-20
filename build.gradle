@@ -101,6 +101,8 @@ dependencies {
 
   compile group: 'com.hierynomus', name: 'sshj', version: '0.23.0'
 
+  compile group: 'org.apache.commons', name: 'commons-csv', version: '1.5'
+
   compile group: 'org.apache.pdfbox', name: 'pdfbox', version: '2.0.8'
 
   testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: versions.springBoot
