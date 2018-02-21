@@ -66,4 +66,15 @@ public class SendLetterClient {
             logger.error("Exception occurred while updating printed_at time for letter id = " + status.id, exception);
         }
     }
+
+    public void updateIsFailedStatus(UUID letterId) {
+        try {
+            restTemplate.put(sendLetterProducerUrl + letterId + "/is-failed", null);
+        } catch (RestClientException exception) {
+            logger.error(
+                "Exception occurred while updating is failed status for letter id = " + letterId,
+                exception
+            );
+        }
+    }
 }
