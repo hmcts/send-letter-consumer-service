@@ -11,7 +11,6 @@ import uk.gov.hmcts.reform.slc.services.SendLetterClient;
 import java.time.ZonedDateTime;
 import java.util.UUID;
 
-import static org.apache.commons.lang3.StringUtils.removeEnd;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.ThrowableAssert.catchThrowable;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
@@ -33,36 +32,17 @@ public class UpdateIsFailedTest {
 
     private static final ZonedDateTime now = ZonedDateTime.now();
 
+    private SendLetterClient sendLetterClient;
+
     @Before
     public void setUp() {
         mockServer = MockRestServiceServer.bindTo(restTemplate).build();
+        sendLetterClient = new SendLetterClient(restTemplate, sendLetterProducerUrl, () -> now);
     }
 
     @Test
-    public void should_successfully_put_is_failed_attribute_when_base_url_contains_slash_suffixed() {
+    public void should_successfully_put_is_failed_attribute() {
         //given
-        SendLetterClient sendLetterClient = new SendLetterClient(restTemplate, sendLetterProducerUrl, () -> now);
-
-        mockServer.expect(requestTo(sendLetterProducerUrl + letterId + IS_FAILED))
-            .andExpect(method(HttpMethod.PUT))
-            .andRespond(withStatus(HttpStatus.OK));
-
-        //when
-        sendLetterClient.updateIsFailedStatus(letterId);
-
-        //then
-        mockServer.verify();
-    }
-
-    @Test
-    public void should_successfully_put_is_failed_attribute_when_base_url_contains_no_slash_suffixed() {
-        //given
-        SendLetterClient sendLetterClient = new SendLetterClient(
-            restTemplate,
-            removeEnd(sendLetterProducerUrl, "/"),
-            () -> now
-        );
-
         mockServer.expect(requestTo(sendLetterProducerUrl + letterId + IS_FAILED))
             .andExpect(method(HttpMethod.PUT))
             .andRespond(withStatus(HttpStatus.OK));
@@ -77,8 +57,6 @@ public class UpdateIsFailedTest {
     @Test
     public void should_not_throw_exception_when_rest_template_throws_server_error() {
         //given
-        SendLetterClient sendLetterClient = new SendLetterClient(restTemplate, sendLetterProducerUrl, () -> now);
-
         mockServer.expect(requestTo(sendLetterProducerUrl + letterId + IS_FAILED))
             .andExpect(method(HttpMethod.PUT))
             .andRespond(withServerError());

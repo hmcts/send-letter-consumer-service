@@ -58,6 +58,8 @@ public class SendLetterService {
             //update producer with is_failed status for reporting
             if (Objects.nonNull(letter)) {
                 sendLetterClient.updateIsFailedStatus(letter.id);
+            } else {
+                logger.error("Unable to update is_failed status in producer for reporting");
             }
 
             return FAILURE;
