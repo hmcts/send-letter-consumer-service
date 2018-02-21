@@ -56,7 +56,7 @@ public class SendLetterClient {
     public void updatePrintedAt(LetterPrintStatus status) {
         try {
             restTemplate.put(
-                sendLetterProducerUrl + status.id + "/printed_at",
+                sendLetterProducerUrl + status.id + "/printed-at",
                 ImmutableMap.of(
                     "printed_at",
                     status.printedAt.format(ISO_INSTANT)

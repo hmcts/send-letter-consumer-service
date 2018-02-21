@@ -41,7 +41,7 @@ public class UpdatePrintedAtTest {
         String datetime = "2018-01-01T21:11:00Z";
 
         mockServer
-            .expect(requestTo(url + id + "/printed_at"))
+            .expect(requestTo(url + id + "/printed-at"))
             .andExpect(method(PUT))
             .andExpect(content().string("{\"printed_at\":\"" + datetime + "\"}"))
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
@@ -57,7 +57,7 @@ public class UpdatePrintedAtTest {
         String id = "f36e834a-216c-48ed-8fe9-b0dabc4daa49";
 
         mockServer
-            .expect(requestTo(url + id + "/printed_at"))
+            .expect(requestTo(url + id + "/printed-at"))
             .andExpect(method(PUT))
             .andRespond(withServerError());
 
