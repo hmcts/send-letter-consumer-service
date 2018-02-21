@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.slc.services;
+package uk.gov.hmcts.reform.slc.services.sendletterclient;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestTemplate;
+import uk.gov.hmcts.reform.slc.services.SendLetterClient;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -21,7 +22,7 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withServerError;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 
-public class SendLetterClientTest {
+public class UpdateSentToPrintAtTest {
 
     private MockRestServiceServer mockServer;
 

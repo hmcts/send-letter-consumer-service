@@ -37,15 +37,17 @@ public class SendLetterClient {
 
     public void updateSentToPrintAt(UUID letterId) {
         try {
-            restTemplate.put(sendLetterProducerUrl + letterId + "/sent-to-print-at",
+            restTemplate.put(
+                sendLetterProducerUrl + letterId + "/sent-to-print-at",
                 ImmutableMap.of(
                     "sent_to_print_at",
-                    currentDateTimeSupplier.get().format(DateTimeFormatter.ISO_INSTANT)));
+                    currentDateTimeSupplier.get().format(DateTimeFormatter.ISO_INSTANT)
+                )
+            );
         } catch (RestClientException exception) {
             //If updating timestamp fails just log the message as the letter is already uploaded
             logger.error(
-                "Exception occurred while updating sent to print time for letter id = {}",
-                letterId,
+                "Exception occurred while updating sent to print time for letter id = " + letterId,
                 exception
             );
         }
