@@ -10,10 +10,10 @@ import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.reform.slc.model.LetterPrintStatus;
 
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 import java.util.function.Supplier;
 
+import static java.time.format.DateTimeFormatter.ISO_INSTANT;
 import static org.apache.commons.lang3.StringUtils.appendIfMissing;
 
 @Component
@@ -41,7 +41,7 @@ public class SendLetterClient {
                 sendLetterProducerUrl + letterId + "/sent-to-print-at",
                 ImmutableMap.of(
                     "sent_to_print_at",
-                    currentDateTimeSupplier.get().format(DateTimeFormatter.ISO_INSTANT)
+                    currentDateTimeSupplier.get().format(ISO_INSTANT)
                 )
             );
         } catch (RestClientException exception) {
@@ -54,6 +54,27 @@ public class SendLetterClient {
     }
 
     public void updatePrintedAt(LetterPrintStatus status) {
-        // TODO: call API
+        try {
+            restTemplate.put(
+                sendLetterProducerUrl + status.id + "/printed-at",
+                ImmutableMap.of(
+                    "printed_at",
+                    status.printedAt.format(ISO_INSTANT)
+                )
+            );
+        } catch (RestClientException exception) {
+            logger.error("Exception occurred while updating printed_at time for letter id = " + status.id, exception);
+        }
+    }
+
+    public void updateIsFailedStatus(UUID letterId) {
+        try {
+            restTemplate.put(sendLetterProducerUrl + letterId + "/is-failed", null);
+        } catch (RestClientException exception) {
+            logger.error(
+                "Exception occurred while updating is failed status for letter id = " + letterId,
+                exception
+            );
+        }
     }
 }

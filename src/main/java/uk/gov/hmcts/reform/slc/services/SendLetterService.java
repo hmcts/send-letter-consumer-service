@@ -11,6 +11,8 @@ import uk.gov.hmcts.reform.slc.services.steps.getpdf.PdfDoc;
 import uk.gov.hmcts.reform.slc.services.steps.maptoletter.LetterMapper;
 import uk.gov.hmcts.reform.slc.services.steps.sftpupload.FtpClient;
 
+import java.util.Objects;
+
 import static uk.gov.hmcts.reform.slc.services.servicebus.MessageHandlingResult.FAILURE;
 import static uk.gov.hmcts.reform.slc.services.servicebus.MessageHandlingResult.SUCCESS;
 
@@ -37,8 +39,10 @@ public class SendLetterService {
     }
 
     public MessageHandlingResult send(IMessage msg) {
+        Letter letter = null;
+
         try {
-            Letter letter = letterMapper.from(msg);
+            letter = letterMapper.from(msg);
             PdfDoc pdf = pdfCreator.create(letter);
             // TODO: encrypt & sign
             ftpClient.upload(pdf);
@@ -50,6 +54,13 @@ public class SendLetterService {
 
         } catch (Exception exc) {
             logger.error(exc.getMessage(), exc.getCause());
+
+            //update producer with is_failed status for reporting
+            if (Objects.nonNull(letter)) {
+                sendLetterClient.updateIsFailedStatus(letter.id);
+            } else {
+                logger.error("Unable to update is_failed status in producer for reporting");
+            }
 
             return FAILURE;
         }
