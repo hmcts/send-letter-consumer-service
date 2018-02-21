@@ -11,6 +11,8 @@ import uk.gov.hmcts.reform.slc.services.steps.getpdf.PdfDoc;
 import uk.gov.hmcts.reform.slc.services.steps.maptoletter.LetterMapper;
 import uk.gov.hmcts.reform.slc.services.steps.sftpupload.FtpClient;
 
+import java.util.Objects;
+
 import static uk.gov.hmcts.reform.slc.services.servicebus.MessageHandlingResult.FAILURE;
 import static uk.gov.hmcts.reform.slc.services.servicebus.MessageHandlingResult.SUCCESS;
 
@@ -54,7 +56,9 @@ public class SendLetterService {
             logger.error(exc.getMessage(), exc.getCause());
 
             //update producer with is_failed status for reporting
-            sendLetterClient.updateIsFailedStatus(letter.id);
+            if (Objects.nonNull(letter)) {
+                sendLetterClient.updateIsFailedStatus(letter.id);
+            }
 
             return FAILURE;
         }
