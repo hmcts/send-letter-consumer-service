@@ -33,7 +33,7 @@ public class UpdateLetterStatusJob {
         this.parser = parser;
     }
 
-    @Scheduled(cron = "${reports-cron}")
+    @Scheduled(cron = "${ftp.reports-cron}")
     public void run() {
         logger.trace("Running job");
 
