@@ -37,8 +37,10 @@ public class SendLetterService {
     }
 
     public MessageHandlingResult send(IMessage msg) {
+        Letter letter = null;
+
         try {
-            Letter letter = letterMapper.from(msg);
+            letter = letterMapper.from(msg);
             PdfDoc pdf = pdfCreator.create(letter);
             // TODO: encrypt & sign
             ftpClient.upload(pdf);
@@ -50,6 +52,9 @@ public class SendLetterService {
 
         } catch (Exception exc) {
             logger.error(exc.getMessage(), exc.getCause());
+
+            //update producer with is_failed status for reporting
+            sendLetterClient.updateIsFailedStatus(letter.id);
 
             return FAILURE;
         }
