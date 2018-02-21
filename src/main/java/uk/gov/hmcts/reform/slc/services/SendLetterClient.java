@@ -47,7 +47,7 @@ public class SendLetterClient {
         } catch (RestClientException exception) {
             //If updating timestamp fails just log the message as the letter is already uploaded
             logger.error(
-                "Exception occurred while updating sent to print time for letter id = {}" + letterId,
+                "Exception occurred while updating sent to print time for letter id = " + letterId,
                 exception
             );
         }
