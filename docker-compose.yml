@@ -11,6 +11,19 @@ services:
     image: docker.artifactory.reform.hmcts.net/reform/send-letter-consumer-service
     container_name: send-letter-consumer-service
     environment:
+      - APPLICATION_INSIGHTS_IKEY
+      - FTP_FINGERPRINT
+      - FTP_HOSTNAME
+      - FTP_PORT
+      - FTP_PRIVATE_KEY
+      - FTP_PUBLIC_KEY
+      - FTP_REPORTS_FOLDER
+      - FTP_TARGET_FOLDER
+      - FTP_USER
+      - PDF_SERVICE_URL
+      - S2S_SECRET
+      - S2S_URL
+      - SEND_LETTER_PRODUCER_URL
       # these environment variables are used by java-logging library
       - ROOT_APPENDER
       - JSON_CONSOLE_PRETTY_PRINT
