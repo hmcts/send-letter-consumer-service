@@ -1,0 +1,2 @@
+org.springframework.boot.actuate.autoconfigure.ManagementContextConfiguration=\
+uk.gov.hmcts.reform.slc.config.HealthEndpointConfiguration
