@@ -29,7 +29,8 @@ public class HealthEndpointConfiguration {
     }
 
     /**
-     * Overriding health mvc endpoint bean to be able to include custom service health endpoint
+     * Overriding health mvc endpoint bean to be able to include custom service health endpoint.
+     *
      * @param delegate Integration for endpoint call
      * @return Custom health endpoints
      */
