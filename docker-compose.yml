@@ -1,15 +1,15 @@
 version: '2.1'
 
 services:
-  send-letter-consumer:
+  send-letter-consumer-service:
     build:
       context: .
       args:
         - http_proxy
         - https_proxy
         - no_proxy
-    image: docker.artifactory.reform.hmcts.net/reform/send-letter-consumer
-    container_name: send-letter-consumer
+    image: docker.artifactory.reform.hmcts.net/reform/send-letter-consumer-service
+    container_name: send-letter-consumer-service
     environment:
       # these environment variables are used by java-logging library
       - ROOT_APPENDER

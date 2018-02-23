@@ -1,6 +1,6 @@
 FROM openjdk:8-jre
 
-COPY build/install/send-letter-consumer /opt/app/
+COPY build/install/send-letter-consumer-service /opt/app/
 
 WORKDIR /opt/app
 
@@ -8,4 +8,4 @@ HEALTHCHECK --interval=10s --timeout=10s --retries=10 CMD http_proxy="" curl --s
 
 EXPOSE 8486
 
-ENTRYPOINT ["/opt/app/bin/send-letter-consumer"]
+ENTRYPOINT ["/opt/app/bin/send-letter-consumer-service"]
