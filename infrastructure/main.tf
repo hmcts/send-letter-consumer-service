@@ -3,7 +3,7 @@ provider "vault" {
 }
 
 data "vault_generic_secret" "s2s_secret" {
-  path = "secret/${var.vault_section}/cc/send-letter-consumer/s2s-secret"
+  path = "secret/${var.vault_section}/ccidam/service-auth-provider/api/microservice-keys/send-letter-consumer"
 }
 
 data "vault_generic_secret" "ftp_user" {
