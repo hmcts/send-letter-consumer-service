@@ -31,11 +31,12 @@ locals {
 }
 
 module "consumer" {
-  source   = "git@github.com:contino/moj-module-webapp.git"
-  product  = "${var.product}-consumer"
-  location = "${var.location}"
-  env      = "${var.env}"
-  ilbIp    = "${var.ilbIp}"
+  source        = "git@github.com:contino/moj-module-webapp.git"
+  product       = "${var.product}-consumer"
+  location      = "${var.location}"
+  env           = "${var.env}"
+  ilbIp         = "${var.ilbIp}"
+  subscription  = "${var.subscription}"
 
   app_settings = {
 
