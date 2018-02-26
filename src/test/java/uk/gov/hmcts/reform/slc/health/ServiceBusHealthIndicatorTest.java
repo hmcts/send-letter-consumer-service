@@ -7,7 +7,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.HealthIndicator;
 import org.springframework.boot.actuate.health.Status;
 import uk.gov.hmcts.reform.slc.services.servicebus.exceptions.ConnectionException;
@@ -46,11 +45,7 @@ public class ServiceBusHealthIndicatorTest {
         given(receiverSupplier.get()).willReturn(receiver);
         willThrow(ServiceBusException.class).given(receiver).close();
 
-        Health health = healthIndicator.health();
-
-        assertThat(health.getStatus()).isEqualTo(Status.DOWN);
-        assertThat(health.getDetails()).containsKey("error")
-            .containsValue(ConnectionException.class.getName() + ": Unable to close the queue");
+        assertThat(healthIndicator.health().getStatus()).isEqualTo(Status.DOWN);
     }
 
     @Test
