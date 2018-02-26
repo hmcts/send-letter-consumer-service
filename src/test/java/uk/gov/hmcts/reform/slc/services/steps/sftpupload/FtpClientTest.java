@@ -148,14 +148,9 @@ public class FtpClientTest {
 
     @Test
     public void should_throw_an_exception_while_getting_sftp_client_for_health_check() throws IOException {
-        // given
         reset(sshClient);
         doThrow(IOException.class).when(sshClient).newSFTPClient();
 
-        // when
-        Throwable exc = catchThrowable(() -> client.isHealthy());
-
-        // then
-        assertThat(exc).isInstanceOf(FtpStepException.class);
+        assertThat(client.isHealthy()).isFalse();
     }
 }

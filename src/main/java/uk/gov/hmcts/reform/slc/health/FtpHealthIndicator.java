@@ -22,8 +22,10 @@ public class FtpHealthIndicator extends AbstractHealthIndicator {
 
     @Override
     protected void doHealthCheck(Health.Builder builder) throws Exception {
-        if (availabilityChecker.isFtpAvailable(LocalTime.now())) {
-            client.isHealthy();
+        if (availabilityChecker.isFtpAvailable(LocalTime.now()) && !client.isHealthy()) {
+            builder.down();
+
+            return;
         }
 
         builder.up();
