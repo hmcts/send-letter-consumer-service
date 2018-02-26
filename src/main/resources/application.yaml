@@ -2,6 +2,9 @@ server:
   port: 8486
 
 management:
+  health:
+    service:
+      enabled: true
   security:
     enabled: ${MANAGEMENT_SECURITY_ENABLED:true}
 
