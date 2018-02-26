@@ -1,12 +1,12 @@
 package uk.gov.hmcts.reform.slc.health;
 
-import org.springframework.boot.actuate.health.AbstractHealthIndicator;
 import org.springframework.boot.actuate.health.Health;
+import org.springframework.boot.actuate.health.HealthIndicator;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.pdf.service.client.PDFServiceClient;
 
 @Component
-public class PdfServiceHealthIndicator extends AbstractHealthIndicator {
+public class PdfServiceHealthIndicator implements HealthIndicator {
 
     private final PDFServiceClient client;
 
@@ -15,9 +15,7 @@ public class PdfServiceHealthIndicator extends AbstractHealthIndicator {
     }
 
     @Override
-    protected void doHealthCheck(Health.Builder builder) throws Exception {
-        Health health = client.serviceHealthy();
-        builder.status(health.getStatus());
-        health.getDetails().forEach(builder::withDetail);
+    public Health health() {
+        return client.serviceHealthy();
     }
 }
