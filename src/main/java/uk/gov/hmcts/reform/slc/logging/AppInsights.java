@@ -66,27 +66,27 @@ public class AppInsights extends AbstractAppInsights {
 
     // EVENTS
 
-    public void trackMessageReceived(String messageId, long enqueuedInNanos) {
+    public void trackMessageReceived(String messageId, java.time.Duration duration) {
         telemetry.trackEvent(
             AppEvent.MESSAGE_RECEIVED,
             singletonMap("messageId", messageId),
-            singletonMap("enqueuedInNanos", (double) enqueuedInNanos)
+            singletonMap("enqueuedInMillis", (double) duration.toMillis())
         );
     }
 
-    public void markMessageHandled(String messageId, long handlingInNanos) {
+    public void markMessageHandled(String messageId, java.time.Duration duration) {
         telemetry.trackEvent(
             AppEvent.MESSAGE_HANDLED_SUCCESSFULLY,
             singletonMap("messageId", messageId),
-            singletonMap("handledInNanos", (double) handlingInNanos)
+            singletonMap("handledInMillis", (double) duration.toMillis())
         );
     }
 
-    public void markMessageNotHandled(String messageId, long handlingInNanos) {
+    public void markMessageNotHandled(String messageId, java.time.Duration duration) {
         telemetry.trackEvent(
             AppEvent.MESSAGE_HANDLED_UNSUCCESSFULLY,
             singletonMap("messageId", messageId),
-            singletonMap("handledInNanos", (double) handlingInNanos)
+            singletonMap("handledInMillis", (double) duration.toMillis())
         );
     }
 

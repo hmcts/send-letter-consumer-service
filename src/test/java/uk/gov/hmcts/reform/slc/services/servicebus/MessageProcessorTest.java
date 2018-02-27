@@ -16,7 +16,6 @@ import java.time.Instant;
 
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.never;
@@ -55,8 +54,8 @@ public class MessageProcessorTest {
         // then
         verify(messageReceiver).complete(any());
         verify(insights).trackMessageReceivedFromServiceBus(any(Duration.class), eq(true));
-        verify(insights).trackMessageReceived(anyString(), anyLong());
-        verify(insights).markMessageHandled(anyString(), anyLong());
+        verify(insights).trackMessageReceived(anyString(), any(Duration.class));
+        verify(insights).markMessageHandled(anyString(), any(Duration.class));
         verify(insights).trackMessageCompletedInServiceBus(any(Duration.class), eq(true));
         verifyNoMoreInteractions(insights);
     }
@@ -74,8 +73,8 @@ public class MessageProcessorTest {
         // then
         verify(messageReceiver).deadLetter(any());
         verify(insights).trackMessageReceivedFromServiceBus(any(Duration.class), eq(true));
-        verify(insights).trackMessageReceived(anyString(), anyLong());
-        verify(insights).markMessageNotHandled(anyString(), anyLong());
+        verify(insights).trackMessageReceived(anyString(), any(Duration.class));
+        verify(insights).markMessageNotHandled(anyString(), any(Duration.class));
         verify(insights).trackMessageDeadLetteredInServiceBus(any(Duration.class), eq(true));
         verifyNoMoreInteractions(insights);
     }
