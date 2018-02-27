@@ -27,14 +27,14 @@ public class SendLetterProducerHealthIndicatorTest {
     }
 
     @Test
-    public void send_letter_producer_service_should_be_healthy() {
+    public void should_be_healthy_when_send_letter_producer_service_is_healthy() {
         given(client.serviceHealthy()).willReturn(Health.up().build());
 
         assertThat(healthIndicator.health().getStatus()).isEqualTo(Status.UP);
     }
 
     @Test
-    public void send_letter_producer_service_should_not_be_healthy() {
+    public void should_not_be_healthy_when_send_letter_producer_service_is_not_healthy() {
         given(client.serviceHealthy()).willReturn(Health.down().build());
 
         assertThat(healthIndicator.health().getStatus()).isEqualTo(Status.DOWN);

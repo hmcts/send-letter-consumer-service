@@ -35,7 +35,7 @@ public class FtpHealthIndicatorTest {
     }
 
     @Test
-    public void should_be_healthy_out_of_operating_hours() {
+    public void should_be_healthy_when_ftp_is_not_available() {
         given(availabilityChecker.isFtpAvailable(any(LocalTime.class))).willReturn(false);
 
         assertThat(healthIndicator.health().getStatus()).isEqualTo(Status.UP);
@@ -43,7 +43,7 @@ public class FtpHealthIndicatorTest {
     }
 
     @Test
-    public void should_be_healthy_during_operating_hours() {
+    public void should_be_healthy_when_ftp_is_available() {
         given(availabilityChecker.isFtpAvailable(any(LocalTime.class))).willReturn(true);
         given(client.isHealthy()).willReturn(true);
 

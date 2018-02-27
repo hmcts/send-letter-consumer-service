@@ -28,14 +28,14 @@ public class PdfServiceHealthIndicatorTest {
     }
 
     @Test
-    public void pdf_service_should_be_healthy() {
+    public void should_be_healthy_when_pdf_service_is_up() {
         given(client.serviceHealthy()).willReturn(Health.up().build());
 
         assertThat(healthIndicator.health().getStatus()).isEqualTo(Status.UP);
     }
 
     @Test
-    public void pdf_service_should_not_be_healthy() {
+    public void should_not_be_healthy_when_pdf_service_is_down() {
         given(client.serviceHealthy()).willReturn(
             Health.down(new PDFServiceClientException("some error", null)).build()
         );
