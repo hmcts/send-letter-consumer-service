@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.slc.services;
 
-import com.google.common.collect.ImmutableMap;
 import com.microsoft.azure.servicebus.IMessage;
 import org.junit.Before;
 import org.junit.Test;
@@ -79,11 +78,7 @@ public class SendLetterServiceTest {
             ),
             "some_type",
             "cmc",
-            "some-service-bus-id",
-            ImmutableMap.of(
-                "case_id", "asd7efwy8ef",
-                "document_type", "claim"
-            )
+            "some-service-bus-id"
         );
     }
 }

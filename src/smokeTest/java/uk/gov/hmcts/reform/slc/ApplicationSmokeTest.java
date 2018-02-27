@@ -20,7 +20,9 @@ public class ApplicationSmokeTest {
     public void service_is_healthy() {
         RestAssured.baseURI = testUrl;
 
-        RestAssured.get("/health").then().assertThat()
+        RestAssured.given()
+            .relaxedHTTPSValidation()
+            .get("/health").then().assertThat()
             .statusCode(HttpStatus.OK.value())
             .and()
             .body("status", equalTo(Status.UP.toString()));
