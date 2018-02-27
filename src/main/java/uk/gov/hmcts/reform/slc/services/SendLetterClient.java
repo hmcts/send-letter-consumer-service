@@ -4,9 +4,12 @@ import com.google.common.collect.ImmutableMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.actuate.health.Health;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
+import uk.gov.hmcts.reform.authorisation.healthcheck.InternalHealth;
 import uk.gov.hmcts.reform.slc.model.LetterPrintStatus;
 
 import java.time.ZonedDateTime;
@@ -75,6 +78,24 @@ public class SendLetterClient {
                 "Exception occurred while updating is failed status for letter id = " + letterId,
                 exception
             );
+        }
+    }
+
+    /**
+     * Calls the Send Letter Producer service healthcheck.
+     *
+     * @return health status
+     */
+    public Health serviceHealthy() {
+        try {
+            ResponseEntity<InternalHealth> response = restTemplate
+                .getForEntity(sendLetterProducerUrl + "health", InternalHealth.class);
+
+            return Health.status(response.getBody().getStatus()).build();
+        } catch (Exception ex) {
+            logger.error("Error on send letter producer service healthcheck", ex);
+
+            return Health.down(ex).build();
         }
     }
 }
