@@ -3,27 +3,27 @@ provider "vault" {
 }
 
 data "vault_generic_secret" "s2s_secret" {
-  path = "secret/${var.env}/cc/send-letter-consumer/s2s-secret"
+  path = "secret/${var.vault_section}/ccidam/service-auth-provider/api/microservice-keys/send-letter-consumer"
 }
 
 data "vault_generic_secret" "ftp_user" {
-  path = "secret/${var.env}/cc/send-letter-consumer/ftp-user"
+  path = "secret/${var.vault_section}/cc/send-letter-consumer/ftp-user"
 }
 
 data "vault_generic_secret" "ftp_private_key" {
-  path = "secret/${var.env}/cc/send-letter-consumer/ftp-private-key"
+  path = "secret/${var.vault_section}/cc/send-letter-consumer/ftp-private-key"
 }
 
 data "vault_generic_secret" "ftp_public_key" {
-  path = "secret/${var.env}/cc/send-letter-consumer/ftp-public-key"
+  path = "secret/${var.vault_section}/cc/send-letter-consumer/ftp-public-key"
 }
 
 data "vault_generic_secret" "servicebus_conn_string" {
-  path = "secret/${var.env}/cc/send-letter/servicebus-listen-conn-string"
+  path = "secret/${var.vault_section}/cc/send-letter/servicebus-listen-conn-string"
 }
 
 data "vault_generic_secret" "send_letter_producer_url" {
-  path = "secret/${var.env}/cc/send-letter/producer-url"
+  path = "secret/${var.vault_section}/cc/send-letter/producer-url"
 }
 
 locals {
@@ -31,11 +31,12 @@ locals {
 }
 
 module "consumer" {
-  source   = "git@github.com:contino/moj-module-webapp.git"
-  product  = "${var.product}-consumer"
-  location = "${var.location}"
-  env      = "${var.env}"
-  ilbIp    = "${var.ilbIp}"
+  source        = "git@github.com:contino/moj-module-webapp.git"
+  product       = "${var.product}-consumer"
+  location      = "${var.location}"
+  env           = "${var.env}"
+  ilbIp         = "${var.ilbIp}"
+  subscription  = "${var.subscription}"
 
   app_settings = {
 
