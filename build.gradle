@@ -17,6 +17,15 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 sourceSets {
+  functionalTest {
+    java {
+      compileClasspath += main.output
+      runtimeClasspath += main.output
+      srcDir file('src/functionalTest/java')
+    }
+    resources.srcDir file('src/functionalTest/resources')
+  }
+
   smokeTest {
     java {
       compileClasspath += main.output
@@ -25,6 +34,14 @@ sourceSets {
     }
     resources.srcDir file('src/smokeTest/resources')
   }
+}
+
+task functional(type: Test, group: 'Verification') {
+  description = 'Runs the functional tests'
+  testClassesDirs = sourceSets.functionalTest.output.classesDirs
+  classpath = sourceSets.functionalTest.runtimeClasspath
+
+  environment("APPLICATION_INSIGHTS_IKEY", "test-key")
 }
 
 task smoke(type: Test) {
@@ -43,13 +60,13 @@ checkstyle {
 pmd {
   toolVersion = "5.8.1"
   ignoreFailures = true
-  sourceSets = [sourceSets.main, sourceSets.test, sourceSets.smokeTest]
+  sourceSets = [sourceSets.main, sourceSets.test, sourceSets.functionalTest, sourceSets.smokeTest]
   reportsDir = file("$project.buildDir/reports/pmd")
   ruleSetFiles = files("config/pmd/ruleset.xml")
 }
 
 jacocoTestReport {
-  executionData(test)
+  executionData(test, functional)
   reports {
     xml.enabled = true
     csv.enabled = false
@@ -57,11 +74,12 @@ jacocoTestReport {
   }
 }
 
-project.tasks['sonarqube'].dependsOn test
+project.tasks['sonarqube'].dependsOn test, functional
 sonarqube {
   properties {
     property "sonar.projectName", "Reform :: Send Letter Consumer"
     property "sonar.jacoco.reportPath", "${project.buildDir}/jacoco/test.exec"
+    property "sonar.jacoco.itReportPath", "${project.buildDir}/jacoco/functional.exec"
   }
 }
 
@@ -132,6 +150,9 @@ dependencies {
   compile group: 'org.apache.pdfbox', name: 'pdfbox', version: '2.0.8'
 
   testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: versions.springBoot
+
+  functionalTestCompile sourceSets.main.runtimeClasspath
+  functionalTestCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: versions.springBoot
 
   smokeTestCompile sourceSets.main.runtimeClasspath
   smokeTestCompile group: 'io.rest-assured', name: 'rest-assured', version: '3.0.7'
