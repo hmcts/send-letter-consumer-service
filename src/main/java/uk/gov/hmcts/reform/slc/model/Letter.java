@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import javax.validation.constraints.NotNull;
 
@@ -25,21 +24,17 @@ public class Letter {
     @NotEmpty
     public final String messageId;
 
-    public final Map<String, Object> additionalData;
-
     public Letter(
         @JsonProperty("id") UUID id,
         @JsonProperty("documents") List<Document> documents,
         @JsonProperty("type") String type,
         @JsonProperty("service") String service,
-        @JsonProperty("message_id") String messageId,
-        @JsonProperty("additional_data") Map<String, Object> additionalData
+        @JsonProperty("message_id") String messageId
     ) {
         this.id = id;
         this.documents = documents;
         this.type = type;
         this.service = service;
         this.messageId = messageId;
-        this.additionalData = additionalData;
     }
 }

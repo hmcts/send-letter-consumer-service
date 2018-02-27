@@ -6,7 +6,6 @@ import uk.gov.hmcts.reform.slc.model.Letter;
 import java.util.UUID;
 
 import static java.util.Collections.emptyList;
-import static java.util.Collections.emptyMap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -88,8 +87,7 @@ public class FileNameHelperTest {
             emptyList(),
             type,
             service,
-            "098F6BCD4621D373CADE4E832627B4F6",
-            emptyMap()
+            "098F6BCD4621D373CADE4E832627B4F6"
         );
     }
 }
