@@ -54,10 +54,7 @@ public class LetterMapperTest {
                     + "],"
                     + "\"type\": \"some_type\","
                     + "\"service\": \"some_service\","
-                    + "\"message_id\": \"syf8f7\","
-                    + "\"additional_data\": {"
-                    + "  \"document_type\": \"claim\""
-                    + "}"
+                    + "\"message_id\": \"syf8f7\""
                     + "}"
                 ).getBytes()
             );
