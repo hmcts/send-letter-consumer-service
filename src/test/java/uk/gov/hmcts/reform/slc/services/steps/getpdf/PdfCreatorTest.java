@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.slc.services.steps.getpdf;
 
-import com.google.common.collect.ImmutableMap;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.junit.Before;
 import org.junit.Test;
@@ -82,10 +81,7 @@ public class PdfCreatorTest {
             ),
             "type",
             "service",
-            "3h9j8e",
-            ImmutableMap.of(
-                "case_id", "asd38r"
-            )
+            "3h9j8e"
         );
 
         // when
@@ -121,10 +117,7 @@ public class PdfCreatorTest {
             ),
             "type",
             "service",
-            "a97gss8as",
-            ImmutableMap.of(
-                "foo", "bar"
-            )
+            "a97gss8as"
         );
 
         assertThatThrownBy(() -> pdfCreator.create(letter))
