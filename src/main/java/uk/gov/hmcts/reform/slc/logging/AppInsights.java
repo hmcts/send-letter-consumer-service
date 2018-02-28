@@ -13,6 +13,10 @@ import static java.util.Collections.singletonMap;
 @Component
 public class AppInsights extends AbstractAppInsights {
 
+    private static final String MESSAGE_ID = "messageId";
+    private static final String MESSAGE_SIZE = "messageSize";
+    private static final String HANDLED_IN_MILLIS = "handledInMillis";
+
     public AppInsights(TelemetryClient telemetryClient) {
         super(telemetryClient);
     }
@@ -69,7 +73,7 @@ public class AppInsights extends AbstractAppInsights {
     public void trackMessageReceived(String messageId, java.time.Duration duration) {
         telemetry.trackEvent(
             AppEvent.MESSAGE_RECEIVED,
-            singletonMap("messageId", messageId),
+            singletonMap(MESSAGE_ID, messageId),
             singletonMap("enqueuedInMillis", (double) duration.toMillis())
         );
     }
@@ -77,22 +81,22 @@ public class AppInsights extends AbstractAppInsights {
     public void markMessageHandled(String messageId, java.time.Duration duration) {
         telemetry.trackEvent(
             AppEvent.MESSAGE_HANDLED_SUCCESSFULLY,
-            singletonMap("messageId", messageId),
-            singletonMap("handledInMillis", (double) duration.toMillis())
+            singletonMap(MESSAGE_ID, messageId),
+            singletonMap(HANDLED_IN_MILLIS, (double) duration.toMillis())
         );
     }
 
     public void markMessageNotHandled(String messageId, java.time.Duration duration) {
         telemetry.trackEvent(
             AppEvent.MESSAGE_HANDLED_UNSUCCESSFULLY,
-            singletonMap("messageId", messageId),
-            singletonMap("handledInMillis", (double) duration.toMillis())
+            singletonMap(MESSAGE_ID, messageId),
+            singletonMap(HANDLED_IN_MILLIS, (double) duration.toMillis())
         );
     }
 
     public void trackMessageMappedToLetter(String messageId, String serviceName, String template, long bodyLength) {
         Map<String, String> properties = ImmutableMap.of(
-            "messageId", messageId,
+            MESSAGE_ID, messageId,
             "service", serviceName,
             "template", template
         );
@@ -100,14 +104,14 @@ public class AppInsights extends AbstractAppInsights {
         telemetry.trackEvent(
             AppEvent.MESSAGE_MAPPED_SUCCESSFULLY,
             properties,
-            singletonMap("messageSize", (double) bodyLength)
+            singletonMap(MESSAGE_SIZE, (double) bodyLength)
         );
     }
 
     public void trackMessageMappedToNull(String messageId) {
         telemetry.trackEvent(
             AppEvent.MESSAGE_MAPPED_EMPTY,
-            singletonMap("messageId", messageId),
+            singletonMap(MESSAGE_ID, messageId),
             null
         );
     }
@@ -115,16 +119,16 @@ public class AppInsights extends AbstractAppInsights {
     public void trackMessageMappedToInvalid(String messageId, long bodyLength) {
         telemetry.trackEvent(
             AppEvent.MESSAGE_MAPPED_INVALID,
-            singletonMap("messageId", messageId),
-            singletonMap("messageSize", (double) bodyLength)
+            singletonMap(MESSAGE_ID, messageId),
+            singletonMap(MESSAGE_SIZE, (double) bodyLength)
         );
     }
 
     public void trackMessageNotMapped(String messageId, long bodyLength) {
         telemetry.trackEvent(
             AppEvent.MESSAGE_MAPPED_UNSUCCESSFULLY,
-            singletonMap("messageId", messageId),
-            singletonMap("messageSize", (double) bodyLength)
+            singletonMap(MESSAGE_ID, messageId),
+            singletonMap(MESSAGE_SIZE, (double) bodyLength)
         );
     }
 
