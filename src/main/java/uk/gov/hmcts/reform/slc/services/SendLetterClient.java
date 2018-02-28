@@ -5,10 +5,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.actuate.health.Health;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
+import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.authorisation.healthcheck.InternalHealth;
 import uk.gov.hmcts.reform.slc.model.LetterPrintStatus;
 
@@ -22,25 +27,30 @@ import static org.apache.commons.lang3.StringUtils.appendIfMissing;
 @Component
 public class SendLetterClient {
 
+    public static final String AUTHORIZATION_HEADER = "ServiceAuthorization";
+
     private static final Logger logger = LoggerFactory.getLogger(SendLetterService.class);
 
     private final RestTemplate restTemplate;
     private final String sendLetterProducerUrl;
     private final Supplier<ZonedDateTime> currentDateTimeSupplier;
+    private final AuthTokenGenerator authTokenGenerator;
 
     public SendLetterClient(
         RestTemplate restTemplate,
         @Value("${sendletter.producer.url}") String sendLetterProducerUrl,
-        Supplier<ZonedDateTime> currentDateTimeSupplier
+        Supplier<ZonedDateTime> currentDateTimeSupplier,
+        AuthTokenGenerator authTokenGenerator
     ) {
         this.restTemplate = restTemplate;
         this.sendLetterProducerUrl = appendIfMissing(sendLetterProducerUrl, "/");
         this.currentDateTimeSupplier = currentDateTimeSupplier;
+        this.authTokenGenerator = authTokenGenerator;
     }
 
     public void updateSentToPrintAt(UUID letterId) {
         try {
-            restTemplate.put(
+            restTemplatePut(
                 sendLetterProducerUrl + letterId + "/sent-to-print-at",
                 ImmutableMap.of(
                     "sent_to_print_at",
@@ -58,7 +68,7 @@ public class SendLetterClient {
 
     public void updatePrintedAt(LetterPrintStatus status) {
         try {
-            restTemplate.put(
+            restTemplatePut(
                 sendLetterProducerUrl + status.id + "/printed-at",
                 ImmutableMap.of(
                     "printed_at",
@@ -72,7 +82,7 @@ public class SendLetterClient {
 
     public void updateIsFailedStatus(UUID letterId) {
         try {
-            restTemplate.put(sendLetterProducerUrl + letterId + "/is-failed", null);
+            restTemplatePut(sendLetterProducerUrl + letterId + "/is-failed", null);
         } catch (RestClientException exception) {
             logger.error(
                 "Exception occurred while updating is failed status for letter id = " + letterId,
@@ -97,5 +107,15 @@ public class SendLetterClient {
 
             return Health.down(ex).build();
         }
+    }
+
+    private void restTemplatePut(String url, Object body) throws RestClientException {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_UTF8_VALUE);
+        headers.add(AUTHORIZATION_HEADER, authTokenGenerator.generate());
+
+        HttpEntity<Object> entity = new HttpEntity<>(body, headers);
+
+        restTemplate.exchange(url, HttpMethod.PUT, entity, Void.class);
     }
 }

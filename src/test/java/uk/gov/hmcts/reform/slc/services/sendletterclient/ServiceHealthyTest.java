@@ -6,11 +6,13 @@ import org.springframework.boot.actuate.health.Status;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestTemplate;
+import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.slc.services.SendLetterClient;
 
 import java.time.ZonedDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 import static org.springframework.boot.actuate.health.Status.DOWN;
 import static org.springframework.boot.actuate.health.Status.UP;
 import static org.springframework.http.HttpMethod.GET;
@@ -29,7 +31,7 @@ public class ServiceHealthyTest {
     @Before
     public void setUp() {
         mockServer = MockRestServiceServer.bindTo(restTemplate).build();
-        client = new SendLetterClient(restTemplate, url, ZonedDateTime::now);
+        client = new SendLetterClient(restTemplate, url, ZonedDateTime::now, mock(AuthTokenGenerator.class));
     }
 
     @Test
