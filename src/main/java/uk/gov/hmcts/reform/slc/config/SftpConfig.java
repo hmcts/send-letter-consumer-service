@@ -4,11 +4,13 @@ import net.schmizz.sshj.SSHClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.function.Supplier;
+
 @Configuration
 public class SftpConfig {
 
     @Bean
-    public SSHClient sshClient() {
-        return new SSHClient();
+    public Supplier<SSHClient> sshClient() {
+        return SSHClient::new;
     }
 }

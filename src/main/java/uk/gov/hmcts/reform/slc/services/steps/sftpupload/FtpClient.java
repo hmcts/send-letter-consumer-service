@@ -18,6 +18,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import static java.util.stream.Collectors.toList;
 
@@ -33,7 +34,7 @@ public class FtpClient {
     private final int port;
     private final String fingerprint;
     private final String username;
-    private final SSHClient ssh;
+    private final Supplier<SSHClient> sshClientSupplier;
     private final String publicKey;
     private final String privateKey;
     private final String targetFolder;
@@ -46,7 +47,7 @@ public class FtpClient {
         @Value("${ftp.port}") int port,
         @Value("${ftp.fingerprint}") String fingerprint,
         @Value("${ftp.user}") String username,
-        SSHClient sshClient,
+        Supplier<SSHClient> sshClientSupplier,
         @Value("${ftp.keys.public}") String publicKey,
         @Value("@{ftp.keys.private}") String privateKey,
         @Value("@{ftp.target-folder}") String targetFolder,
@@ -56,7 +57,7 @@ public class FtpClient {
         this.port = port;
         this.fingerprint = fingerprint;
         this.username = username;
-        this.ssh = sshClient;
+        this.sshClientSupplier = sshClientSupplier;
         this.publicKey = publicKey;
         this.privateKey = privateKey;
         this.targetFolder = targetFolder;
@@ -121,7 +122,11 @@ public class FtpClient {
     }
 
     private <T> T runWith(Function<SFTPClient, T> action) {
+        SSHClient ssh = null;
+
         try {
+            ssh = sshClientSupplier.get();
+
             ssh.addHostKeyVerifier(fingerprint);
             ssh.connect(hostname, port);
 
@@ -143,7 +148,9 @@ public class FtpClient {
             throw new FtpStepException("Unable to upload PDF.", exc);
         } finally {
             try {
-                ssh.disconnect();
+                if (ssh != null) {
+                    ssh.disconnect();
+                }
             } catch (IOException e) {
                 logger.warn("Error closing ssh connection.");
             }
