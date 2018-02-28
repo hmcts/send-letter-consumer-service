@@ -140,4 +140,44 @@ public class MessageProcessorTest {
         verify(sendLetterService, never()).send(any());
         verifyNoMoreInteractions(insights);
     }
+
+    @Test
+    public void should_not_process_message_when_interrupted_exception_is_thrown_on_retrieving_message_from_sb_queue()
+        throws Exception {
+        // given
+        doThrow(InterruptedException.class).when(messageReceiver).receive();
+
+        //when
+        Throwable exception = catchThrowable(() -> {
+            processor.process();
+        });
+
+        // then
+        assertThat(exception).isNull();
+
+        verify(insights).trackMessageReceivedFromServiceBus(any(Duration.class), eq(false));
+        verify(insights).trackException(any(InterruptedException.class));
+        verify(sendLetterService, never()).send(any());
+        verifyNoMoreInteractions(insights);
+    }
+
+    @Test
+    public void should_not_process_message_when_servicebus_exception_is_thrown_on_retrieving_message_from_sb_queue()
+        throws Exception {
+        // given
+        doThrow(ServiceBusException.class).when(messageReceiver).receive();
+
+        //when
+        Throwable exception = catchThrowable(() -> {
+            processor.process();
+        });
+
+        // then
+        assertThat(exception).isNull();
+
+        verify(insights).trackMessageReceivedFromServiceBus(any(Duration.class), eq(false));
+        verify(insights).trackException(any(ServiceBusException.class));
+        verify(sendLetterService, never()).send(any());
+        verifyNoMoreInteractions(insights);
+    }
 }
