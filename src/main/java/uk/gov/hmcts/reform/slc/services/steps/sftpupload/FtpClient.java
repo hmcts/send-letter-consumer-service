@@ -112,6 +112,14 @@ public class FtpClient {
         });
     }
 
+    public boolean isHealthy() {
+        try {
+            return runWith(sftpClient -> true);
+        } catch (FtpStepException exception) {
+            return false;
+        }
+    }
+
     private <T> T runWith(Function<SFTPClient, T> action) {
         try {
             ssh.addHostKeyVerifier(fingerprint);

@@ -70,7 +70,7 @@ public class MessageProcessor {
 
         if (message != null) {
             Duration tookReceiving = Duration.between(receiveStartTime, Instant.now());
-            long timeInQueue = Duration.between(message.getEnqueuedTimeUtc(), receiveStartTime).toNanos();
+            Duration timeInQueue = Duration.between(message.getEnqueuedTimeUtc(), receiveStartTime);
             String messageId = message.getMessageId();
 
             insights.trackMessageReceivedFromServiceBus(tookReceiving, true);
@@ -85,7 +85,7 @@ public class MessageProcessor {
     private void sendLetter(IMessageReceiver messageReceiver, IMessage message) {
         Instant startHandling = Instant.now();
         MessageHandlingResult result = sendLetterService.send(message);
-        long tookHandling = Duration.between(startHandling, Instant.now()).toNanos();
+        Duration tookHandling = Duration.between(startHandling, Instant.now());
 
         switch (result) {
             case SUCCESS:

@@ -31,7 +31,7 @@ public class AppInsightsTest {
 
     private static final String MESSAGE_ID = "some message id";
 
-    private static final long NOT_MANY_NANOS = 1_000;
+    private static final long NOT_MANY_MILLIS = 10;
 
     private static final String SERVICE_NAME = "some service";
 
@@ -125,34 +125,34 @@ public class AppInsightsTest {
 
     @Test
     public void should_track_message_received() {
-        insights.trackMessageReceived(MESSAGE_ID, NOT_MANY_NANOS);
+        insights.trackMessageReceived(MESSAGE_ID, java.time.Duration.ofMillis(NOT_MANY_MILLIS));
 
         verify(client).trackEvent(
             AppEvent.MESSAGE_RECEIVED,
             singletonMap(MESSAGE_ID_KEY, MESSAGE_ID),
-            singletonMap("enqueuedInNanos", (double) NOT_MANY_NANOS)
+            singletonMap("enqueuedInMillis", (double) NOT_MANY_MILLIS)
         );
     }
 
     @Test
     public void should_mark_message_handled() {
-        insights.markMessageHandled(MESSAGE_ID, NOT_MANY_NANOS);
+        insights.markMessageHandled(MESSAGE_ID, java.time.Duration.ofMillis(NOT_MANY_MILLIS));
 
         verify(client).trackEvent(
             AppEvent.MESSAGE_HANDLED_SUCCESSFULLY,
             singletonMap(MESSAGE_ID_KEY, MESSAGE_ID),
-            singletonMap("handledInNanos", (double) NOT_MANY_NANOS)
+            singletonMap("handledInMillis", (double) NOT_MANY_MILLIS)
         );
     }
 
     @Test
     public void should_mark_message_not_handled() {
-        insights.markMessageNotHandled(MESSAGE_ID, NOT_MANY_NANOS);
+        insights.markMessageNotHandled(MESSAGE_ID, java.time.Duration.ofMillis(NOT_MANY_MILLIS));
 
         verify(client).trackEvent(
             AppEvent.MESSAGE_HANDLED_UNSUCCESSFULLY,
             singletonMap(MESSAGE_ID_KEY, MESSAGE_ID),
-            singletonMap("handledInNanos", (double) NOT_MANY_NANOS)
+            singletonMap("handledInMillis", (double) NOT_MANY_MILLIS)
         );
     }
 
