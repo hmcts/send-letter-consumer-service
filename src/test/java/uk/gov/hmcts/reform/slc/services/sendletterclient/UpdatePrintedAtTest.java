@@ -6,6 +6,7 @@ import org.junit.Test;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestTemplate;
+import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.slc.model.LetterPrintStatus;
 import uk.gov.hmcts.reform.slc.services.SendLetterClient;
 
@@ -14,6 +15,8 @@ import java.time.ZonedDateTime;
 import static java.time.ZonedDateTime.now;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.ThrowableAssert.catchThrowable;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpMethod.PUT;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.content;
@@ -25,6 +28,7 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 
 public class UpdatePrintedAtTest {
 
+    private static final String AUTH_HEADER = "service-auth-header";
     private static final String url = "http://localhost/";
     private final RestTemplate restTemplate = new RestTemplate();
 
@@ -33,8 +37,11 @@ public class UpdatePrintedAtTest {
 
     @Before
     public void setUp() {
+        AuthTokenGenerator authTokenGenerator = mock(AuthTokenGenerator.class);
+        when(authTokenGenerator.generate()).thenReturn(AUTH_HEADER);
+
         mockServer = MockRestServiceServer.bindTo(restTemplate).build();
-        client = new SendLetterClient(restTemplate, url, ZonedDateTime::now);
+        client = new SendLetterClient(restTemplate, url, ZonedDateTime::now, authTokenGenerator);
     }
 
     @Test
@@ -46,7 +53,7 @@ public class UpdatePrintedAtTest {
             .expect(requestTo(url + id + "/printed-at"))
             .andExpect(method(PUT))
             .andExpect(header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_UTF8_VALUE))
-            .andExpect(header(SendLetterClient.AUTHORIZATION_HEADER, "some-header"))
+            .andExpect(header(SendLetterClient.AUTHORIZATION_HEADER, AUTH_HEADER))
             .andExpect(content().string("{\"printed_at\":\"" + datetime + "\"}"))
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
             .andRespond(withStatus(NO_CONTENT));

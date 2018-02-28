@@ -8,15 +8,17 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestTemplate;
+import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.slc.services.SendLetterClient;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 
-import static org.apache.commons.lang3.StringUtils.removeEnd;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.ThrowableAssert.catchThrowable;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.content;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.header;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
@@ -36,24 +38,30 @@ public class UpdateSentToPrintAtTest {
 
     private static final String sendLetterProducerUrl = "http://localhost:5432/";
 
+    private static final String AUTH_HEADER = "service-auth-header";
+
     private static final ZonedDateTime now = ZonedDateTime.now();
 
     private String isoDate;
 
+    private SendLetterClient sendLetterClient;
+
     @Before
     public void setUp() {
+        AuthTokenGenerator authTokenGenerator = mock(AuthTokenGenerator.class);
+        when(authTokenGenerator.generate()).thenReturn(AUTH_HEADER);
+
         isoDate = now.format(DateTimeFormatter.ISO_INSTANT);
         mockServer = MockRestServiceServer.bindTo(restTemplate).build();
+        sendLetterClient = new SendLetterClient(restTemplate, sendLetterProducerUrl, () -> now, authTokenGenerator);
     }
 
     @Test
     public void should_successfully_put_sent_to_print_at_attribute_when_base_url_contains_slash_suffixed() {
         //given
-        SendLetterClient sendLetterClient = new SendLetterClient(restTemplate, sendLetterProducerUrl, () -> now);
-
         mockServer.expect(requestTo(sendLetterProducerUrl + letterId + SENT_TO_PRINT_AT))
             .andExpect(header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_UTF8_VALUE))
-            .andExpect(header(SendLetterClient.AUTHORIZATION_HEADER, "some-header"))
+            .andExpect(header(SendLetterClient.AUTHORIZATION_HEADER, AUTH_HEADER))
             .andExpect(content().string("{\"sent_to_print_at\":\"" + isoDate + "\"}"))
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
             .andExpect(method(HttpMethod.PUT))
@@ -69,15 +77,9 @@ public class UpdateSentToPrintAtTest {
     @Test
     public void should_successfully_put_sent_to_print_at_attribute_when_base_url_contains_no_slash_suffixed() {
         //given
-        SendLetterClient sendLetterClient = new SendLetterClient(
-            restTemplate,
-            removeEnd(sendLetterProducerUrl, "/"),
-            () -> now
-        );
-
         mockServer.expect(requestTo(sendLetterProducerUrl + letterId + SENT_TO_PRINT_AT))
             .andExpect(header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_UTF8_VALUE))
-            .andExpect(header(SendLetterClient.AUTHORIZATION_HEADER, "some-header"))
+            .andExpect(header(SendLetterClient.AUTHORIZATION_HEADER, AUTH_HEADER))
             .andExpect(content().string("{\"sent_to_print_at\":\"" + isoDate + "\"}"))
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
             .andExpect(method(HttpMethod.PUT))
@@ -93,16 +95,12 @@ public class UpdateSentToPrintAtTest {
     @Test
     public void should_not_throw_exception_when_rest_template_throw_server_error() {
         //given
-        SendLetterClient sendLetterClient = new SendLetterClient(restTemplate, sendLetterProducerUrl, () -> now);
-
         mockServer.expect(requestTo(sendLetterProducerUrl + letterId + SENT_TO_PRINT_AT))
             .andExpect(method(HttpMethod.PUT))
             .andRespond(withServerError());
 
         //when
-        Throwable exception = catchThrowable(() -> {
-            sendLetterClient.updateSentToPrintAt(letterId);
-        });
+        Throwable exception = catchThrowable(() -> sendLetterClient.updateSentToPrintAt(letterId));
 
         //then
         assertThat(exception).isNull();
