@@ -97,7 +97,7 @@ public class MessageProcessor {
                 deadLetter(messageReceiver, message);
                 break;
             default:
-                logger.error("Unknown message handling result: " + result);
+                logger.error("Unknown message handling result: {}", result);
                 deadLetter(messageReceiver, message);
                 break;
         }
@@ -113,7 +113,7 @@ public class MessageProcessor {
         } catch (InterruptedException | ServiceBusException e) {
             insights.trackMessageCompletedInServiceBus(Duration.between(start, Instant.now()), false);
 
-            logger.error("Unable to mark message " + msg.getMessageId() + " as processed");
+            logger.error("Unable to mark message {} as processed", msg.getMessageId());
         }
     }
 

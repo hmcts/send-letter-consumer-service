@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Objects;
 
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.StreamSupport.stream;
@@ -27,8 +28,8 @@ public class ReportParser {
         try (CSVParser parser = parserFor(report)) {
 
             return stream(parser.spliterator(), false)
-                .map(row -> toPrintStatus(row))
-                .filter(status -> status != null)
+                .map(this::toPrintStatus)
+                .filter(Objects::nonNull)
                 .collect(toList());
 
         } catch (IOException exc) {
