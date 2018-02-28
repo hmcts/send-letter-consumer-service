@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.slc.services.sendletterclient;
 
+import org.apache.http.HttpHeaders;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.http.MediaType;
@@ -16,6 +17,7 @@ import static org.assertj.core.api.ThrowableAssert.catchThrowable;
 import static org.springframework.http.HttpMethod.PUT;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.content;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.header;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withServerError;
@@ -43,6 +45,8 @@ public class UpdatePrintedAtTest {
         mockServer
             .expect(requestTo(url + id + "/printed-at"))
             .andExpect(method(PUT))
+            .andExpect(header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .andExpect(header(SendLetterClient.AUTHORIZATION_HEADER, "some-header"))
             .andExpect(content().string("{\"printed_at\":\"" + datetime + "\"}"))
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
             .andRespond(withStatus(NO_CONTENT));

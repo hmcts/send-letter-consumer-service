@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.slc.services.sendletterclient;
 
+import org.apache.http.HttpHeaders;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.http.HttpMethod;
@@ -17,6 +18,7 @@ import static org.apache.commons.lang3.StringUtils.removeEnd;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.ThrowableAssert.catchThrowable;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.content;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.header;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withServerError;
@@ -50,6 +52,8 @@ public class UpdateSentToPrintAtTest {
         SendLetterClient sendLetterClient = new SendLetterClient(restTemplate, sendLetterProducerUrl, () -> now);
 
         mockServer.expect(requestTo(sendLetterProducerUrl + letterId + SENT_TO_PRINT_AT))
+            .andExpect(header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .andExpect(header(SendLetterClient.AUTHORIZATION_HEADER, "some-header"))
             .andExpect(content().string("{\"sent_to_print_at\":\"" + isoDate + "\"}"))
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
             .andExpect(method(HttpMethod.PUT))
@@ -72,6 +76,8 @@ public class UpdateSentToPrintAtTest {
         );
 
         mockServer.expect(requestTo(sendLetterProducerUrl + letterId + SENT_TO_PRINT_AT))
+            .andExpect(header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .andExpect(header(SendLetterClient.AUTHORIZATION_HEADER, "some-header"))
             .andExpect(content().string("{\"sent_to_print_at\":\"" + isoDate + "\"}"))
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
             .andExpect(method(HttpMethod.PUT))
