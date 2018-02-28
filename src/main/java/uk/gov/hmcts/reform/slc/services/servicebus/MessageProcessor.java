@@ -49,7 +49,7 @@ public class MessageProcessor {
         } catch (ServiceBusException e) {
             insights.trackException(e);
 
-            logger.error("Error closing connection" );
+            logger.error("Error closing connection");
         }
     }
 
@@ -70,7 +70,7 @@ public class MessageProcessor {
 
                 sendLetter(messageReceiver, message);
             } else {
-                logger.trace("No messages to process" );
+                logger.trace("No messages to process");
             }
         } catch (InterruptedException | ServiceBusException e) {
             Duration tookReceiving = Duration.between(receiveStartTime, Instant.now());
