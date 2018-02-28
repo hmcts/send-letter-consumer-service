@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.slc.services.servicebus;
 
 import com.microsoft.azure.servicebus.IMessage;
 import com.microsoft.azure.servicebus.IMessageReceiver;
+import com.microsoft.azure.servicebus.primitives.ServiceBusException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -10,14 +11,19 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.slc.logging.AppInsights;
 import uk.gov.hmcts.reform.slc.services.SendLetterService;
+import uk.gov.hmcts.reform.slc.services.servicebus.exceptions.ConnectionException;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.function.Supplier;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.ThrowableAssert.catchThrowable;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -33,6 +39,7 @@ public class MessageProcessorTest {
     @Mock private SendLetterService sendLetterService;
     @Mock private IMessage message;
     @Mock private AppInsights insights;
+    @Mock private Supplier<IMessageReceiver> receiverProvider;
 
     @Before
     public void setUp() {
@@ -88,6 +95,48 @@ public class MessageProcessorTest {
         processor.process();
 
         // then
+        verify(sendLetterService, never()).send(any());
+        verifyNoMoreInteractions(insights);
+    }
+
+    @Test
+    public void should_not_process_message_when_connection_exception_is_thrown_on_acquiring_sb_queue_connection() {
+        //given
+        processor = new MessageProcessor(receiverProvider, sendLetterService);
+        ReflectionTestUtils.setField(processor, "insights", insights);
+
+        doThrow(ConnectionException.class).when(receiverProvider).get();
+
+        //when
+        Throwable exception = catchThrowable(() -> {
+            processor.process();
+        });
+
+        //then
+        assertThat(exception).isNull();
+
+        verify(insights).trackException(any(ConnectionException.class));
+        verify(sendLetterService, never()).send(any());
+        verifyNoMoreInteractions(insights);
+    }
+
+    @Test
+    public void should_not_process_message_when_servicebus_exception_is_thrown_on_closing_sb_queue_connection() {
+        //given
+        processor = new MessageProcessor(receiverProvider, sendLetterService);
+        ReflectionTestUtils.setField(processor, "insights", insights);
+
+        doThrow(ServiceBusException.class).when(receiverProvider).get();
+
+        //when
+        Throwable exception = catchThrowable(() -> {
+            processor.process();
+        });
+
+        //then
+        assertThat(exception).isNull();
+
+        verify(insights).trackException(any(ServiceBusException.class));
         verify(sendLetterService, never()).send(any());
         verifyNoMoreInteractions(insights);
     }
