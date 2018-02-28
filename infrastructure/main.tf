@@ -62,6 +62,6 @@ module "consumer" {
     FTP_USER                  = "${data.vault_generic_secret.ftp_user.data["value"]}"
     FTP_PRIVATE_KEY           = "${data.vault_generic_secret.ftp_private_key.data["value"]}"
     FTP_PUBLIC_KEY            = "${data.vault_generic_secret.ftp_public_key.data["value"]}"
-    SEND_LETTER_PRODUCER_URL  = "${data.vault_generic_secret.send_letter_producer_url.data["value"]}"
+    SEND_LETTER_PRODUCER_URL  = "http://send-letter-producer-${var.env}.service.${local.aseName}.internal"
   }
 }
