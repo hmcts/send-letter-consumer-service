@@ -49,9 +49,9 @@ public class FtpClient {
         @Value("${ftp.user}") String username,
         Supplier<SSHClient> sshClientSupplier,
         @Value("${ftp.keys.public}") String publicKey,
-        @Value("@{ftp.keys.private}") String privateKey,
-        @Value("@{ftp.target-folder}") String targetFolder,
-        @Value("@{ftp.reports-folder}") String reportsFolder
+        @Value("${ftp.keys.private}") String privateKey,
+        @Value("${ftp.target-folder}") String targetFolder,
+        @Value("${ftp.reports-folder}") String reportsFolder
     ) {
         this.hostname = hostname;
         this.port = port;
