@@ -38,15 +38,7 @@ public class MessageProcessor {
             IMessageReceiver messageReceiver = receiverProvider.get();
             Instant receiveStartTime = Instant.now();
 
-            try {
-                processNextMessage(messageReceiver, receiveStartTime);
-            } catch (InterruptedException | ServiceBusException e) {
-                Duration tookReceiving = Duration.between(receiveStartTime, Instant.now());
-                insights.trackMessageReceivedFromServiceBus(tookReceiving, false);
-                insights.trackException(e);
-
-                logger.error("Unable to read message from queue", e);
-            }
+            processNextMessage(messageReceiver, receiveStartTime);
 
             messageReceiver.close();
 
@@ -63,22 +55,28 @@ public class MessageProcessor {
 
     private void processNextMessage(
         IMessageReceiver messageReceiver,
-        Instant receiveStartTime
-    ) throws InterruptedException, ServiceBusException {
+        Instant receiveStartTime) {
+        try {
+            IMessage message = messageReceiver.receive();
 
-        IMessage message = messageReceiver.receive();
+            if (message != null) {
+                Duration tookReceiving = Duration.between(receiveStartTime, Instant.now());
+                Duration timeInQueue = Duration.between(message.getEnqueuedTimeUtc(), receiveStartTime);
+                String messageId = message.getMessageId();
 
-        if (message != null) {
+                insights.trackMessageReceivedFromServiceBus(tookReceiving, true);
+                insights.trackMessageReceived(messageId, timeInQueue);
+
+                sendLetter(messageReceiver, message);
+            } else {
+                logger.trace("No messages to process");
+            }
+        } catch (InterruptedException | ServiceBusException e) {
             Duration tookReceiving = Duration.between(receiveStartTime, Instant.now());
-            Duration timeInQueue = Duration.between(message.getEnqueuedTimeUtc(), receiveStartTime);
-            String messageId = message.getMessageId();
+            insights.trackMessageReceivedFromServiceBus(tookReceiving, false);
+            insights.trackException(e);
 
-            insights.trackMessageReceivedFromServiceBus(tookReceiving, true);
-            insights.trackMessageReceived(messageId, timeInQueue);
-
-            sendLetter(messageReceiver, message);
-        } else {
-            logger.trace("No messages to process");
+            logger.error("Unable to read message from queue", e);
         }
     }
 
