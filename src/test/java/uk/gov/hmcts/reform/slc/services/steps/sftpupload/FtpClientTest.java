@@ -142,15 +142,19 @@ public class FtpClientTest {
     }
 
     @Test
-    public void should_succeed_to_check_health() {
-        assertThat(client.isHealthy()).isTrue();
+    public void testConnection_should_not_throw_an_exception_when_connection_can_be_established() {
+        Throwable exc = catchThrowable(() -> client.testConnection());
+
+        assertThat(exc).isNull();
     }
 
     @Test
-    public void should_throw_an_exception_while_getting_sftp_client_for_health_check() throws IOException {
+    public void testConnection_should_throw_an_exception_when_unable_to_connect() throws IOException {
         reset(sshClient);
         doThrow(IOException.class).when(sshClient).newSFTPClient();
 
-        assertThat(client.isHealthy()).isFalse();
+        Throwable exc = catchThrowable(() -> client.testConnection());
+
+        assertThat(exc).isNotNull();
     }
 }
