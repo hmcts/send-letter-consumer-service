@@ -55,7 +55,8 @@ public class MessageProcessor {
 
     private void processNextMessage(
         IMessageReceiver messageReceiver,
-        Instant receiveStartTime) {
+        Instant receiveStartTime
+    ) {
         try {
             IMessage message = messageReceiver.receive();
 

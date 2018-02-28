@@ -28,7 +28,7 @@ public class ReportParser {
         try (CSVParser parser = parserFor(report)) {
 
             return stream(parser.spliterator(), false)
-                .map(this::toPrintStatus)
+                .map(row -> toPrintStatus(row))
                 .filter(Objects::nonNull)
                 .collect(toList());
 
