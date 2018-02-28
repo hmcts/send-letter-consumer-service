@@ -57,25 +57,7 @@ public class UpdateSentToPrintAtTest {
     }
 
     @Test
-    public void should_successfully_put_sent_to_print_at_attribute_when_base_url_contains_slash_suffixed() {
-        //given
-        mockServer.expect(requestTo(sendLetterProducerUrl + letterId + SENT_TO_PRINT_AT))
-            .andExpect(header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_UTF8_VALUE))
-            .andExpect(header(SendLetterClient.AUTHORIZATION_HEADER, AUTH_HEADER))
-            .andExpect(content().string("{\"sent_to_print_at\":\"" + isoDate + "\"}"))
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-            .andExpect(method(HttpMethod.PUT))
-            .andRespond(withStatus(HttpStatus.OK));
-
-        //when
-        sendLetterClient.updateSentToPrintAt(letterId);
-
-        //then
-        mockServer.verify();
-    }
-
-    @Test
-    public void should_successfully_put_sent_to_print_at_attribute_when_base_url_contains_no_slash_suffixed() {
+    public void should_successfully_put_sent_to_print_at_attribute() {
         //given
         mockServer.expect(requestTo(sendLetterProducerUrl + letterId + SENT_TO_PRINT_AT))
             .andExpect(header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_UTF8_VALUE))
