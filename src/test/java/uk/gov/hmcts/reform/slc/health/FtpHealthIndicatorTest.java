@@ -16,6 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.never;
 import static org.mockito.BDDMockito.verify;
+import static org.mockito.BDDMockito.willThrow;
 import static org.mockito.Matchers.any;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -39,13 +40,12 @@ public class FtpHealthIndicatorTest {
         given(availabilityChecker.isFtpAvailable(any(LocalTime.class))).willReturn(false);
 
         assertThat(healthIndicator.health().getStatus()).isEqualTo(Status.UP);
-        verify(client, never()).isHealthy();
+        verify(client, never()).testConnection();
     }
 
     @Test
     public void should_be_healthy_when_ftp_is_available() {
         given(availabilityChecker.isFtpAvailable(any(LocalTime.class))).willReturn(true);
-        given(client.isHealthy()).willReturn(true);
 
         assertThat(healthIndicator.health().getStatus()).isEqualTo(Status.UP);
     }
@@ -53,7 +53,7 @@ public class FtpHealthIndicatorTest {
     @Test
     public void should_be_unhealthy_when_unable_to_connect_to_sftp() {
         given(availabilityChecker.isFtpAvailable(any(LocalTime.class))).willReturn(true);
-        given(client.isHealthy()).willReturn(false);
+        willThrow(new RuntimeException("hello")).given(client).testConnection();
 
         assertThat(healthIndicator.health().getStatus()).isEqualTo(Status.DOWN);
     }

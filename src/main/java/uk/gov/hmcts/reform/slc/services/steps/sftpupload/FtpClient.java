@@ -113,12 +113,8 @@ public class FtpClient {
         });
     }
 
-    public boolean isHealthy() {
-        try {
-            return runWith(sftpClient -> true);
-        } catch (FtpStepException exception) {
-            return false;
-        }
+    public void testConnection() {
+        runWith(sftpClient -> null);
     }
 
     private <T> T runWith(Function<SFTPClient, T> action) {
