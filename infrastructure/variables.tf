@@ -31,7 +31,7 @@ variable "service_bus_interval" {
 }
 
 variable "ftp_hostname" {
-  default = "TBD"
+  default = "cmseft.services.xerox.com"
 }
 
 variable "ftp_port" {
