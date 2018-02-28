@@ -121,7 +121,7 @@ public class MessageProcessorTest {
     }
 
     @Test
-    public void should_not_process_message_when_servicebus_exception_is_thrown_on_closing_sb_queue_connection() {
+    public void should_not_process_message_when_servicebus_exception_is_thrown_on_acquiring_sb_queue_connection() {
         //given
         processor = new MessageProcessor(receiverProvider, sendLetterService);
         ReflectionTestUtils.setField(processor, "insights", insights);
