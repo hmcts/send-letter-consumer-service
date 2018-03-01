@@ -8,8 +8,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.slc.config.FtpConfiguration;
 import uk.gov.hmcts.reform.slc.logging.AppInsights;
-import uk.gov.hmcts.reform.slc.model.FtpConfigProperties;
 import uk.gov.hmcts.reform.slc.services.steps.getpdf.PdfDoc;
 import uk.gov.hmcts.reform.slc.services.steps.sftpupload.exceptions.FtpStepException;
 
@@ -30,16 +30,17 @@ public class FtpClient {
     @Autowired
     private AppInsights insights;
 
+    private final FtpConfiguration ftpConfiguration;
+
     private final Supplier<SSHClient> sshClientSupplier;
-    private final FtpConfigProperties ftpConfigProperties;
 
     // region constructor
     public FtpClient(
         Supplier<SSHClient> sshClientSupplier,
-        FtpConfigProperties ftpConfigProperties
+        FtpConfiguration ftpConfiguration
     ) {
         this.sshClientSupplier = sshClientSupplier;
-        this.ftpConfigProperties = ftpConfigProperties;
+        this.ftpConfiguration = ftpConfiguration;
     }
     // endregion
 
@@ -48,7 +49,7 @@ public class FtpClient {
 
         runWith(sftp -> {
             try {
-                String path = String.join("/", ftpConfigProperties.targetFolder, pdfDoc.filename);
+                String path = String.join("/", ftpConfiguration.getTargetFolder(), pdfDoc.filename);
                 sftp.getFileTransfer().upload(pdfDoc, path);
                 insights.trackFtpUpload(Duration.between(start, Instant.now()), true);
 
@@ -71,7 +72,7 @@ public class FtpClient {
             try {
                 SFTPFileTransfer transfer = sftp.getFileTransfer();
 
-                return sftp.ls(ftpConfigProperties.reportsFolder)
+                return sftp.ls(ftpConfiguration.getReportsFolder())
                     .stream()
                     .filter(RemoteResourceInfo::isRegularFile)
                     .map(file -> {
@@ -101,14 +102,14 @@ public class FtpClient {
         try {
             ssh = sshClientSupplier.get();
 
-            ssh.addHostKeyVerifier(ftpConfigProperties.fingerprint);
-            ssh.connect(ftpConfigProperties.hostname, ftpConfigProperties.port);
+            ssh.addHostKeyVerifier(ftpConfiguration.getFingerprint());
+            ssh.connect(ftpConfiguration.getHostname(), ftpConfiguration.getPort());
 
             ssh.authPublickey(
-                ftpConfigProperties.username,
+                ftpConfiguration.getUsername(),
                 ssh.loadKeys(
-                    ftpConfigProperties.privateKey,
-                    ftpConfigProperties.publicKey,
+                    ftpConfiguration.getPrivateKey(),
+                    ftpConfiguration.getPublicKey(),
                     null
                 )
             );

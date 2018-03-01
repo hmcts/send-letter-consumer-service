@@ -11,8 +11,8 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.test.util.ReflectionTestUtils;
+import uk.gov.hmcts.reform.slc.config.FtpConfiguration;
 import uk.gov.hmcts.reform.slc.logging.AppInsights;
-import uk.gov.hmcts.reform.slc.model.FtpConfigProperties;
 import uk.gov.hmcts.reform.slc.services.steps.getpdf.PdfDoc;
 import uk.gov.hmcts.reform.slc.services.steps.sftpupload.exceptions.FtpStepException;
 
@@ -41,6 +41,7 @@ public class FtpClientTest {
     @Mock private SFTPClient sftpClient;
     @Mock private SFTPFileTransfer sftpFileTransfer;
     @Mock private AppInsights insights;
+    @Mock private FtpConfiguration ftpConfiguration;
 
     private FtpClient client;
 
@@ -49,21 +50,9 @@ public class FtpClientTest {
         given(sshClient.newSFTPClient()).willReturn(sftpClient);
         given(sftpClient.getFileTransfer()).willReturn(sftpFileTransfer);
 
-        FtpConfigProperties configProperties = FtpConfigProperties
-            .builder()
-            .hostname("hostname")
-            .port(22)
-            .fingerprint("d8:2f:cd:a0:ce:d4:a0:c9:93:09:be:43:4b:20:49:b3")
-            .username("user")
-            .publicKey(null)
-            .privateKey(null)
-            .targetFolder("target_folder")
-            .reportsFolder("reports_folder")
-            .build();
-
         client = new FtpClient(
             () -> sshClient,
-            configProperties
+            ftpConfiguration
         );
 
         ReflectionTestUtils.setField(client, "insights", insights);
