@@ -30,17 +30,17 @@ public class FtpClient {
     @Autowired
     private AppInsights insights;
 
-    private final FtpConfiguration ftpConfiguration;
+    private final FtpConfiguration config;
 
     private final Supplier<SSHClient> sshClientSupplier;
 
     // region constructor
     public FtpClient(
         Supplier<SSHClient> sshClientSupplier,
-        FtpConfiguration ftpConfiguration
+        FtpConfiguration config
     ) {
         this.sshClientSupplier = sshClientSupplier;
-        this.ftpConfiguration = ftpConfiguration;
+        this.config = config;
     }
     // endregion
 
@@ -49,7 +49,7 @@ public class FtpClient {
 
         runWith(sftp -> {
             try {
-                String path = String.join("/", ftpConfiguration.getTargetFolder(), pdfDoc.filename);
+                String path = String.join("/", config.getTargetFolder(), pdfDoc.filename);
                 sftp.getFileTransfer().upload(pdfDoc, path);
                 insights.trackFtpUpload(Duration.between(start, Instant.now()), true);
 
@@ -72,7 +72,7 @@ public class FtpClient {
             try {
                 SFTPFileTransfer transfer = sftp.getFileTransfer();
 
-                return sftp.ls(ftpConfiguration.getReportsFolder())
+                return sftp.ls(config.getReportsFolder())
                     .stream()
                     .filter(RemoteResourceInfo::isRegularFile)
                     .map(file -> {
@@ -102,14 +102,14 @@ public class FtpClient {
         try {
             ssh = sshClientSupplier.get();
 
-            ssh.addHostKeyVerifier(ftpConfiguration.getFingerprint());
-            ssh.connect(ftpConfiguration.getHostname(), ftpConfiguration.getPort());
+            ssh.addHostKeyVerifier(config.getFingerprint());
+            ssh.connect(config.getHostname(), config.getPort());
 
             ssh.authPublickey(
-                ftpConfiguration.getUsername(),
+                config.getUsername(),
                 ssh.loadKeys(
-                    ftpConfiguration.getPrivateKey(),
-                    ftpConfiguration.getPublicKey(),
+                    config.getPrivateKey(),
+                    config.getPublicKey(),
                     null
                 )
             );
