@@ -22,10 +22,6 @@ data "vault_generic_secret" "servicebus_conn_string" {
   path = "secret/${var.vault_section}/cc/send-letter/servicebus-listen-conn-string"
 }
 
-data "vault_generic_secret" "send_letter_producer_url" {
-  path = "secret/${var.vault_section}/cc/send-letter/producer-url"
-}
-
 locals {
   aseName = "${data.terraform_remote_state.core_apps_compute.ase_name[0]}"
 }
