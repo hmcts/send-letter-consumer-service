@@ -11,7 +11,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.test.util.ReflectionTestUtils;
-import uk.gov.hmcts.reform.slc.config.FtpConfiguration;
+import uk.gov.hmcts.reform.slc.config.FtpConfigProperties;
 import uk.gov.hmcts.reform.slc.logging.AppInsights;
 import uk.gov.hmcts.reform.slc.services.steps.getpdf.PdfDoc;
 import uk.gov.hmcts.reform.slc.services.steps.sftpupload.exceptions.FtpStepException;
@@ -41,7 +41,7 @@ public class FtpClientTest {
     @Mock private SFTPClient sftpClient;
     @Mock private SFTPFileTransfer sftpFileTransfer;
     @Mock private AppInsights insights;
-    @Mock private FtpConfiguration config;
+    @Mock private FtpConfigProperties configProperties;
 
     private FtpClient client;
 
@@ -52,7 +52,7 @@ public class FtpClientTest {
 
         client = new FtpClient(
             () -> sshClient,
-            config
+            configProperties
         );
 
         ReflectionTestUtils.setField(client, "insights", insights);

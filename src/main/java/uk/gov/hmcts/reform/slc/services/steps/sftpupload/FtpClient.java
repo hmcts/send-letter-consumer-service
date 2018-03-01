@@ -8,7 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.slc.config.FtpConfiguration;
+import uk.gov.hmcts.reform.slc.config.FtpConfigProperties;
 import uk.gov.hmcts.reform.slc.logging.AppInsights;
 import uk.gov.hmcts.reform.slc.services.steps.getpdf.PdfDoc;
 import uk.gov.hmcts.reform.slc.services.steps.sftpupload.exceptions.FtpStepException;
@@ -30,17 +30,17 @@ public class FtpClient {
     @Autowired
     private AppInsights insights;
 
-    private final FtpConfiguration config;
+    private final FtpConfigProperties configProperties;
 
     private final Supplier<SSHClient> sshClientSupplier;
 
     // region constructor
     public FtpClient(
         Supplier<SSHClient> sshClientSupplier,
-        FtpConfiguration config
+        FtpConfigProperties configProperties
     ) {
         this.sshClientSupplier = sshClientSupplier;
-        this.config = config;
+        this.configProperties = configProperties;
     }
     // endregion
 
@@ -49,7 +49,7 @@ public class FtpClient {
 
         runWith(sftp -> {
             try {
-                String path = String.join("/", config.getTargetFolder(), pdfDoc.filename);
+                String path = String.join("/", configProperties.getTargetFolder(), pdfDoc.filename);
                 sftp.getFileTransfer().upload(pdfDoc, path);
                 insights.trackFtpUpload(Duration.between(start, Instant.now()), true);
 
@@ -72,7 +72,7 @@ public class FtpClient {
             try {
                 SFTPFileTransfer transfer = sftp.getFileTransfer();
 
-                return sftp.ls(config.getReportsFolder())
+                return sftp.ls(configProperties.getReportsFolder())
                     .stream()
                     .filter(RemoteResourceInfo::isRegularFile)
                     .map(file -> {
@@ -102,14 +102,14 @@ public class FtpClient {
         try {
             ssh = sshClientSupplier.get();
 
-            ssh.addHostKeyVerifier(config.getFingerprint());
-            ssh.connect(config.getHostname(), config.getPort());
+            ssh.addHostKeyVerifier(configProperties.getFingerprint());
+            ssh.connect(configProperties.getHostname(), configProperties.getPort());
 
             ssh.authPublickey(
-                config.getUsername(),
+                configProperties.getUsername(),
                 ssh.loadKeys(
-                    config.getPrivateKey(),
-                    config.getPublicKey(),
+                    configProperties.getPrivateKey(),
+                    configProperties.getPublicKey(),
                     null
                 )
             );
