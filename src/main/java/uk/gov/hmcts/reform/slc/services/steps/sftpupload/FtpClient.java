@@ -7,8 +7,9 @@ import net.schmizz.sshj.sftp.SFTPFileTransfer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.slc.config.FtpConfigProperties;
 import uk.gov.hmcts.reform.slc.logging.AppInsights;
 import uk.gov.hmcts.reform.slc.services.steps.getpdf.PdfDoc;
 import uk.gov.hmcts.reform.slc.services.steps.sftpupload.exceptions.FtpStepException;
@@ -23,6 +24,7 @@ import java.util.function.Supplier;
 import static java.util.stream.Collectors.toList;
 
 @Component
+@EnableConfigurationProperties(FtpConfigProperties.class)
 public class FtpClient {
 
     private static final Logger logger = LoggerFactory.getLogger(FtpClient.class);
@@ -30,38 +32,17 @@ public class FtpClient {
     @Autowired
     private AppInsights insights;
 
-    private final String hostname;
-    private final int port;
-    private final String fingerprint;
-    private final String username;
-    private final Supplier<SSHClient> sshClientSupplier;
-    private final String publicKey;
-    private final String privateKey;
-    private final String targetFolder;
-    private final String reportsFolder;
+    private final FtpConfigProperties configProperties;
 
+    private final Supplier<SSHClient> sshClientSupplier;
 
     // region constructor
     public FtpClient(
-        @Value("${ftp.hostname}") String hostname,
-        @Value("${ftp.port}") int port,
-        @Value("${ftp.fingerprint}") String fingerprint,
-        @Value("${ftp.user}") String username,
         Supplier<SSHClient> sshClientSupplier,
-        @Value("${ftp.keys.public}") String publicKey,
-        @Value("${ftp.keys.private}") String privateKey,
-        @Value("${ftp.target-folder}") String targetFolder,
-        @Value("${ftp.reports-folder}") String reportsFolder
+        FtpConfigProperties configProperties
     ) {
-        this.hostname = hostname;
-        this.port = port;
-        this.fingerprint = fingerprint;
-        this.username = username;
         this.sshClientSupplier = sshClientSupplier;
-        this.publicKey = publicKey;
-        this.privateKey = privateKey;
-        this.targetFolder = targetFolder;
-        this.reportsFolder = reportsFolder;
+        this.configProperties = configProperties;
     }
     // endregion
 
@@ -70,7 +51,7 @@ public class FtpClient {
 
         runWith(sftp -> {
             try {
-                String path = String.join("/", this.targetFolder, pdfDoc.filename);
+                String path = String.join("/", configProperties.getTargetFolder(), pdfDoc.filename);
                 sftp.getFileTransfer().upload(pdfDoc, path);
                 insights.trackFtpUpload(Duration.between(start, Instant.now()), true);
 
@@ -93,7 +74,7 @@ public class FtpClient {
             try {
                 SFTPFileTransfer transfer = sftp.getFileTransfer();
 
-                return sftp.ls(reportsFolder)
+                return sftp.ls(configProperties.getReportsFolder())
                     .stream()
                     .filter(RemoteResourceInfo::isRegularFile)
                     .map(file -> {
@@ -123,14 +104,14 @@ public class FtpClient {
         try {
             ssh = sshClientSupplier.get();
 
-            ssh.addHostKeyVerifier(fingerprint);
-            ssh.connect(hostname, port);
+            ssh.addHostKeyVerifier(configProperties.getFingerprint());
+            ssh.connect(configProperties.getHostname(), configProperties.getPort());
 
             ssh.authPublickey(
-                username,
+                configProperties.getUsername(),
                 ssh.loadKeys(
-                    privateKey,
-                    publicKey,
+                    configProperties.getPrivateKey(),
+                    configProperties.getPublicKey(),
                     null
                 )
             );

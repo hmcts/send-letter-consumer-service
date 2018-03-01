@@ -109,7 +109,7 @@ public class SendLetterClient {
         }
     }
 
-    private void restTemplatePut(String url, Object body) throws RestClientException {
+    private void restTemplatePut(String url, Object body) {
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_UTF8_VALUE);
         headers.add(AUTHORIZATION_HEADER, authTokenGenerator.generate());
