@@ -53,8 +53,7 @@ public class LetterMapperTest {
                     + "  }"
                     + "],"
                     + "\"type\": \"some_type\","
-                    + "\"service\": \"some_service\","
-                    + "\"message_id\": \"syf8f7\""
+                    + "\"service\": \"some_service\""
                     + "}"
                 ).getBytes()
             );

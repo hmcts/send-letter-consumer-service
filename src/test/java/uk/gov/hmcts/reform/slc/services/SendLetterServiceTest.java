@@ -77,8 +77,7 @@ public class SendLetterServiceTest {
                 new Document("template", emptyMap())
             ),
             "some_type",
-            "cmc",
-            "some-service-bus-id"
+            "cmc"
         );
     }
 }

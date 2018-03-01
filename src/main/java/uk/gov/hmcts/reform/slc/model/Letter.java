@@ -21,20 +21,15 @@ public class Letter {
     @NotEmpty
     public final String service;
 
-    @NotEmpty
-    public final String messageId;
-
     public Letter(
         @JsonProperty("id") UUID id,
         @JsonProperty("documents") List<Document> documents,
         @JsonProperty("type") String type,
-        @JsonProperty("service") String service,
-        @JsonProperty("message_id") String messageId
+        @JsonProperty("service") String service
     ) {
         this.id = id;
         this.documents = documents;
         this.type = type;
         this.service = service;
-        this.messageId = messageId;
     }
 }
