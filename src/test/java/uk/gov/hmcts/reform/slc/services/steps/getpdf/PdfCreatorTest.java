@@ -80,8 +80,7 @@ public class PdfCreatorTest {
                 new Document("t2", emptyMap())
             ),
             "type",
-            "service",
-            "3h9j8e"
+            "service"
         );
 
         // when
@@ -116,8 +115,7 @@ public class PdfCreatorTest {
                 new Document("template", emptyMap())
             ),
             "type",
-            "service",
-            "a97gss8as"
+            "service"
         );
 
         assertThatThrownBy(() -> pdfCreator.create(letter))
