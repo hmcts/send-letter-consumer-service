@@ -41,7 +41,7 @@ public class FtpClientTest {
     @Mock private SFTPClient sftpClient;
     @Mock private SFTPFileTransfer sftpFileTransfer;
     @Mock private AppInsights insights;
-    @Mock private FtpConfiguration ftpConfiguration;
+    @Mock private FtpConfiguration config;
 
     private FtpClient client;
 
@@ -52,7 +52,7 @@ public class FtpClientTest {
 
         client = new FtpClient(
             () -> sshClient,
-            ftpConfiguration
+            config
         );
 
         ReflectionTestUtils.setField(client, "insights", insights);
