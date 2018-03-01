@@ -7,6 +7,7 @@ import net.schmizz.sshj.sftp.SFTPFileTransfer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.slc.config.FtpConfigProperties;
 import uk.gov.hmcts.reform.slc.logging.AppInsights;
@@ -23,6 +24,7 @@ import java.util.function.Supplier;
 import static java.util.stream.Collectors.toList;
 
 @Component
+@EnableConfigurationProperties(FtpConfigProperties.class)
 public class FtpClient {
 
     private static final Logger logger = LoggerFactory.getLogger(FtpClient.class);
