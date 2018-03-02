@@ -6,6 +6,7 @@ import org.junit.Test;
 import static com.google.common.io.Resources.getResource;
 import static com.google.common.io.Resources.toByteArray;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class DuplexPreparatorTest {
 
@@ -34,5 +35,11 @@ public class DuplexPreparatorTest {
 
         // then
         assertThat(after).isEqualTo(before);
+    }
+
+    @Test
+    public void should_throw_duplex_exception_when_pdf_stream_is_corrupted() {
+        assertThatThrownBy(() -> new DuplexPreparator().prepare("corruptedStream".getBytes()))
+            .isInstanceOf(DuplexException.class);
     }
 }

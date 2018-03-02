@@ -53,7 +53,7 @@ public class SendLetterService {
             return SUCCESS;
 
         } catch (Exception exc) {
-            logger.error(exc.getMessage(), exc.getCause());
+            logger.error("Exception occurred while processing message ", exc);
 
             //update producer with is_failed status for reporting
             if (Objects.nonNull(letter)) {
