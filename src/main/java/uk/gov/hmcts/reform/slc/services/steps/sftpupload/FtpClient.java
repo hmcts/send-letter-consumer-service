@@ -129,7 +129,7 @@ public class FtpClient {
                     ssh.disconnect();
                 }
             } catch (IOException e) {
-                logger.warn("Error closing ssh connection.", e);
+                logger.warn("Error closing ssh connection.");
             }
         }
     }
