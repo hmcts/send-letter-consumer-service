@@ -11,8 +11,6 @@ import uk.gov.hmcts.reform.slc.services.steps.sftpupload.FtpClient;
 import uk.gov.hmcts.reform.slc.services.steps.sftpupload.ParsedReport;
 import uk.gov.hmcts.reform.slc.services.steps.sftpupload.Report;
 
-import java.util.Collections;
-
 import static java.time.ZonedDateTime.now;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
