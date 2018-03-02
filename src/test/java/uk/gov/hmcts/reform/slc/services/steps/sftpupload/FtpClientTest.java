@@ -116,7 +116,7 @@ public class FtpClientTest {
             .willReturn(emptyList());
 
         // when
-        List<byte[]> reports = client.downloadReports();
+        List<Report> reports = client.downloadReports();
 
         // then
         assertThat(reports).isEmpty();

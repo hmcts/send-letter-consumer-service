@@ -6,8 +6,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.slc.services.steps.sftpupload.FtpClient;
 
-import java.util.List;
-
 import static java.time.LocalTime.now;
 
 @Component
@@ -42,8 +40,10 @@ public class UpdateLetterStatusJob {
                 .downloadReports()
                 .stream()
                 .map(parser::parse)
-                .flatMap(List::stream)
-                .forEach(sendLetterClient::updatePrintedAt);
+                .forEach(parsedReport -> {
+                    parsedReport.statuses.forEach(sendLetterClient::updatePrintedAt);
+                    // TODO: delete report
+                });
         } else {
             logger.trace("FTP server not available, job cancelled");
         }
