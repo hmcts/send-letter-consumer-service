@@ -4,3 +4,4 @@ output "vaultUri" {
 
 output "vaultName" {
   value = "send-letter-queue-listen-connection-string"
+}
