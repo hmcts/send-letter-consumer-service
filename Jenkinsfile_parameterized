@@ -1,0 +1,31 @@
+#!groovy
+@Library("Infrastructure") _
+
+properties([
+  parameters([
+    string(name: 'PRODUCT_NAME', defaultValue: 'send-letter', description: ''),
+    string(name: 'APP', defaultValue: 'consumer', description: ''),
+    string(name: 'TYPE', defaultValue: 'java', description: ''),
+    string(name: 'ENVIRONMENT', defaultValue: 'sandbox', description: 'Environment where code should be build and deployed'),
+    choice(name: 'SUBSCRIPTION', choices: 'sandbox', description: 'Azure subscriptions available to build in')
+  ]),
+  [$class: 'GithubProjectProperty', projectUrlStr: 'github.com/hmcts/send-letter-consumer-service'],
+  pipelineTriggers([[$class: 'GitHubPushTrigger']])
+])
+
+List<LinkedHashMap<String, Object>> secrets = [
+  secret('send-letter-queue-listen-connection-string', 'SERVICE_BUS_CONNECTION_STRING')
+]
+
+static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
+  [ $class: 'AzureKeyVaultSecret',
+    secretType: 'Secret',
+    name: secretName,
+    version: '',
+    envVariable: envVar
+  ]
+}
+
+withParameterizedPipeline(params.TYPE, params.PRODUCT_NAME, params.APP, params.ENVIRONMENT, params.SUBSCRIPTION) {
+	loadVaultSecrets(secrets)
+}
