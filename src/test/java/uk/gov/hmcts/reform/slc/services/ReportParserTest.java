@@ -10,6 +10,7 @@ import java.time.ZonedDateTime;
 import static com.google.common.io.Resources.getResource;
 import static com.google.common.io.Resources.toByteArray;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowable;
 
 public class ReportParserTest {
 
@@ -65,5 +66,19 @@ public class ReportParserTest {
         ParsedReport result = new ReportParser().parse(new Report("a.csv", report));
 
         assertThat(result.statuses).hasSize(11);
+    }
+
+    @Test
+    public void should_throw_report_parsing_exception_when_csv_contains_semicolon_delimiter() {
+        String report =
+            "\"Date\";\"Time\";\"Filename\"\n"
+                + "20180101;10:30:53;TE5A_TE5B_9364001\n"
+                + "2018-01-01;10:30:53;TE5A_TE5B_9364002\n";
+
+        Throwable exc = catchThrowable(() ->
+            new ReportParser().parse(new Report("a.csv", report.getBytes())));
+
+        assertThat(exc)
+            .isInstanceOf(ReportParser.ReportParsingException.class);
     }
 }

@@ -110,6 +110,21 @@ public class FtpClientTest {
     }
 
     @Test
+    public void should_throw_a_custom_exception_if_listing_folder_contents_fails() throws Exception {
+        // given
+        doThrow(IOException.class)
+            .when(sftpClient).ls(anyString());
+
+        // when
+        Throwable exc = catchThrowable(() -> client.downloadReports());
+
+        // then
+        assertThat(exc)
+            .isInstanceOf(FtpStepException.class)
+            .hasMessageContaining("Error while downloading reports");
+    }
+
+    @Test
     public void download_should_return_an_empty_list_if_there_are_no_reports() throws Exception {
         // given
         given(sftpClient.ls(anyString()))
