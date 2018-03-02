@@ -6,11 +6,11 @@ import java.util.List;
 
 public class ParsedReport {
 
-    public final String name;
+    public final String path;
     public final List<LetterPrintStatus> statuses;
 
-    public ParsedReport(String name, List<LetterPrintStatus> statuses) {
-        this.name = name;
+    public ParsedReport(String path, List<LetterPrintStatus> statuses) {
+        this.path = path;
         this.statuses = statuses;
     }
 }
