@@ -2,9 +2,10 @@ package uk.gov.hmcts.reform.slc.services;
 
 import org.junit.Test;
 import uk.gov.hmcts.reform.slc.model.LetterPrintStatus;
+import uk.gov.hmcts.reform.slc.services.steps.sftpupload.ParsedReport;
+import uk.gov.hmcts.reform.slc.services.steps.sftpupload.Report;
 
 import java.time.ZonedDateTime;
-import java.util.List;
 
 import static com.google.common.io.Resources.getResource;
 import static com.google.common.io.Resources.toByteArray;
@@ -19,9 +20,9 @@ public class ReportParserTest {
                 + "2018-01-01,10:30:53,TE5A_TE5B_9364001\n"
                 + "2018-01-01,10:30:53,TE5A_TE5B_9364002\n";
 
-        List<LetterPrintStatus> result = new ReportParser().parse(report.getBytes());
+        ParsedReport result = new ReportParser().parse(new Report("a.csv", report.getBytes()));
 
-        assertThat(result)
+        assertThat(result.statuses)
             .usingFieldByFieldElementComparator()
             .containsExactlyInAnyOrder(
                 new LetterPrintStatus("9364001", ZonedDateTime.parse("2018-01-01T10:30:53Z")),
@@ -36,9 +37,9 @@ public class ReportParserTest {
                 + "2018-01-01,10:30:53,invalidfilename\n"
                 + "2018-01-01,10:30:53,TE5A_TE5B_9364002\n";
 
-        List<LetterPrintStatus> result = new ReportParser().parse(report.getBytes());
+        ParsedReport result = new ReportParser().parse(new Report("a.csv", report.getBytes()));
 
-        assertThat(result)
+        assertThat(result.statuses)
             .usingFieldByFieldElementComparator()
             .containsExactly(new LetterPrintStatus("9364002", ZonedDateTime.parse("2018-01-01T10:30:53Z")));
     }
@@ -50,9 +51,9 @@ public class ReportParserTest {
                 + "20180101,10:30:53,TE5A_TE5B_9364001\n"
                 + "2018-01-01,10:30:53,TE5A_TE5B_9364002\n";
 
-        List<LetterPrintStatus> result = new ReportParser().parse(report.getBytes());
+        ParsedReport result = new ReportParser().parse(new Report("a.csv", report.getBytes()));
 
-        assertThat(result)
+        assertThat(result.statuses)
             .usingFieldByFieldElementComparator()
             .containsExactly(new LetterPrintStatus("9364002", ZonedDateTime.parse("2018-01-01T10:30:53Z")));
     }
@@ -61,8 +62,8 @@ public class ReportParserTest {
     public void should_parse_sample_report() throws Exception {
         byte[] report = toByteArray(getResource("report.csv"));
 
-        List<LetterPrintStatus> result = new ReportParser().parse(report);
+        ParsedReport result = new ReportParser().parse(new Report("a.csv", report));
 
-        assertThat(result).hasSize(11);
+        assertThat(result.statuses).hasSize(11);
     }
 }

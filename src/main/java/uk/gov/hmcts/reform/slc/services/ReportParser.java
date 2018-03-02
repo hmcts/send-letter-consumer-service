@@ -8,6 +8,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.slc.model.LetterPrintStatus;
 import uk.gov.hmcts.reform.slc.services.steps.getpdf.FileNameHelper;
+import uk.gov.hmcts.reform.slc.services.steps.sftpupload.ParsedReport;
+import uk.gov.hmcts.reform.slc.services.steps.sftpupload.Report;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -24,13 +26,16 @@ public class ReportParser {
 
     private static final Logger logger = LoggerFactory.getLogger(ReportParser.class);
 
-    public List<LetterPrintStatus> parse(byte[] report) {
-        try (CSVParser parser = parserFor(report)) {
+    public ParsedReport parse(Report report) {
+        try (CSVParser parser = parserFor(report.content)) {
 
-            return stream(parser.spliterator(), false)
-                .map(row -> toPrintStatus(row))
-                .filter(Objects::nonNull)
-                .collect(toList());
+            List<LetterPrintStatus> statuses =
+                stream(parser.spliterator(), false)
+                    .map(row -> toPrintStatus(row))
+                    .filter(Objects::nonNull)
+                    .collect(toList());
+
+            return new ParsedReport(report.path, statuses);
 
         } catch (IOException exc) {
             throw new ReportParsingException(exc);
