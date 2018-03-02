@@ -38,7 +38,7 @@ public class DuplexPreparatorTest {
     }
 
     @Test
-    public void should_throw_duplex_exception_when_pdf_stream_is_corrupted() {
+    public void should_throw_duplex_exception_when_stream_is_not_pdf() {
         assertThatThrownBy(() -> new DuplexPreparator().prepare("corruptedStream".getBytes()))
             .isInstanceOf(DuplexException.class);
     }
