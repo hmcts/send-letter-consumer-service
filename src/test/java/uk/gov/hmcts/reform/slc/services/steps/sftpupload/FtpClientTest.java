@@ -112,9 +112,6 @@ public class FtpClientTest {
     @Test
     public void should_throw_a_custom_exception_if_listing_folder_contents_fails() throws Exception {
         // given
-        RemoteResourceInfo rri = mock(RemoteResourceInfo.class);
-        given(rri.isRegularFile()).willReturn(true);
-
         doThrow(IOException.class)
             .when(sftpClient).ls(anyString());
 
