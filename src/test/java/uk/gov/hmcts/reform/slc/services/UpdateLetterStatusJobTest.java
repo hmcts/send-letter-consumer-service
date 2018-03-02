@@ -95,4 +95,31 @@ public class UpdateLetterStatusJobTest {
         // then
         verify(ftpClient, times(0)).deleteReport(anyString());
     }
+
+    @Test
+    public void should_delete_file_if_parsing_and_api_calls_succeeded() {
+        // given
+        String filePath = "FROM/1.csv";
+        given(ftpAvailabilityChecker.isFtpAvailable(any())).willReturn(true);
+
+        given(ftpClient.downloadReports())
+            .willReturn(singletonList(new Report(filePath, null)));
+
+        given(parser.parse(any()))
+            .willReturn(
+                new ParsedReport(
+                    filePath,
+                    asList(
+                        new LetterPrintStatus("abc", now()),
+                        new LetterPrintStatus("xyz", now())
+                    )
+                )
+            );
+
+        // when
+        job.run();
+
+        // then
+        verify(ftpClient, times(1)).deleteReport(filePath);
+    }
 }
