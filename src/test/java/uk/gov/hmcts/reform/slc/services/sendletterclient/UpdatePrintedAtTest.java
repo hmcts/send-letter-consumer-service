@@ -64,7 +64,7 @@ public class UpdatePrintedAtTest {
     }
 
     @Test
-    public void should_not_throw_exception_when_server_responds_with_an_error() {
+    public void should_throw_exception_when_server_responds_with_an_error() {
         String id = "f36e834a-216c-48ed-8fe9-b0dabc4daa49";
 
         mockServer
@@ -74,7 +74,7 @@ public class UpdatePrintedAtTest {
 
         Throwable exception = catchThrowable(() -> client.updatePrintedAt(new LetterPrintStatus(id, now())));
 
-        assertThat(exception).isNull();
+        assertThat(exception).isNotNull();
 
         mockServer.verify();
     }
