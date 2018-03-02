@@ -69,7 +69,7 @@ public class FtpClient {
     /**
      * Downloads ALL files from reports directory.
      */
-    public List<byte[]> downloadReports() {
+    public List<Report> downloadReports() {
         return runWith(sftp -> {
             try {
                 SFTPFileTransfer transfer = sftp.getFileTransfer();
@@ -81,7 +81,7 @@ public class FtpClient {
                         InMemoryDownloadedFile inMemoryFile = new InMemoryDownloadedFile();
                         try {
                             transfer.download(file.getPath(), inMemoryFile);
-                            return inMemoryFile.getBytes();
+                            return new Report(file.getPath(), inMemoryFile.getBytes());
                         } catch (IOException exc) {
                             throw new FtpStepException("Unable to download file " + file.getName(), exc);
                         }
