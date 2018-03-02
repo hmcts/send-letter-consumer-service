@@ -40,7 +40,7 @@ module "consumer" {
     PDF_SERVICE_URL = "http://cmc-pdf-service-${var.env}.service.${local.aseName}.internal"
 
     // s2s
-    S2S_URL     = "http://betadevbccidams2slb.reform.hmcts.net:80"
+    S2S_URL     = "${var.s2s_url}"
     S2S_SECRET  = "${data.vault_generic_secret.s2s_secret.data["value"]}"
     S2S_NAME    = "${var.s2s_name}"
 
