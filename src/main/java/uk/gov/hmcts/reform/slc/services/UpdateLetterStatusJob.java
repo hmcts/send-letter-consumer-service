@@ -5,6 +5,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.slc.services.steps.sftpupload.FtpClient;
+import uk.gov.hmcts.reform.slc.services.steps.sftpupload.ParsedReport;
+import uk.gov.hmcts.reform.slc.services.steps.sftpupload.Report;
 
 import java.util.Objects;
 
@@ -41,14 +43,7 @@ public class UpdateLetterStatusJob {
             ftpClient
                 .downloadReports()
                 .stream()
-                .map(report -> {
-                    try {
-                        return parser.parse(report);
-                    } catch (Exception exc) {
-                        logger.error("Error parsing report " + report.path, exc);
-                        return null;
-                    }
-                })
+                .map(this::tryParse)
                 .filter(Objects::nonNull)
                 .forEach(parsedReport -> {
                     parsedReport.statuses.forEach(sendLetterClient::updatePrintedAt);
@@ -56,6 +51,15 @@ public class UpdateLetterStatusJob {
                 });
         } else {
             logger.trace("FTP server not available, job cancelled");
+        }
+    }
+
+    private ParsedReport tryParse(Report report) {
+        try {
+            return parser.parse(report);
+        } catch (Exception exc) {
+            logger.error("Error parsing report " + report.path, exc);
+            return null;
         }
     }
 }
