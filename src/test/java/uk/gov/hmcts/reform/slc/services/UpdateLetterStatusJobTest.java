@@ -122,4 +122,29 @@ public class UpdateLetterStatusJobTest {
         // then
         verify(ftpClient, times(1)).deleteReport(filePath);
     }
+
+    @Test
+    public void should_try_parsing_seconds_report_if_first_one_failed() {
+        // given
+        Report report1 = new Report("FROM/1.pdf", null);
+        Report report2 = new Report("FROM/2.pdf", null);
+
+        given(ftpAvailabilityChecker.isFtpAvailable(any())).willReturn(true);
+
+        given(ftpClient.downloadReports())
+            .willReturn(
+                asList(
+                    report1,
+                    report2
+                )
+            );
+
+        given(parser.parse(any())).willThrow(new ReportParser.ReportParsingException(null));
+
+        // when
+        job.run();
+
+        // then
+        verify(parser, times(2)).parse(any());
+    }
 }

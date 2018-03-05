@@ -6,6 +6,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.slc.services.steps.sftpupload.FtpClient;
 
+import java.util.Objects;
+
 import static java.time.LocalTime.now;
 
 @Component
@@ -39,7 +41,15 @@ public class UpdateLetterStatusJob {
             ftpClient
                 .downloadReports()
                 .stream()
-                .map(parser::parse)
+                .map(report -> {
+                    try {
+                        return parser.parse(report);
+                    } catch (Exception exc) {
+                        logger.error("Error parsing report " + report.path, exc);
+                        return null;
+                    }
+                })
+                .filter(Objects::nonNull)
                 .forEach(parsedReport -> {
                     parsedReport.statuses.forEach(sendLetterClient::updatePrintedAt);
                     ftpClient.deleteReport(parsedReport.path);
