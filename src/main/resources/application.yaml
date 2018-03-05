@@ -25,7 +25,7 @@ ftp:
   reports-folder: ${FTP_REPORTS_FOLDER}
   reports-cron: ${FTP_REPORTS_CRON:0 30 * * * *}
   fingerprint: ${FTP_FINGERPRINT}
-  user: ${FTP_USER}
+  username: ${FTP_USER}
   privateKey: ${FTP_PRIVATE_KEY}
   publicKey: ${FTP_PUBLIC_KEY}
   downtime:
