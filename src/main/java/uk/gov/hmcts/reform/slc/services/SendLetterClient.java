@@ -67,17 +67,13 @@ public class SendLetterClient {
     }
 
     public void updatePrintedAt(LetterPrintStatus status) {
-        try {
-            restTemplatePut(
-                sendLetterProducerUrl + status.id + "/printed-at",
-                ImmutableMap.of(
-                    "printed_at",
-                    status.printedAt.format(ISO_INSTANT)
-                )
-            );
-        } catch (RestClientException exception) {
-            logger.error("Exception occurred while updating printed_at time for letter id = " + status.id, exception);
-        }
+        restTemplatePut(
+            sendLetterProducerUrl + status.id + "/printed-at",
+            ImmutableMap.of(
+                "printed_at",
+                status.printedAt.format(ISO_INSTANT)
+            )
+        );
     }
 
     public void updateIsFailedStatus(UUID letterId) {

@@ -94,6 +94,17 @@ public class FtpClient {
         });
     }
 
+    public void deleteReport(String reportPath) {
+        runWith(sftp -> {
+            try {
+                sftp.rm(reportPath);
+                return null;
+            } catch (Exception exc) {
+                throw new FtpStepException("Error while deleting report: " + reportPath, exc);
+            }
+        });
+    }
+
     public void testConnection() {
         runWith(sftpClient -> null);
     }

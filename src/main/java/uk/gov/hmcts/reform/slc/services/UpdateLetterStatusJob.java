@@ -42,7 +42,7 @@ public class UpdateLetterStatusJob {
                 .map(parser::parse)
                 .forEach(parsedReport -> {
                     parsedReport.statuses.forEach(sendLetterClient::updatePrintedAt);
-                    // TODO: delete report
+                    ftpClient.deleteReport(parsedReport.path);
                 });
         } else {
             logger.trace("FTP server not available, job cancelled");
