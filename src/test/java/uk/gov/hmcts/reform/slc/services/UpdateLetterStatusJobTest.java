@@ -53,7 +53,7 @@ public class UpdateLetterStatusJobTest {
 
         job.run();
 
-        verify(ftpClient, times(1)).downloadReports();
+        verify(ftpClient).downloadReports();
     }
 
     @Test
@@ -67,7 +67,7 @@ public class UpdateLetterStatusJobTest {
         catchThrowable(() -> job.run());
 
         // then
-        verify(ftpClient, times(0)).deleteReport(anyString());
+        verify(ftpClient, never()).deleteReport(anyString());
         verify(sendLetterClient, never()).checkPrintStatus();
     }
 
@@ -94,7 +94,7 @@ public class UpdateLetterStatusJobTest {
         catchThrowable(() -> job.run());
 
         // then
-        verify(ftpClient, times(0)).deleteReport(anyString());
+        verify(ftpClient, never()).deleteReport(anyString());
         verify(sendLetterClient, never()).checkPrintStatus();
     }
 
@@ -122,7 +122,7 @@ public class UpdateLetterStatusJobTest {
         job.run();
 
         // then
-        verify(ftpClient, times(1)).deleteReport(filePath);
+        verify(ftpClient).deleteReport(filePath);
         verify(sendLetterClient).checkPrintStatus();
     }
 
