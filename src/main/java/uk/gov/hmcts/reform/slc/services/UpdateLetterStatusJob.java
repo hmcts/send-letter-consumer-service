@@ -4,13 +4,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.slc.model.LetterPrintStatus;
 import uk.gov.hmcts.reform.slc.services.steps.sftpupload.FtpClient;
 import uk.gov.hmcts.reform.slc.services.steps.sftpupload.ParsedReport;
 import uk.gov.hmcts.reform.slc.services.steps.sftpupload.Report;
 
+import java.util.List;
 import java.util.Objects;
 
 import static java.time.LocalTime.now;
+import static java.util.stream.Collectors.toList;
 
 @Component
 public class UpdateLetterStatusJob {
@@ -46,8 +49,15 @@ public class UpdateLetterStatusJob {
                 .map(this::tryParse)
                 .filter(Objects::nonNull)
                 .forEach(parsedReport -> {
-                    parsedReport.statuses.forEach(sendLetterClient::updatePrintedAt);
-                    ftpClient.deleteReport(parsedReport.path);
+                    List<Boolean> successStatuses = parsedReport
+                        .statuses
+                        .stream()
+                        .map(this::trySendUpdate)
+                        .collect(toList());
+
+                    if (successStatuses.stream().allMatch(s -> s == true)) {
+                        ftpClient.deleteReport(parsedReport.path);
+                    }
                 });
         } else {
             logger.trace("FTP server not available, job cancelled");
@@ -60,6 +70,21 @@ public class UpdateLetterStatusJob {
         } catch (Exception exc) {
             logger.error("Error parsing report " + report.path, exc);
             return null;
+        }
+    }
+
+    /**
+     * Tries to send an update on when letter was printed.
+     *
+     * @return true if update succeeded.
+     */
+    private boolean trySendUpdate(LetterPrintStatus letterStatus) {
+        try {
+            sendLetterClient.updatePrintedAt(letterStatus);
+            return true;
+        } catch (Exception exc) {
+            logger.error("Error updating status for letter: " + letterStatus.id);
+            return false;
         }
     }
 }
