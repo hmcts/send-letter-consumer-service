@@ -147,4 +147,33 @@ public class UpdateLetterStatusJobTest {
         // then
         verify(parser, times(2)).parse(any());
     }
+
+    @Test
+    public void should_continue_updating_letters_if_previous_one_failed() {
+        // given
+        String filePath = "FROM/1.csv";
+        given(ftpAvailabilityChecker.isFtpAvailable(any())).willReturn(true);
+
+        given(ftpClient.downloadReports())
+            .willReturn(singletonList(new Report(filePath, null)));
+
+        given(parser.parse(any()))
+            .willReturn(
+                new ParsedReport(
+                    filePath,
+                    asList(
+                        new LetterPrintStatus("abc", now()),
+                        new LetterPrintStatus("xyz", now())
+                    )
+                )
+            );
+
+        willThrow(RestClientException.class).given(sendLetterClient).updatePrintedAt(any());
+
+        // when
+        job.run();
+
+        // then
+        verify(sendLetterClient, times(2)).updatePrintedAt(any());
+    }
 }
