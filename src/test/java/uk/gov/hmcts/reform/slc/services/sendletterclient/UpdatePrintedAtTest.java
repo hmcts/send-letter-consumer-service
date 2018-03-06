@@ -29,9 +29,12 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 
 public class UpdatePrintedAtTest {
 
-    private static final String LETTER_ID = UUID.randomUUID().toString();
+    private static final UUID LETTER_ID = UUID.randomUUID();
+
     private static final String AUTH_HEADER = "service-auth-header";
+
     private static final String PRODUCER_URL = "http://localhost/";
+
     private static final String API_URL = PRODUCER_URL + "letters/" + LETTER_ID + "/printed-at";
 
     private final RestTemplate restTemplate = new RestTemplate();
@@ -61,7 +64,7 @@ public class UpdatePrintedAtTest {
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
             .andRespond(withStatus(NO_CONTENT));
 
-        client.updatePrintedAt(new LetterPrintStatus(LETTER_ID, ZonedDateTime.parse(datetime)));
+        client.updatePrintedAt(new LetterPrintStatus(LETTER_ID.toString(), ZonedDateTime.parse(datetime)));
 
         mockServer.verify();
     }
@@ -73,7 +76,9 @@ public class UpdatePrintedAtTest {
             .andExpect(method(PUT))
             .andRespond(withServerError());
 
-        Throwable exception = catchThrowable(() -> client.updatePrintedAt(new LetterPrintStatus(LETTER_ID, now())));
+        Throwable exception = catchThrowable(() ->
+            client.updatePrintedAt(new LetterPrintStatus(LETTER_ID.toString(), now()))
+        );
 
         assertThat(exception).isNotNull();
 

@@ -32,11 +32,11 @@ public class UpdateSentToPrintAtTest {
 
     private final RestTemplate restTemplate = new RestTemplate();
 
-    private static final UUID letterId = UUID.randomUUID();
+    private static final UUID LETTER_ID = UUID.randomUUID();
 
-    private static final String sendLetterProducerUrl = "http://localhost:5432/";
+    private static final String PRODUCER_URL = "http://localhost:5432/";
 
-    private static final String API_URL = sendLetterProducerUrl + "letters/" + letterId + "/sent-to-print-at";
+    private static final String API_URL = PRODUCER_URL + "letters/" + LETTER_ID + "/sent-to-print-at";
 
     private static final String AUTH_HEADER = "service-auth-header";
 
@@ -53,7 +53,7 @@ public class UpdateSentToPrintAtTest {
 
         isoDate = now.format(DateTimeFormatter.ISO_INSTANT);
         mockServer = MockRestServiceServer.bindTo(restTemplate).build();
-        sendLetterClient = new SendLetterClient(restTemplate, sendLetterProducerUrl, () -> now, authTokenGenerator);
+        sendLetterClient = new SendLetterClient(restTemplate, PRODUCER_URL, () -> now, authTokenGenerator);
     }
 
     @Test
@@ -68,7 +68,7 @@ public class UpdateSentToPrintAtTest {
             .andRespond(withStatus(HttpStatus.OK));
 
         //when
-        sendLetterClient.updateSentToPrintAt(letterId);
+        sendLetterClient.updateSentToPrintAt(LETTER_ID);
 
         //then
         mockServer.verify();
@@ -82,7 +82,7 @@ public class UpdateSentToPrintAtTest {
             .andRespond(withServerError());
 
         //when
-        Throwable exception = catchThrowable(() -> sendLetterClient.updateSentToPrintAt(letterId));
+        Throwable exception = catchThrowable(() -> sendLetterClient.updateSentToPrintAt(LETTER_ID));
 
         //then
         assertThat(exception).isNull();

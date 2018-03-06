@@ -30,11 +30,11 @@ public class UpdateIsFailedTest {
 
     private final RestTemplate restTemplate = new RestTemplate();
 
-    private static final UUID letterId = UUID.randomUUID();
+    private static final UUID LETTER_ID = UUID.randomUUID();
 
-    private static final String sendLetterProducerUrl = "http://localhost:5432/";
+    private static final String PRODUCER_URL = "http://localhost:5432/";
 
-    private static final String API_URL = sendLetterProducerUrl + "letters/" + letterId + "/is-failed";
+    private static final String API_URL = PRODUCER_URL + "letters/" + LETTER_ID + "/is-failed";
 
     private static final String AUTH_HEADER = "service-auth-header";
 
@@ -48,7 +48,7 @@ public class UpdateIsFailedTest {
         when(authTokenGenerator.generate()).thenReturn(AUTH_HEADER);
 
         mockServer = MockRestServiceServer.bindTo(restTemplate).build();
-        sendLetterClient = new SendLetterClient(restTemplate, sendLetterProducerUrl, () -> now, authTokenGenerator);
+        sendLetterClient = new SendLetterClient(restTemplate, PRODUCER_URL, () -> now, authTokenGenerator);
     }
 
     @Test
@@ -61,7 +61,7 @@ public class UpdateIsFailedTest {
             .andRespond(withStatus(HttpStatus.OK));
 
         //when
-        sendLetterClient.updateIsFailedStatus(letterId);
+        sendLetterClient.updateIsFailedStatus(LETTER_ID);
 
         //then
         mockServer.verify();
@@ -76,7 +76,7 @@ public class UpdateIsFailedTest {
 
         //when
         Throwable exception = catchThrowable(() -> {
-            sendLetterClient.updateIsFailedStatus(letterId);
+            sendLetterClient.updateIsFailedStatus(LETTER_ID);
         });
 
         //then
