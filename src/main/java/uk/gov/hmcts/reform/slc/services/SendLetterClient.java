@@ -109,13 +109,21 @@ public class SendLetterClient {
         }
     }
 
-    private void restTemplatePut(String url, Object body) {
+    private void callRestTemplate(String url, HttpMethod method, Object body) {
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_UTF8_VALUE);
         headers.add(AUTHORIZATION_HEADER, authTokenGenerator.generate());
 
         HttpEntity<Object> entity = new HttpEntity<>(body, headers);
 
-        restTemplate.exchange(url, HttpMethod.PUT, entity, Void.class);
+        restTemplate.exchange(url, method, entity, Void.class);
+    }
+
+    private void restTemplatePost(String url, Object body) {
+        callRestTemplate(url, HttpMethod.POST, body);
+    }
+
+    private void restTemplatePut(String url, Object body) {
+        callRestTemplate(url, HttpMethod.PUT, body);
     }
 }
