@@ -32,11 +32,11 @@ public class UpdateSentToPrintAtTest {
 
     private final RestTemplate restTemplate = new RestTemplate();
 
-    private static final UUID letterId = UUID.randomUUID();
+    private static final UUID LETTER_ID = UUID.randomUUID();
 
-    private static final String SENT_TO_PRINT_AT = "/sent-to-print-at";
+    private static final String PRODUCER_URL = "http://localhost:5432/";
 
-    private static final String sendLetterProducerUrl = "http://localhost:5432/";
+    private static final String API_URL = PRODUCER_URL + "letters/" + LETTER_ID + "/sent-to-print-at";
 
     private static final String AUTH_HEADER = "service-auth-header";
 
@@ -53,13 +53,13 @@ public class UpdateSentToPrintAtTest {
 
         isoDate = now.format(DateTimeFormatter.ISO_INSTANT);
         mockServer = MockRestServiceServer.bindTo(restTemplate).build();
-        sendLetterClient = new SendLetterClient(restTemplate, sendLetterProducerUrl, () -> now, authTokenGenerator);
+        sendLetterClient = new SendLetterClient(restTemplate, PRODUCER_URL, () -> now, authTokenGenerator);
     }
 
     @Test
     public void should_successfully_put_sent_to_print_at_attribute() {
         //given
-        mockServer.expect(requestTo(sendLetterProducerUrl + letterId + SENT_TO_PRINT_AT))
+        mockServer.expect(requestTo(API_URL))
             .andExpect(header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(header(SendLetterClient.AUTHORIZATION_HEADER, AUTH_HEADER))
             .andExpect(content().string("{\"sent_to_print_at\":\"" + isoDate + "\"}"))
@@ -68,7 +68,7 @@ public class UpdateSentToPrintAtTest {
             .andRespond(withStatus(HttpStatus.OK));
 
         //when
-        sendLetterClient.updateSentToPrintAt(letterId);
+        sendLetterClient.updateSentToPrintAt(LETTER_ID);
 
         //then
         mockServer.verify();
@@ -77,12 +77,12 @@ public class UpdateSentToPrintAtTest {
     @Test
     public void should_not_throw_exception_when_rest_template_throw_server_error() {
         //given
-        mockServer.expect(requestTo(sendLetterProducerUrl + letterId + SENT_TO_PRINT_AT))
+        mockServer.expect(requestTo(API_URL))
             .andExpect(method(HttpMethod.PUT))
             .andRespond(withServerError());
 
         //when
-        Throwable exception = catchThrowable(() -> sendLetterClient.updateSentToPrintAt(letterId));
+        Throwable exception = catchThrowable(() -> sendLetterClient.updateSentToPrintAt(LETTER_ID));
 
         //then
         assertThat(exception).isNull();

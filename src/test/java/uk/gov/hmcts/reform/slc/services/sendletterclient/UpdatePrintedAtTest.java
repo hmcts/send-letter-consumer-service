@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.slc.model.LetterPrintStatus;
 import uk.gov.hmcts.reform.slc.services.SendLetterClient;
 
 import java.time.ZonedDateTime;
+import java.util.UUID;
 
 import static java.time.ZonedDateTime.now;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -28,8 +29,14 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 
 public class UpdatePrintedAtTest {
 
+    private static final UUID LETTER_ID = UUID.randomUUID();
+
     private static final String AUTH_HEADER = "service-auth-header";
-    private static final String url = "http://localhost/";
+
+    private static final String PRODUCER_URL = "http://localhost/";
+
+    private static final String API_URL = PRODUCER_URL + "letters/" + LETTER_ID + "/printed-at";
+
     private final RestTemplate restTemplate = new RestTemplate();
 
     private MockRestServiceServer mockServer;
@@ -41,16 +48,15 @@ public class UpdatePrintedAtTest {
         when(authTokenGenerator.generate()).thenReturn(AUTH_HEADER);
 
         mockServer = MockRestServiceServer.bindTo(restTemplate).build();
-        client = new SendLetterClient(restTemplate, url, ZonedDateTime::now, authTokenGenerator);
+        client = new SendLetterClient(restTemplate, PRODUCER_URL, ZonedDateTime::now, authTokenGenerator);
     }
 
     @Test
     public void should_send_valid_request() {
-        String id = "f36e834a-216c-48ed-8fe9-b0dabc4daa49";
         String datetime = "2018-01-01T21:11:00Z";
 
         mockServer
-            .expect(requestTo(url + id + "/printed-at"))
+            .expect(requestTo(API_URL))
             .andExpect(method(PUT))
             .andExpect(header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(header(SendLetterClient.AUTHORIZATION_HEADER, AUTH_HEADER))
@@ -58,21 +64,21 @@ public class UpdatePrintedAtTest {
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
             .andRespond(withStatus(NO_CONTENT));
 
-        client.updatePrintedAt(new LetterPrintStatus(id, ZonedDateTime.parse(datetime)));
+        client.updatePrintedAt(new LetterPrintStatus(LETTER_ID.toString(), ZonedDateTime.parse(datetime)));
 
         mockServer.verify();
     }
 
     @Test
     public void should_throw_exception_when_server_responds_with_an_error() {
-        String id = "f36e834a-216c-48ed-8fe9-b0dabc4daa49";
-
         mockServer
-            .expect(requestTo(url + id + "/printed-at"))
+            .expect(requestTo(API_URL))
             .andExpect(method(PUT))
             .andRespond(withServerError());
 
-        Throwable exception = catchThrowable(() -> client.updatePrintedAt(new LetterPrintStatus(id, now())));
+        Throwable exception = catchThrowable(() ->
+            client.updatePrintedAt(new LetterPrintStatus(LETTER_ID.toString(), now()))
+        );
 
         assertThat(exception).isNotNull();
 

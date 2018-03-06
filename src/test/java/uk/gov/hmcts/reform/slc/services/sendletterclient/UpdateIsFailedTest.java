@@ -30,11 +30,11 @@ public class UpdateIsFailedTest {
 
     private final RestTemplate restTemplate = new RestTemplate();
 
-    private static final UUID letterId = UUID.randomUUID();
+    private static final UUID LETTER_ID = UUID.randomUUID();
 
-    private static final String sendLetterProducerUrl = "http://localhost:5432/";
+    private static final String PRODUCER_URL = "http://localhost:5432/";
 
-    private static final String IS_FAILED = "/is-failed";
+    private static final String API_URL = PRODUCER_URL + "letters/" + LETTER_ID + "/is-failed";
 
     private static final String AUTH_HEADER = "service-auth-header";
 
@@ -48,20 +48,20 @@ public class UpdateIsFailedTest {
         when(authTokenGenerator.generate()).thenReturn(AUTH_HEADER);
 
         mockServer = MockRestServiceServer.bindTo(restTemplate).build();
-        sendLetterClient = new SendLetterClient(restTemplate, sendLetterProducerUrl, () -> now, authTokenGenerator);
+        sendLetterClient = new SendLetterClient(restTemplate, PRODUCER_URL, () -> now, authTokenGenerator);
     }
 
     @Test
     public void should_successfully_put_is_failed_attribute() {
         //given
-        mockServer.expect(requestTo(sendLetterProducerUrl + letterId + IS_FAILED))
+        mockServer.expect(requestTo(API_URL))
             .andExpect(method(HttpMethod.PUT))
             .andExpect(header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(header(SendLetterClient.AUTHORIZATION_HEADER, AUTH_HEADER))
             .andRespond(withStatus(HttpStatus.OK));
 
         //when
-        sendLetterClient.updateIsFailedStatus(letterId);
+        sendLetterClient.updateIsFailedStatus(LETTER_ID);
 
         //then
         mockServer.verify();
@@ -70,13 +70,13 @@ public class UpdateIsFailedTest {
     @Test
     public void should_not_throw_exception_when_rest_template_throws_server_error() {
         //given
-        mockServer.expect(requestTo(sendLetterProducerUrl + letterId + IS_FAILED))
+        mockServer.expect(requestTo(API_URL))
             .andExpect(method(HttpMethod.PUT))
             .andRespond(withServerError());
 
         //when
         Throwable exception = catchThrowable(() -> {
-            sendLetterClient.updateIsFailedStatus(letterId);
+            sendLetterClient.updateIsFailedStatus(LETTER_ID);
         });
 
         //then
