@@ -68,6 +68,7 @@ public class UpdateLetterStatusJobTest {
 
         // then
         verify(ftpClient, times(0)).deleteReport(anyString());
+        verify(sendLetterClient, never()).checkPrintStatus();
     }
 
     @Test
@@ -94,6 +95,7 @@ public class UpdateLetterStatusJobTest {
 
         // then
         verify(ftpClient, times(0)).deleteReport(anyString());
+        verify(sendLetterClient, never()).checkPrintStatus();
     }
 
     @Test
@@ -121,6 +123,7 @@ public class UpdateLetterStatusJobTest {
 
         // then
         verify(ftpClient, times(1)).deleteReport(filePath);
+        verify(sendLetterClient).checkPrintStatus();
     }
 
     @Test

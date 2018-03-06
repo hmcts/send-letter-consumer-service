@@ -57,6 +57,7 @@ public class UpdateLetterStatusJob {
 
                     if (successStatuses.stream().allMatch(s -> s == true)) {
                         ftpClient.deleteReport(parsedReport.path);
+                        sendLetterClient.checkPrintStatus(); // TODO after all reports
                     }
                 });
         } else {
