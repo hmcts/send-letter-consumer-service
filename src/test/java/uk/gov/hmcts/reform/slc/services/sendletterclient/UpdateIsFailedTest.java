@@ -34,7 +34,7 @@ public class UpdateIsFailedTest {
 
     private static final String sendLetterProducerUrl = "http://localhost:5432/";
 
-    private static final String IS_FAILED = "/is-failed";
+    private static final String API_URL = sendLetterProducerUrl + "letters/" + letterId + "/is-failed";
 
     private static final String AUTH_HEADER = "service-auth-header";
 
@@ -54,7 +54,7 @@ public class UpdateIsFailedTest {
     @Test
     public void should_successfully_put_is_failed_attribute() {
         //given
-        mockServer.expect(requestTo(sendLetterProducerUrl + letterId + IS_FAILED))
+        mockServer.expect(requestTo(API_URL))
             .andExpect(method(HttpMethod.PUT))
             .andExpect(header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(header(SendLetterClient.AUTHORIZATION_HEADER, AUTH_HEADER))
@@ -70,7 +70,7 @@ public class UpdateIsFailedTest {
     @Test
     public void should_not_throw_exception_when_rest_template_throws_server_error() {
         //given
-        mockServer.expect(requestTo(sendLetterProducerUrl + letterId + IS_FAILED))
+        mockServer.expect(requestTo(API_URL))
             .andExpect(method(HttpMethod.PUT))
             .andRespond(withServerError());
 

@@ -32,18 +32,22 @@ public class SendLetterClient {
     private static final Logger logger = LoggerFactory.getLogger(SendLetterService.class);
 
     private final RestTemplate restTemplate;
+    private final String sendLetterUrl;
     private final String sendLetterProducerUrl;
     private final Supplier<ZonedDateTime> currentDateTimeSupplier;
     private final AuthTokenGenerator authTokenGenerator;
 
     public SendLetterClient(
         RestTemplate restTemplate,
-        @Value("${sendletter.producer.url}") String sendLetterProducerUrl,
+        @Value("${sendletter.producer.url}") String sendLetterUrl,
         Supplier<ZonedDateTime> currentDateTimeSupplier,
         AuthTokenGenerator authTokenGenerator
     ) {
+        String appendedUrl = appendIfMissing(sendLetterUrl, "/");
+
         this.restTemplate = restTemplate;
-        this.sendLetterProducerUrl = appendIfMissing(sendLetterProducerUrl, "/");
+        this.sendLetterUrl = appendedUrl;
+        this.sendLetterProducerUrl = appendedUrl + "letters/";
         this.currentDateTimeSupplier = currentDateTimeSupplier;
         this.authTokenGenerator = authTokenGenerator;
     }
@@ -95,7 +99,7 @@ public class SendLetterClient {
     public Health serviceHealthy() {
         try {
             ResponseEntity<InternalHealth> response = restTemplate
-                .getForEntity(sendLetterProducerUrl + "health", InternalHealth.class);
+                .getForEntity(sendLetterUrl + "health", InternalHealth.class);
 
             return Health.status(response.getBody().getStatus()).build();
         } catch (Exception ex) {

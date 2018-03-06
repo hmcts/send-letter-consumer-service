@@ -34,9 +34,9 @@ public class UpdateSentToPrintAtTest {
 
     private static final UUID letterId = UUID.randomUUID();
 
-    private static final String SENT_TO_PRINT_AT = "/sent-to-print-at";
-
     private static final String sendLetterProducerUrl = "http://localhost:5432/";
+
+    private static final String API_URL = sendLetterProducerUrl + "letters/" + letterId + "/sent-to-print-at";
 
     private static final String AUTH_HEADER = "service-auth-header";
 
@@ -59,7 +59,7 @@ public class UpdateSentToPrintAtTest {
     @Test
     public void should_successfully_put_sent_to_print_at_attribute() {
         //given
-        mockServer.expect(requestTo(sendLetterProducerUrl + letterId + SENT_TO_PRINT_AT))
+        mockServer.expect(requestTo(API_URL))
             .andExpect(header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(header(SendLetterClient.AUTHORIZATION_HEADER, AUTH_HEADER))
             .andExpect(content().string("{\"sent_to_print_at\":\"" + isoDate + "\"}"))
@@ -77,7 +77,7 @@ public class UpdateSentToPrintAtTest {
     @Test
     public void should_not_throw_exception_when_rest_template_throw_server_error() {
         //given
-        mockServer.expect(requestTo(sendLetterProducerUrl + letterId + SENT_TO_PRINT_AT))
+        mockServer.expect(requestTo(API_URL))
             .andExpect(method(HttpMethod.PUT))
             .andRespond(withServerError());
 
