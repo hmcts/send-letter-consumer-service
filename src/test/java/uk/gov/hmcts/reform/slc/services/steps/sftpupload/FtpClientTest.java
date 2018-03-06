@@ -167,4 +167,19 @@ public class FtpClientTest {
 
         assertThat(exc).isNotNull();
     }
+
+    @Test
+    public void deleteReports_should_throw_an_exception_if_deleting_file_failed() throws Exception {
+        // given
+        doThrow(IOException.class)
+            .when(sftpClient).rm("hello.csv");
+
+        // when
+        Throwable exc = catchThrowable(() -> client.deleteReport("hello.csv"));
+
+        // then
+        assertThat(exc)
+            .isInstanceOf(FtpStepException.class)
+            .hasMessageContaining("Error while deleting report");
+    }
 }
