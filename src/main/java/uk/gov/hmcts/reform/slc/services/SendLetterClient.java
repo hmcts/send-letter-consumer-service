@@ -34,6 +34,7 @@ public class SendLetterClient {
     private final RestTemplate restTemplate;
     private final String healthUrl;
     private final String lettersUrl;
+    private final String letterReportsUrl;
     private final Supplier<ZonedDateTime> currentDateTimeSupplier;
     private final AuthTokenGenerator authTokenGenerator;
 
@@ -48,6 +49,7 @@ public class SendLetterClient {
         this.restTemplate = restTemplate;
         this.healthUrl = appendedUrl + "health";
         this.lettersUrl = appendedUrl + "letters/";
+        this.letterReportsUrl = appendedUrl + "letter-reports/";
         this.currentDateTimeSupplier = currentDateTimeSupplier;
         this.authTokenGenerator = authTokenGenerator;
     }
@@ -88,6 +90,14 @@ public class SendLetterClient {
                 "Exception occurred while updating is failed status for letter id = " + letterId,
                 exception
             );
+        }
+    }
+
+    public void checkPrintStatus() {
+        try {
+            restTemplatePost(letterReportsUrl + "print-status-check", null);
+        } catch (RestClientException exception) {
+            logger.error("Exception occurred while triggering print status check", exception);
         }
     }
 
