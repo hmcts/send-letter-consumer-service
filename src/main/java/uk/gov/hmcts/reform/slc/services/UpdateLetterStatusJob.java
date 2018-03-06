@@ -83,7 +83,7 @@ public class UpdateLetterStatusJob {
             sendLetterClient.updatePrintedAt(letterStatus);
             return true;
         } catch (Exception exc) {
-            logger.error("Error updating status for letter: " + letterStatus.id);
+            logger.error("Error updating status for letter: " + letterStatus.id, exc);
             return false;
         }
     }
