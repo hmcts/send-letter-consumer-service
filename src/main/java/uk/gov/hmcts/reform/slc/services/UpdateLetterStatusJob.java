@@ -46,20 +46,7 @@ public class UpdateLetterStatusJob {
                 .stream()
                 .map(this::tryParse)
                 .filter(Objects::nonNull)
-                .map(parsedReport -> {
-                    boolean success = parsedReport
-                        .statuses
-                        .stream()
-                        .map(this::trySendUpdate)
-                        .reduce(Boolean::logicalAnd)
-                        .orElse(true);
-
-                    if (success) {
-                        ftpClient.deleteReport(parsedReport.path);
-                    }
-
-                    return success;
-                })
+                .map(this::processReport)
                 .reduce(Boolean::logicalAnd)
                 .ifPresent(allSuccess -> {
                     if (allSuccess) {
@@ -93,5 +80,20 @@ public class UpdateLetterStatusJob {
             logger.error("Error updating status for letter: " + letterStatus.id, exc);
             return false;
         }
+    }
+
+    private boolean processReport(ParsedReport report) {
+        boolean success = report
+            .statuses
+            .stream()
+            .map(this::trySendUpdate)
+            .reduce(Boolean::logicalAnd)
+            .orElse(true);
+
+        if (success) {
+            ftpClient.deleteReport(report.path);
+        }
+
+        return success;
     }
 }
