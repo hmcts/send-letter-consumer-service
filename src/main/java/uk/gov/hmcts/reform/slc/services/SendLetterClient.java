@@ -32,7 +32,8 @@ public class SendLetterClient {
     private static final Logger logger = LoggerFactory.getLogger(SendLetterService.class);
 
     private final RestTemplate restTemplate;
-    private final String sendLetterProducerUrl;
+    private final String healthUrl;
+    private final String lettersUrl;
     private final Supplier<ZonedDateTime> currentDateTimeSupplier;
     private final AuthTokenGenerator authTokenGenerator;
 
@@ -42,8 +43,11 @@ public class SendLetterClient {
         Supplier<ZonedDateTime> currentDateTimeSupplier,
         AuthTokenGenerator authTokenGenerator
     ) {
+        String appendedUrl = appendIfMissing(sendLetterProducerUrl, "/");
+
         this.restTemplate = restTemplate;
-        this.sendLetterProducerUrl = appendIfMissing(sendLetterProducerUrl, "/");
+        this.healthUrl = appendedUrl + "health";
+        this.lettersUrl = appendedUrl + "letters/";
         this.currentDateTimeSupplier = currentDateTimeSupplier;
         this.authTokenGenerator = authTokenGenerator;
     }
@@ -51,7 +55,7 @@ public class SendLetterClient {
     public void updateSentToPrintAt(UUID letterId) {
         try {
             restTemplatePut(
-                sendLetterProducerUrl + letterId + "/sent-to-print-at",
+                lettersUrl + letterId + "/sent-to-print-at",
                 ImmutableMap.of(
                     "sent_to_print_at",
                     currentDateTimeSupplier.get().format(ISO_INSTANT)
@@ -68,7 +72,7 @@ public class SendLetterClient {
 
     public void updatePrintedAt(LetterPrintStatus status) {
         restTemplatePut(
-            sendLetterProducerUrl + status.id + "/printed-at",
+            lettersUrl + status.id + "/printed-at",
             ImmutableMap.of(
                 "printed_at",
                 status.printedAt.format(ISO_INSTANT)
@@ -78,7 +82,7 @@ public class SendLetterClient {
 
     public void updateIsFailedStatus(UUID letterId) {
         try {
-            restTemplatePut(sendLetterProducerUrl + letterId + "/is-failed", null);
+            restTemplatePut(lettersUrl + letterId + "/is-failed", null);
         } catch (RestClientException exception) {
             logger.error(
                 "Exception occurred while updating is failed status for letter id = " + letterId,
@@ -95,7 +99,7 @@ public class SendLetterClient {
     public Health serviceHealthy() {
         try {
             ResponseEntity<InternalHealth> response = restTemplate
-                .getForEntity(sendLetterProducerUrl + "health", InternalHealth.class);
+                .getForEntity(healthUrl, InternalHealth.class);
 
             return Health.status(response.getBody().getStatus()).build();
         } catch (Exception ex) {
