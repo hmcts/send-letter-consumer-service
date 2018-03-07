@@ -9,11 +9,9 @@ import uk.gov.hmcts.reform.slc.services.steps.sftpupload.FtpClient;
 import uk.gov.hmcts.reform.slc.services.steps.sftpupload.ParsedReport;
 import uk.gov.hmcts.reform.slc.services.steps.sftpupload.Report;
 
-import java.util.List;
 import java.util.Objects;
 
 import static java.time.LocalTime.now;
-import static java.util.stream.Collectors.toList;
 
 @Component
 public class UpdateLetterStatusJob {
@@ -48,16 +46,24 @@ public class UpdateLetterStatusJob {
                 .stream()
                 .map(this::tryParse)
                 .filter(Objects::nonNull)
-                .forEach(parsedReport -> {
-                    List<Boolean> successStatuses = parsedReport
+                .map(parsedReport -> {
+                    boolean success = parsedReport
                         .statuses
                         .stream()
                         .map(this::trySendUpdate)
-                        .collect(toList());
+                        .reduce(Boolean::logicalAnd)
+                        .orElse(true);
 
-                    if (successStatuses.stream().allMatch(s -> s == true)) {
+                    if (success) {
                         ftpClient.deleteReport(parsedReport.path);
-                        sendLetterClient.checkPrintStatus(); // TODO after all reports
+                    }
+
+                    return success;
+                })
+                .reduce(Boolean::logicalAnd)
+                .ifPresent(allSuccess -> {
+                    if (allSuccess) {
+                        sendLetterClient.checkPrintStatus();
                     }
                 });
         } else {
