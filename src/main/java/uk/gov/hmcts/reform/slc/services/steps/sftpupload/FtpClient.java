@@ -46,12 +46,12 @@ public class FtpClient {
     }
     // endregion
 
-    public void upload(PdfDoc pdfDoc, boolean isSmokeTest) {
+    public void upload(PdfDoc pdfDoc, boolean isSmokeTestDoc) {
         Instant start = Instant.now();
 
         runWith(sftp -> {
             try {
-                String folder = isSmokeTest
+                String folder = isSmokeTestDoc
                     ? configProperties.getSmokeTestTargetFolder()
                     : configProperties.getTargetFolder();
 
