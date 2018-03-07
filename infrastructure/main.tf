@@ -53,6 +53,7 @@ module "consumer" {
     FTP_PORT                  = "${var.ftp_port}"
     FTP_FINGERPRINT           = "${var.ftp_fingerprint}"
     FTP_TARGET_FOLDER         = "${var.ftp_target_folder}"
+    FTP_SMOKE_TEST_TARGET_FOLDER = "${var.ftp_smoke_test_target_folder}"
     FTP_REPORTS_FOLDER        = "${var.ftp_reports_folder}"
     FTP_REPORTS_CRON          = "${var.ftp_reports_cron}"
     FTP_USER                  = "${data.vault_generic_secret.ftp_user.data["value"]}"

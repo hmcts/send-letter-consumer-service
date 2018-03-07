@@ -45,7 +45,7 @@ public class SendLetterService {
             letter = letterMapper.from(msg);
             PdfDoc pdf = pdfCreator.create(letter);
             // TODO: encrypt & sign
-            ftpClient.upload(pdf);
+            ftpClient.upload(pdf, isSmokeTest(letter));
 
             //update producer with sent to print at time for reporting
             sendLetterClient.updateSentToPrintAt(letter.id);
@@ -64,5 +64,9 @@ public class SendLetterService {
 
             return FAILURE;
         }
+    }
+
+    private boolean isSmokeTest(Letter letter) {
+        return Objects.equals(letter.type, "smoke_test");
     }
 }

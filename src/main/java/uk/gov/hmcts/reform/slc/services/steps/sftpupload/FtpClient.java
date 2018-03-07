@@ -46,12 +46,16 @@ public class FtpClient {
     }
     // endregion
 
-    public void upload(PdfDoc pdfDoc) {
+    public void upload(PdfDoc pdfDoc, boolean isSmokeTest) {
         Instant start = Instant.now();
 
         runWith(sftp -> {
             try {
-                String path = String.join("/", configProperties.getTargetFolder(), pdfDoc.filename);
+                String folder = isSmokeTest
+                    ? configProperties.getTargetFolder()
+                    : configProperties.getSmokeTestTargetFolder();
+
+                String path = String.join("/", folder, pdfDoc.filename);
                 sftp.getFileTransfer().upload(pdfDoc, path);
                 insights.trackFtpUpload(Duration.between(start, Instant.now()), true);
 

@@ -19,6 +19,8 @@ public class FtpConfigProperties {
 
     private String targetFolder;
 
+    private String smokeTestTargetFolder;
+
     private String reportsFolder;
 
     public String getHostname() {
@@ -75,6 +77,14 @@ public class FtpConfigProperties {
 
     public void setTargetFolder(String targetFolder) {
         this.targetFolder = targetFolder;
+    }
+
+    public String getSmokeTestTargetFolder() {
+        return smokeTestTargetFolder;
+    }
+
+    public void setSmokeTestTargetFolder(String smokeTestTargetFolder) {
+        this.smokeTestTargetFolder = smokeTestTargetFolder;
     }
 
     public String getReportsFolder() {

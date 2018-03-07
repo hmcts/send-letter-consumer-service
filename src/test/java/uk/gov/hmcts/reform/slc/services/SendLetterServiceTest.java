@@ -22,6 +22,9 @@ import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.reform.slc.services.servicebus.MessageHandlingResult.FAILURE;
 import static uk.gov.hmcts.reform.slc.services.servicebus.MessageHandlingResult.SUCCESS;
 
@@ -68,6 +71,32 @@ public class SendLetterServiceTest {
 
         // then
         assertThat(result).isEqualTo(FAILURE);
+    }
+
+    @Test
+    public void should_handle_smoke_test_letters() {
+
+        IMessage msg1 = mock(IMessage.class);
+        IMessage msg2 = mock(IMessage.class);
+
+
+        Letter smokeTestLetter = new Letter(
+            UUID.randomUUID(),
+            singletonList(
+                new Document("template", emptyMap())
+            ),
+            "smoke_test",
+            "cmc"
+        );
+
+        given(letterMapper.from(msg1)).willReturn(smokeTestLetter);
+        given(letterMapper.from(msg2)).willReturn(sampleLetter());
+
+        service.send(msg1);
+        verify(ftpClient).upload(any(), eq(true));
+
+        service.send(msg2);
+        verify(ftpClient).upload(any(), eq(false));
     }
 
     private Letter sampleLetter() {
