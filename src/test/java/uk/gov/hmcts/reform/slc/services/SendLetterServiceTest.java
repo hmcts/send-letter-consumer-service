@@ -76,16 +76,16 @@ public class SendLetterServiceTest {
     @Test
     public void should_handle_smoke_test_letters() {
 
-        IMessage msg1 = mock(IMessage.class);
-        IMessage msg2 = mock(IMessage.class);
+        IMessage smokeTestMsg = mock(IMessage.class);
+        IMessage regularMsg = mock(IMessage.class);
 
-        given(letterMapper.from(msg1)).willReturn(sampleLetterOfType(SendLetterService.SMOKE_TEST_LETTER_TYPE));
-        given(letterMapper.from(msg2)).willReturn(sampleLetterOfType("some_random_type"));
+        given(letterMapper.from(smokeTestMsg)).willReturn(sampleLetterOfType(SendLetterService.SMOKE_TEST_LETTER_TYPE));
+        given(letterMapper.from(regularMsg)).willReturn(sampleLetterOfType("some_random_type"));
 
-        service.send(msg1);
+        service.send(smokeTestMsg);
         verify(ftpClient).upload(any(), eq(true));
 
-        service.send(msg2);
+        service.send(regularMsg);
         verify(ftpClient).upload(any(), eq(false));
     }
 
