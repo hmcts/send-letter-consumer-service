@@ -48,11 +48,7 @@ public class UpdateLetterStatusJob {
                 .filter(Objects::nonNull)
                 .map(this::processReport)
                 .reduce(Boolean::logicalAnd)
-                .ifPresent(allSuccess -> {
-                    if (allSuccess) {
-                        sendLetterClient.checkPrintStatus();
-                    }
-                });
+                .ifPresent(allSuccess -> sendLetterClient.checkPrintStatus());
         } else {
             logger.trace("FTP server not available, job cancelled");
         }

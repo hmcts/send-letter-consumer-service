@@ -95,7 +95,7 @@ public class UpdateLetterStatusJobTest {
 
         // then
         verify(ftpClient, never()).deleteReport(anyString());
-        verify(sendLetterClient, never()).checkPrintStatus();
+        verify(sendLetterClient).checkPrintStatus();
     }
 
     @Test
