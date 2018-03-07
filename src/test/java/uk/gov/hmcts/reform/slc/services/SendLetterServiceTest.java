@@ -79,18 +79,8 @@ public class SendLetterServiceTest {
         IMessage msg1 = mock(IMessage.class);
         IMessage msg2 = mock(IMessage.class);
 
-
-        Letter smokeTestLetter = new Letter(
-            UUID.randomUUID(),
-            singletonList(
-                new Document("template", emptyMap())
-            ),
-            "smoke_test",
-            "cmc"
-        );
-
-        given(letterMapper.from(msg1)).willReturn(smokeTestLetter);
-        given(letterMapper.from(msg2)).willReturn(sampleLetter());
+        given(letterMapper.from(msg1)).willReturn(sampleLetterOfType(SendLetterService.SMOKE_TEST_LETTER_TYPE));
+        given(letterMapper.from(msg2)).willReturn(sampleLetterOfType("some_random_type"));
 
         service.send(msg1);
         verify(ftpClient).upload(any(), eq(true));
@@ -100,12 +90,16 @@ public class SendLetterServiceTest {
     }
 
     private Letter sampleLetter() {
+        return sampleLetterOfType("some_type");
+    }
+
+    private Letter sampleLetterOfType(String type) {
         return new Letter(
             UUID.randomUUID(),
             singletonList(
                 new Document("template", emptyMap())
             ),
-            "some_type",
+            type,
             "cmc"
         );
     }

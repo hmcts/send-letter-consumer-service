@@ -18,6 +18,7 @@ import static uk.gov.hmcts.reform.slc.services.servicebus.MessageHandlingResult.
 
 @Service
 public class SendLetterService {
+    public static String SMOKE_TEST_LETTER_TYPE = "smoke_test";
 
     private static final Logger logger = LoggerFactory.getLogger(SendLetterService.class);
 
@@ -67,6 +68,6 @@ public class SendLetterService {
     }
 
     private boolean isSmokeTest(Letter letter) {
-        return Objects.equals(letter.type, "smoke_test");
+        return Objects.equals(letter.type, SMOKE_TEST_LETTER_TYPE);
     }
 }
