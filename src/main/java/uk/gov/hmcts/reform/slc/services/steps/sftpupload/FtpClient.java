@@ -52,8 +52,8 @@ public class FtpClient {
         runWith(sftp -> {
             try {
                 String folder = isSmokeTest
-                    ? configProperties.getTargetFolder()
-                    : configProperties.getSmokeTestTargetFolder();
+                    ? configProperties.getSmokeTestTargetFolder()
+                    : configProperties.getTargetFolder();
 
                 String path = String.join("/", folder, pdfDoc.filename);
                 sftp.getFileTransfer().upload(pdfDoc, path);

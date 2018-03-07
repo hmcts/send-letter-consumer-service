@@ -191,7 +191,7 @@ public class FtpClientTest {
 
         client.upload(
             new PdfDoc("hello.pdf", "hello".getBytes()),
-            false
+            true
         );
 
         verify(sftpFileTransfer)
@@ -208,7 +208,7 @@ public class FtpClientTest {
 
         client.upload(
             new PdfDoc("hello.pdf", "hello".getBytes()),
-            true
+            false
         );
 
         verify(sftpFileTransfer)
