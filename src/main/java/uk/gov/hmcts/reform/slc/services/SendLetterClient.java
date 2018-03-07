@@ -95,7 +95,7 @@ public class SendLetterClient {
 
     public void checkPrintStatus() {
         try {
-            restTemplatePost(letterReportsUrl + "print-status-check", null);
+            callRestTemplate(letterReportsUrl + "print-status-check", HttpMethod.POST, null);
         } catch (RestClientException exception) {
             logger.error("Exception occurred while triggering print status check", exception);
         }
@@ -127,10 +127,6 @@ public class SendLetterClient {
         HttpEntity<Object> entity = new HttpEntity<>(body, headers);
 
         restTemplate.exchange(url, method, entity, Void.class);
-    }
-
-    private void restTemplatePost(String url, Object body) {
-        callRestTemplate(url, HttpMethod.POST, body);
     }
 
     private void restTemplatePut(String url, Object body) {
