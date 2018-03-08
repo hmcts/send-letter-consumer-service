@@ -50,6 +50,10 @@ variable "ftp_target_folder" {
   default = "TO_XEROX"
 }
 
+variable "ftp_smoke_test_target_folder" {
+  default = "SMOKE_TEST"
+}
+
 variable "ftp_reports_folder" {
   default = "FROM_XEROX"
 }
