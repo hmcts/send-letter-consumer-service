@@ -26,6 +26,11 @@ variable "s2s_name" {
   default = "sendletterconsumer"
 }
 
+variable s2s_url {
+  type = "string"
+  default = "http://betaDevBccidamS2SLB.reform.hmcts.net:80"
+}
+
 variable "service_bus_interval" {
   default = "30000"
 }
