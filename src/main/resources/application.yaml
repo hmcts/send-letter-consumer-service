@@ -24,7 +24,7 @@ ftp:
   target-folder: ${FTP_TARGET_FOLDER}
   smoke-test-target-folder: ${FTP_SMOKE_TEST_TARGET_FOLDER:SMOKE_TEST}
   reports-folder: ${FTP_REPORTS_FOLDER}
-  reports-cron: ${FTP_REPORTS_CRON:0 30 * * * *}
+  reports-cron: ${FTP_REPORTS_CRON:0 30 0 * * *}
   fingerprint: ${FTP_FINGERPRINT}
   username: ${FTP_USER}
   privateKey: ${FTP_PRIVATE_KEY}
