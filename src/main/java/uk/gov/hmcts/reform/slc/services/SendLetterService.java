@@ -18,7 +18,7 @@ import static uk.gov.hmcts.reform.slc.services.servicebus.MessageHandlingResult.
 
 @Service
 public class SendLetterService {
-    public static String SMOKE_TEST_LETTER_TYPE = "smoke_test";
+    public static final String SMOKE_TEST_LETTER_TYPE = "smoke_test";
 
     private static final Logger logger = LoggerFactory.getLogger(SendLetterService.class);
 
