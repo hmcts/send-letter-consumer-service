@@ -20,7 +20,7 @@ before_install:
 script:
   - ./gradlew build
   - ./gradlew test
-  - ./gradlew functional
+  - ./gradlew integration
 
 after_success:
   - ./gradlew jacocoTestReport
