@@ -23,7 +23,7 @@ variable "ilbIp" {}
 # region app config
 
 variable "s2s_name" {
-  default = "sendletterconsumer"
+  default = "send_letter_consumer"
 }
 
 variable "s2s_url" {
