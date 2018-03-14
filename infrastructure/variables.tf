@@ -27,7 +27,7 @@ variable "s2s_name" {
 }
 
 variable "s2s_url" {
-  default = "http://betadevbccidams2slb.reform.hmcts.net:80"
+  default = "http://betadevaccidams2slb.reform.hmcts.net:80"
 }
 
 variable "service_bus_interval" {
