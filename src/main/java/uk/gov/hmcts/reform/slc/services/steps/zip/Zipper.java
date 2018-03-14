@@ -18,11 +18,11 @@ public class Zipper {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-        ZipOutputStream zos = new ZipOutputStream(baos);
-        zos.putNextEntry(entry);
-        zos.write(input);
-        zos.closeEntry();
-        zos.close();
+        try (ZipOutputStream zos = new ZipOutputStream(baos)) {
+            zos.putNextEntry(entry);
+            zos.write(input);
+            zos.closeEntry();
+        }
 
         return baos.toByteArray();
     }
