@@ -46,7 +46,7 @@ public class Zipper {
             "%s_%s_%s_%s.zip",
             letter.type,
             letter.service,
-            now().format(ofPattern("yyyyMMddHHmmss")),
+            now().format(ofPattern("ddMMyyyyHHmmss")),
             letter.id
         );
     }
