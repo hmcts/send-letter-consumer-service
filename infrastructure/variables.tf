@@ -15,7 +15,7 @@ variable "env" {
 variable "vault_section" {
   type = "string"
   description = "Name of the environment-specific section in Vault key path, i.e. secret/{vault_section}/..."
-  default = "dev"
+  default = "test"
 }
 
 variable "ilbIp" {}
@@ -24,10 +24,6 @@ variable "ilbIp" {}
 
 variable "s2s_name" {
   default = "send_letter_consumer"
-}
-
-variable "s2s_url" {
-  default = "http://betadevaccidams2slb.reform.hmcts.net:80"
 }
 
 variable "service_bus_interval" {
