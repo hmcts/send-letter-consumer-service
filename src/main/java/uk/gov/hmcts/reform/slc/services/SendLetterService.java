@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.slc.services.steps.getpdf.PdfCreator;
 import uk.gov.hmcts.reform.slc.services.steps.getpdf.PdfDoc;
 import uk.gov.hmcts.reform.slc.services.steps.maptoletter.LetterMapper;
 import uk.gov.hmcts.reform.slc.services.steps.sftpupload.FtpClient;
+import uk.gov.hmcts.reform.slc.services.steps.zip.ZipFileNameHelper;
 import uk.gov.hmcts.reform.slc.services.steps.zip.ZippedDoc;
 import uk.gov.hmcts.reform.slc.services.steps.zip.Zipper;
 
@@ -51,7 +52,7 @@ public class SendLetterService {
             letter = letterMapper.from(msg);
             PdfDoc pdf = pdfCreator.create(letter);
             // TODO: encrypt & sign
-            ZippedDoc zippedDoc = zipper.zip(Zipper.generateName(letter), pdf);
+            ZippedDoc zippedDoc = zipper.zip(ZipFileNameHelper.generateName(letter), pdf);
             ftpClient.upload(zippedDoc, isSmokeTest(letter));
 
             //update producer with sent to print at time for reporting
