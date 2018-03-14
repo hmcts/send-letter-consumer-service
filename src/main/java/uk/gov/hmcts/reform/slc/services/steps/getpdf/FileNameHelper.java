@@ -13,10 +13,10 @@ public final class FileNameHelper {
 
     public static String extractId(String fileName) {
         String[] parts = FilenameUtils.removeExtension(fileName).split(SEPARATOR);
-        if (parts.length != 3) {
+        if (parts.length < 3) {
             throw new UnableToExtractIdFromFileNameException();
         } else {
-            return parts[2];
+            return parts[parts.length - 1];
         }
     }
 
