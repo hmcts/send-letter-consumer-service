@@ -13,8 +13,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.slc.config.FtpConfigProperties;
 import uk.gov.hmcts.reform.slc.logging.AppInsights;
-import uk.gov.hmcts.reform.slc.services.steps.getpdf.PdfDoc;
 import uk.gov.hmcts.reform.slc.services.steps.sftpupload.exceptions.FtpStepException;
+import uk.gov.hmcts.reform.slc.services.steps.zip.ZippedDoc;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -65,7 +65,7 @@ public class FtpClientTest {
         doThrow(IOException.class).when(sshClient).close();
 
         // when
-        Throwable exc = catchThrowable(() -> client.upload(new PdfDoc("hello.pdf", "hello".getBytes()), false));
+        Throwable exc = catchThrowable(() -> client.upload(sampleFileToUpload(), false));
 
         // then
         assertThat(exc).isNull();
@@ -79,7 +79,7 @@ public class FtpClientTest {
         doThrow(IOException.class).when(sftpFileTransfer).upload(any(LocalSourceFile.class), any());
 
         // when
-        Throwable exc = catchThrowable(() -> client.upload(new PdfDoc("hello.pdf", "hello".getBytes()), false));
+        Throwable exc = catchThrowable(() -> client.upload(sampleFileToUpload(), false));
 
         // then
         assertThat(exc)
@@ -145,7 +145,7 @@ public class FtpClientTest {
         doThrow(IOException.class).when(sshClient).newSFTPClient();
 
         // when
-        Throwable exc = catchThrowable(() -> client.upload(new PdfDoc("hello.pdf", "hello".getBytes()), false));
+        Throwable exc = catchThrowable(() -> client.upload(sampleFileToUpload(), false));
 
         // then
         assertThat(exc).isInstanceOf(FtpStepException.class);
@@ -189,10 +189,7 @@ public class FtpClientTest {
         given(configProperties.getSmokeTestTargetFolder()).willReturn("smoke");
         given(configProperties.getTargetFolder()).willReturn("target");
 
-        client.upload(
-            new PdfDoc("hello.pdf", "hello".getBytes()),
-            true
-        );
+        client.upload(sampleFileToUpload(), true);
 
         verify(sftpFileTransfer)
             .upload(
@@ -206,15 +203,16 @@ public class FtpClientTest {
         given(configProperties.getSmokeTestTargetFolder()).willReturn("smoke");
         given(configProperties.getTargetFolder()).willReturn("target");
 
-        client.upload(
-            new PdfDoc("hello.pdf", "hello".getBytes()),
-            false
-        );
+        client.upload(sampleFileToUpload(), false);
 
         verify(sftpFileTransfer)
             .upload(
                 any(LocalSourceFile.class),
                 contains("target")
             );
+    }
+
+    private ZippedDoc sampleFileToUpload() {
+        return new ZippedDoc("hello.zip", "hello".getBytes());
     }
 }
