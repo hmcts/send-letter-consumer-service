@@ -24,6 +24,7 @@ data "vault_generic_secret" "servicebus_conn_string" {
 
 locals {
   aseName = "${data.terraform_remote_state.core_apps_compute.ase_name[0]}"
+  s2s_url = "http://rpe-service-auth-provider-${var.env}.service.${local.aseName}.internal"
 }
 
 module "consumer" {
@@ -40,7 +41,7 @@ module "consumer" {
     PDF_SERVICE_URL = "http://cmc-pdf-service-${var.env}.service.${local.aseName}.internal"
 
     // s2s
-    S2S_URL     = "${var.s2s_url}"
+    S2S_URL     = "${local.s2s_url}"
     S2S_SECRET  = "${data.vault_generic_secret.s2s_secret.data["value"]}"
     S2S_NAME    = "${var.s2s_name}"
 
