@@ -4,6 +4,7 @@ import net.schmizz.sshj.SSHClient;
 import net.schmizz.sshj.sftp.RemoteResourceInfo;
 import net.schmizz.sshj.sftp.SFTPClient;
 import net.schmizz.sshj.sftp.SFTPFileTransfer;
+import net.schmizz.sshj.xfer.LocalSourceFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +12,6 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.slc.config.FtpConfigProperties;
 import uk.gov.hmcts.reform.slc.logging.AppInsights;
-import uk.gov.hmcts.reform.slc.services.steps.getpdf.PdfDoc;
 import uk.gov.hmcts.reform.slc.services.steps.sftpupload.exceptions.FtpStepException;
 
 import java.io.IOException;
@@ -46,7 +46,7 @@ public class FtpClient {
     }
     // endregion
 
-    public void upload(PdfDoc pdfDoc, boolean isSmokeTestDoc) {
+    public void upload(LocalSourceFile file, boolean isSmokeTestDoc) {
         Instant start = Instant.now();
 
         runWith(sftp -> {
@@ -55,8 +55,8 @@ public class FtpClient {
                     ? configProperties.getSmokeTestTargetFolder()
                     : configProperties.getTargetFolder();
 
-                String path = String.join("/", folder, pdfDoc.filename);
-                sftp.getFileTransfer().upload(pdfDoc, path);
+                String path = String.join("/", folder, file.getName());
+                sftp.getFileTransfer().upload(file, path);
                 insights.trackFtpUpload(Duration.between(start, Instant.now()), true);
 
                 return null;
@@ -65,7 +65,7 @@ public class FtpClient {
                 insights.trackFtpUpload(Duration.between(start, Instant.now()), false);
                 insights.trackException(exc);
 
-                throw new FtpStepException("Unable to upload PDF.", exc);
+                throw new FtpStepException("Unable to upload file.", exc);
             }
         });
     }
@@ -137,7 +137,7 @@ public class FtpClient {
         } catch (IOException exc) {
             insights.trackException(exc);
 
-            throw new FtpStepException("Unable to upload PDF.", exc);
+            throw new FtpStepException("Unable to upload file.", exc);
         } finally {
             try {
                 if (ssh != null) {

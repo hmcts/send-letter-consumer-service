@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.slc.services.steps.getpdf.PdfCreator;
 import uk.gov.hmcts.reform.slc.services.steps.getpdf.PdfDoc;
 import uk.gov.hmcts.reform.slc.services.steps.maptoletter.LetterMapper;
 import uk.gov.hmcts.reform.slc.services.steps.sftpupload.FtpClient;
+import uk.gov.hmcts.reform.slc.services.steps.zip.Zipper;
 
 import java.util.UUID;
 
@@ -33,6 +34,7 @@ public class SendLetterServiceTest {
 
     @Mock private LetterMapper letterMapper;
     @Mock private PdfCreator pdfCreator;
+    @Mock private Zipper zipper;
     @Mock private FtpClient ftpClient;
     @Mock private SendLetterClient sendLetterClient;
 
@@ -42,7 +44,7 @@ public class SendLetterServiceTest {
 
     @Before
     public void setUp() throws Exception {
-        service = new SendLetterService(letterMapper, pdfCreator, ftpClient, sendLetterClient);
+        service = new SendLetterService(letterMapper, pdfCreator, zipper, ftpClient, sendLetterClient);
     }
 
     @Test

@@ -10,6 +10,8 @@ import uk.gov.hmcts.reform.slc.services.steps.getpdf.PdfCreator;
 import uk.gov.hmcts.reform.slc.services.steps.getpdf.PdfDoc;
 import uk.gov.hmcts.reform.slc.services.steps.maptoletter.LetterMapper;
 import uk.gov.hmcts.reform.slc.services.steps.sftpupload.FtpClient;
+import uk.gov.hmcts.reform.slc.services.steps.zip.ZippedDoc;
+import uk.gov.hmcts.reform.slc.services.steps.zip.Zipper;
 
 import java.util.Objects;
 
@@ -24,17 +26,20 @@ public class SendLetterService {
 
     private final LetterMapper letterMapper;
     private final PdfCreator pdfCreator;
+    private final Zipper zipper;
     private final FtpClient ftpClient;
     private final SendLetterClient sendLetterClient;
 
     public SendLetterService(
         LetterMapper letterMapper,
         PdfCreator pdfCreator,
+        Zipper zipper,
         FtpClient ftpClient,
         SendLetterClient sendLetterClient
     ) {
         this.letterMapper = letterMapper;
         this.pdfCreator = pdfCreator;
+        this.zipper = zipper;
         this.ftpClient = ftpClient;
         this.sendLetterClient = sendLetterClient;
     }
@@ -46,7 +51,8 @@ public class SendLetterService {
             letter = letterMapper.from(msg);
             PdfDoc pdf = pdfCreator.create(letter);
             // TODO: encrypt & sign
-            ftpClient.upload(pdf, isSmokeTest(letter));
+            ZippedDoc zippedDoc = zipper.zip(Zipper.generateName(letter), pdf);
+            ftpClient.upload(zippedDoc, isSmokeTest(letter));
 
             //update producer with sent to print at time for reporting
             sendLetterClient.updateSentToPrintAt(letter.id);
