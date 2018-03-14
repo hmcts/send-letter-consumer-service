@@ -4,7 +4,9 @@ import org.junit.Test;
 import uk.gov.hmcts.reform.slc.model.Letter;
 import uk.gov.hmcts.reform.slc.services.steps.getpdf.PdfDoc;
 
+import java.io.ByteArrayInputStream;
 import java.util.regex.Pattern;
+import java.util.zip.ZipInputStream;
 
 import static com.google.common.io.Resources.getResource;
 import static com.google.common.io.Resources.toByteArray;
@@ -30,15 +32,21 @@ public class ZipperTest {
 
     @Test
     public void should_zip_file() throws Exception {
-        byte[] fileContent = toByteArray(getResource("single_page.pdf"));
+        byte[] fileContent = toByteArray(getResource("hello.pdf"));
+        byte[] expectedZipFileContent = toByteArray(getResource("hello.zip"));
 
-        ZippedDoc zippedDoc = new Zipper().zip(
+        ZippedDoc result = new Zipper().zip(
             "hello.zip",
-            new PdfDoc("single_page.pdf", fileContent)
+            new PdfDoc("hello.pdf", fileContent)
         );
 
-        assertThat(zippedDoc).isNotNull();
-        assertThat(zippedDoc.filename).isEqualTo("hello.zip");
-        assertThat(zippedDoc.content).isNotNull();
+        assertThat(result).isNotNull();
+        assertThat(result.filename).isEqualTo("hello.zip");
+        assertThat(asZip(result.content)).hasSameContentAs(asZip(expectedZipFileContent));
+
+    }
+
+    private ZipInputStream asZip(byte[] bytes) {
+        return new ZipInputStream(new ByteArrayInputStream(bytes));
     }
 }
