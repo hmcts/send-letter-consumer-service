@@ -23,8 +23,8 @@ data "vault_generic_secret" "servicebus_conn_string" {
 }
 
 locals {
-  aseName = "${data.terraform_remote_state.core_apps_compute.ase_name[0]}"
-  s2s_url = "http://rpe-service-auth-provider-${var.env}.service.${local.aseName}.internal"
+  ase_name = "${data.terraform_remote_state.core_apps_compute.ase_name[0]}"
+  s2s_url = "http://rpe-service-auth-provider-${var.env}.service.${local.ase_name}.internal"
 }
 
 module "consumer" {
@@ -38,7 +38,7 @@ module "consumer" {
   app_settings = {
 
     // pdf
-    PDF_SERVICE_URL = "http://cmc-pdf-service-${var.env}.service.${local.aseName}.internal"
+    PDF_SERVICE_URL = "http://cmc-pdf-service-${var.env}.service.${local.ase_name}.internal"
 
     // s2s
     S2S_URL     = "${local.s2s_url}"
@@ -58,7 +58,7 @@ module "consumer" {
     FTP_REPORTS_FOLDER        = "${var.ftp_reports_folder}"
     FTP_REPORTS_CRON          = "${var.ftp_reports_cron}"
     FTP_USER                  = "${data.vault_generic_secret.ftp_user.data["value"]}"
-    SEND_LETTER_PRODUCER_URL  = "http://send-letter-producer-${var.env}.service.${local.aseName}.internal"
+    SEND_LETTER_PRODUCER_URL  = "http://send-letter-producer-${var.env}.service.${local.ase_name}.internal"
     FTP_PRIVATE_KEY           = "${replace(data.vault_generic_secret.ftp_private_key.data["value"], "\\n", "\n")}"
     FTP_PUBLIC_KEY            = "${replace(data.vault_generic_secret.ftp_public_key.data["value"], "\\n", "\n")}"
   }
