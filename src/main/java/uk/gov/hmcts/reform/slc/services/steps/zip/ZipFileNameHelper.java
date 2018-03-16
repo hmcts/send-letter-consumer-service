@@ -12,7 +12,7 @@ public final class ZipFileNameHelper {
         return String.format(
             "%s_%s_%s_%s.zip",
             letter.type,
-            letter.service,
+            letter.service.replace("_", ""),
             now().format(ofPattern("ddMMyyyyHHmmss")),
             letter.id
         );
