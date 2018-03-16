@@ -8,7 +8,7 @@ public final class FileNameHelper {
     private static final String SEPARATOR = "_";
 
     public static String generateName(Letter letter, String extension) {
-        String serviceName = letter.service.replace("_", "");
+        String serviceName = letter.service.replace(SEPARATOR, "");
         return letter.type + SEPARATOR + serviceName + SEPARATOR + letter.id + "." + extension;
     }
 
