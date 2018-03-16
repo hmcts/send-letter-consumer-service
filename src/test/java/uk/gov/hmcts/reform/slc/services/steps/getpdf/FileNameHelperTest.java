@@ -66,6 +66,16 @@ public class FileNameHelperTest {
     }
 
     @Test
+    public void should_strip_out_underscores_from_service_name() {
+        UUID letterId = UUID.randomUUID();
+        Letter letter = createLetter(letterId, "typeA", "cmc_claim_store");
+
+        String result = FileNameHelper.generateName(letter, "pdf");
+
+        assertThat(result).isEqualTo("typeA_cmcclaimstore_" + letterId + ".pdf");
+    }
+
+    @Test
     public void should_extract_letter_id_from_file_name() {
         asList(
             createLetter(UUID.randomUUID(), "type", "cmc"),

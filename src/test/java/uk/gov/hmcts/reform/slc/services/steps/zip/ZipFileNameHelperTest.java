@@ -23,4 +23,16 @@ public class ZipFileNameHelperTest {
         assertThat(name)
             .matches(Pattern.compile("type_cmc_[0-9]{14}_" + letter.id + ".zip"));
     }
+
+    @Test
+    public void should_remove_underscores_from_service_name() {
+        // given
+        Letter letter = new Letter(randomUUID(), emptyList(), "type", "cmc_claim_store");
+
+        // when
+        String name = ZipFileNameHelper.generateName(letter);
+
+        // then
+        assertThat(name).contains("cmcclaimstore");
+    }
 }
