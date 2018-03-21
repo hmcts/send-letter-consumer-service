@@ -9,11 +9,9 @@ import uk.gov.hmcts.reform.slc.services.steps.sftpupload.FtpClient;
 import uk.gov.hmcts.reform.slc.services.steps.sftpupload.ParsedReport;
 import uk.gov.hmcts.reform.slc.services.steps.sftpupload.Report;
 
-import java.util.List;
 import java.util.Objects;
 
 import static java.time.LocalTime.now;
-import static java.util.stream.Collectors.toList;
 
 @Component
 public class UpdateLetterStatusJob {
@@ -48,17 +46,9 @@ public class UpdateLetterStatusJob {
                 .stream()
                 .map(this::tryParse)
                 .filter(Objects::nonNull)
-                .forEach(parsedReport -> {
-                    List<Boolean> successStatuses = parsedReport
-                        .statuses
-                        .stream()
-                        .map(this::trySendUpdate)
-                        .collect(toList());
-
-                    if (successStatuses.stream().allMatch(s -> s == true)) {
-                        ftpClient.deleteReport(parsedReport.path);
-                    }
-                });
+                .map(this::processReport)
+                .reduce(Boolean::logicalAnd)
+                .ifPresent(allSuccess -> sendLetterClient.checkPrintStatus());
         } else {
             logger.trace("FTP server not available, job cancelled");
         }
@@ -86,5 +76,20 @@ public class UpdateLetterStatusJob {
             logger.error("Error updating status for letter: " + letterStatus.id, exc);
             return false;
         }
+    }
+
+    private boolean processReport(ParsedReport report) {
+        boolean success = report
+            .statuses
+            .stream()
+            .map(this::trySendUpdate)
+            .reduce(Boolean::logicalAnd)
+            .orElse(true);
+
+        if (success) {
+            ftpClient.deleteReport(report.path);
+        }
+
+        return success;
     }
 }
