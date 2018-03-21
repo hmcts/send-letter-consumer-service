@@ -2,8 +2,12 @@ provider "vault" {
   address = "https://vault.reform.hmcts.net:6200"
 }
 
-data "vault_generic_secret" "s2s_secret" {
+data "vault_generic_secret" "consumer_s2s_secret" {
   path = "secret/${var.vault_section}/ccidam/service-auth-provider/api/microservice-keys/send-letter-consumer"
+}
+
+data "vault_generic_secret" "tests_s2s_secret" {
+  path = "secret/${var.vault_section}/ccidam/service-auth-provider/api/microservice-keys/send-letter-tests"
 }
 
 data "vault_generic_secret" "ftp_user" {
@@ -23,8 +27,12 @@ data "vault_generic_secret" "servicebus_conn_string" {
 }
 
 locals {
-  ase_name = "${data.terraform_remote_state.core_apps_compute.ase_name[0]}"
-  s2s_url = "http://rpe-service-auth-provider-${var.env}.service.${local.ase_name}.internal"
+  ase_name        = "${data.terraform_remote_state.core_apps_compute.ase_name[0]}"
+  s2s_url         = "http://rpe-service-auth-provider-${var.env}.service.${local.ase_name}.internal"
+  producer_url    = "http://send-letter-producer-${var.env}.service.${local.ase_name}.internal"
+  ftp_private_key = "${replace(data.vault_generic_secret.ftp_private_key.data["value"], "\\n", "\n")}"
+  ftp_public_key  = "${replace(data.vault_generic_secret.ftp_public_key.data["value"], "\\n", "\n")}"
+  ftp_user        = "${data.vault_generic_secret.ftp_user.data["value"]}"
 }
 
 module "consumer" {
@@ -43,7 +51,7 @@ module "consumer" {
 
     // s2s
     S2S_URL     = "${local.s2s_url}"
-    S2S_SECRET  = "${data.vault_generic_secret.s2s_secret.data["value"]}"
+    S2S_SECRET  = "${data.vault_generic_secret.consumer_s2s_secret.data["value"]}"
     S2S_NAME    = "${var.s2s_name}"
 
     // azure service bus
@@ -58,10 +66,10 @@ module "consumer" {
     FTP_SMOKE_TEST_TARGET_FOLDER = "${var.ftp_smoke_test_target_folder}"
     FTP_REPORTS_FOLDER        = "${var.ftp_reports_folder}"
     FTP_REPORTS_CRON          = "${var.ftp_reports_cron}"
-    FTP_USER                  = "${data.vault_generic_secret.ftp_user.data["value"]}"
+    FTP_USER                  = "${local.ftp_user}"
     SEND_LETTER_PRODUCER_URL  = "http://send-letter-producer-${var.env}.service.${local.ase_name}.internal"
-    FTP_PRIVATE_KEY           = "${replace(data.vault_generic_secret.ftp_private_key.data["value"], "\\n", "\n")}"
-    FTP_PUBLIC_KEY            = "${replace(data.vault_generic_secret.ftp_public_key.data["value"], "\\n", "\n")}"
+    FTP_PRIVATE_KEY           = "${local.ftp_private_key}"
+    FTP_PUBLIC_KEY            = "${local.ftp_public_key}"
   }
 }
 
