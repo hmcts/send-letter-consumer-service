@@ -8,15 +8,16 @@ public final class FileNameHelper {
     private static final String SEPARATOR = "_";
 
     public static String generateName(Letter letter, String extension) {
-        return letter.type + SEPARATOR + letter.service + SEPARATOR + letter.id + "." + extension;
+        String serviceName = letter.service.replace(SEPARATOR, "");
+        return letter.type + SEPARATOR + serviceName + SEPARATOR + letter.id + "." + extension;
     }
 
     public static String extractId(String fileName) {
         String[] parts = FilenameUtils.removeExtension(fileName).split(SEPARATOR);
-        if (parts.length != 3) {
+        if (parts.length < 3) {
             throw new UnableToExtractIdFromFileNameException();
         } else {
-            return parts[2];
+            return parts[parts.length - 1];
         }
     }
 

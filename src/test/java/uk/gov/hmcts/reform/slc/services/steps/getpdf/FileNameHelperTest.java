@@ -5,6 +5,7 @@ import uk.gov.hmcts.reform.slc.model.Letter;
 
 import java.util.UUID;
 
+import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -65,13 +66,29 @@ public class FileNameHelperTest {
     }
 
     @Test
+    public void should_strip_out_underscores_from_service_name() {
+        UUID letterId = UUID.randomUUID();
+        Letter letter = createLetter(letterId, "typeA", "cmc_claim_store");
+
+        String result = FileNameHelper.generateName(letter, "pdf");
+
+        assertThat(result).isEqualTo("typeA_cmcclaimstore_" + letterId + ".pdf");
+    }
+
+    @Test
     public void should_extract_letter_id_from_file_name() {
-        Letter letter = createLetter(UUID.randomUUID(), "type", "cmc");
-        String name = FileNameHelper.generateName(letter, "pdf");
+        asList(
+            createLetter(UUID.randomUUID(), "type", "cmc"),
+            createLetter(UUID.randomUUID(), "smoke_test", "cmc"),
+            createLetter(UUID.randomUUID(), "type", "my_service_"),
+            createLetter(UUID.randomUUID(), "some_type", "my_service")
+        ).forEach(letter -> {
+            String name = FileNameHelper.generateName(letter, "pdf");
 
-        String extractedId = FileNameHelper.extractId(name);
+            String extractedId = FileNameHelper.extractId(name);
 
-        assertThat(extractedId).isEqualTo(letter.id.toString());
+            assertThat(extractedId).isEqualTo(letter.id.toString());
+        });
     }
 
     @Test

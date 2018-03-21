@@ -15,7 +15,7 @@ variable "env" {
 variable "vault_section" {
   type = "string"
   description = "Name of the environment-specific section in Vault key path, i.e. secret/{vault_section}/..."
-  default = "dev"
+  default = "test"
 }
 
 variable "ilbIp" {}
@@ -23,7 +23,7 @@ variable "ilbIp" {}
 # region app config
 
 variable "s2s_name" {
-  default = "sendletterconsumer"
+  default = "send_letter_consumer"
 }
 
 variable "service_bus_interval" {
@@ -44,6 +44,10 @@ variable "ftp_fingerprint" {
 
 variable "ftp_target_folder" {
   default = "TO_XEROX"
+}
+
+variable "ftp_smoke_test_target_folder" {
+  default = "SMOKE_TEST"
 }
 
 variable "ftp_reports_folder" {

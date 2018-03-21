@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.slc.services.steps.getpdf.PdfCreator;
 import uk.gov.hmcts.reform.slc.services.steps.getpdf.PdfDoc;
 import uk.gov.hmcts.reform.slc.services.steps.maptoletter.LetterMapper;
 import uk.gov.hmcts.reform.slc.services.steps.sftpupload.FtpClient;
+import uk.gov.hmcts.reform.slc.services.steps.zip.Zipper;
 
 import java.util.UUID;
 
@@ -22,6 +23,9 @@ import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.reform.slc.services.servicebus.MessageHandlingResult.FAILURE;
 import static uk.gov.hmcts.reform.slc.services.servicebus.MessageHandlingResult.SUCCESS;
 
@@ -30,6 +34,7 @@ public class SendLetterServiceTest {
 
     @Mock private LetterMapper letterMapper;
     @Mock private PdfCreator pdfCreator;
+    @Mock private Zipper zipper;
     @Mock private FtpClient ftpClient;
     @Mock private SendLetterClient sendLetterClient;
 
@@ -39,7 +44,7 @@ public class SendLetterServiceTest {
 
     @Before
     public void setUp() throws Exception {
-        service = new SendLetterService(letterMapper, pdfCreator, ftpClient, sendLetterClient);
+        service = new SendLetterService(letterMapper, pdfCreator, zipper, ftpClient, sendLetterClient);
     }
 
     @Test
@@ -70,13 +75,33 @@ public class SendLetterServiceTest {
         assertThat(result).isEqualTo(FAILURE);
     }
 
+    @Test
+    public void should_handle_smoke_test_letters() {
+
+        IMessage smokeTestMsg = mock(IMessage.class);
+        IMessage regularMsg = mock(IMessage.class);
+
+        given(letterMapper.from(smokeTestMsg)).willReturn(sampleLetterOfType(SendLetterService.SMOKE_TEST_LETTER_TYPE));
+        given(letterMapper.from(regularMsg)).willReturn(sampleLetterOfType("some_random_type"));
+
+        service.send(smokeTestMsg);
+        verify(ftpClient).upload(any(), eq(true));
+
+        service.send(regularMsg);
+        verify(ftpClient).upload(any(), eq(false));
+    }
+
     private Letter sampleLetter() {
+        return sampleLetterOfType("some_type");
+    }
+
+    private Letter sampleLetterOfType(String type) {
         return new Letter(
             UUID.randomUUID(),
             singletonList(
                 new Document("template", emptyMap())
             ),
-            "some_type",
+            type,
             "cmc"
         );
     }

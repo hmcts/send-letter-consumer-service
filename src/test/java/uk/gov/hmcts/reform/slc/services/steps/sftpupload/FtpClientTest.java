@@ -13,8 +13,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.slc.config.FtpConfigProperties;
 import uk.gov.hmcts.reform.slc.logging.AppInsights;
-import uk.gov.hmcts.reform.slc.services.steps.getpdf.PdfDoc;
 import uk.gov.hmcts.reform.slc.services.steps.sftpupload.exceptions.FtpStepException;
+import uk.gov.hmcts.reform.slc.services.steps.zip.ZippedDoc;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -27,6 +27,7 @@ import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.contains;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -64,7 +65,7 @@ public class FtpClientTest {
         doThrow(IOException.class).when(sshClient).close();
 
         // when
-        Throwable exc = catchThrowable(() -> client.upload(new PdfDoc("hello.pdf", "hello".getBytes())));
+        Throwable exc = catchThrowable(() -> client.upload(sampleFileToUpload(), false));
 
         // then
         assertThat(exc).isNull();
@@ -78,7 +79,7 @@ public class FtpClientTest {
         doThrow(IOException.class).when(sftpFileTransfer).upload(any(LocalSourceFile.class), any());
 
         // when
-        Throwable exc = catchThrowable(() -> client.upload(new PdfDoc("hello.pdf", "hello".getBytes())));
+        Throwable exc = catchThrowable(() -> client.upload(sampleFileToUpload(), false));
 
         // then
         assertThat(exc)
@@ -144,7 +145,7 @@ public class FtpClientTest {
         doThrow(IOException.class).when(sshClient).newSFTPClient();
 
         // when
-        Throwable exc = catchThrowable(() -> client.upload(new PdfDoc("hello.pdf", "hello".getBytes())));
+        Throwable exc = catchThrowable(() -> client.upload(sampleFileToUpload(), false));
 
         // then
         assertThat(exc).isInstanceOf(FtpStepException.class);
@@ -181,5 +182,37 @@ public class FtpClientTest {
         assertThat(exc)
             .isInstanceOf(FtpStepException.class)
             .hasMessageContaining("Error while deleting report");
+    }
+
+    @Test
+    public void should_upload_to_special_folder_if_letter_is_a_smoke_test_letter() throws Exception {
+        given(configProperties.getSmokeTestTargetFolder()).willReturn("smoke");
+        given(configProperties.getTargetFolder()).willReturn("target");
+
+        client.upload(sampleFileToUpload(), true);
+
+        verify(sftpFileTransfer)
+            .upload(
+                any(LocalSourceFile.class),
+                contains("smoke")
+            );
+    }
+
+    @Test
+    public void should_upload_to_target_folder_if_letter_is_not_a_smoke_test_letter() throws Exception {
+        given(configProperties.getSmokeTestTargetFolder()).willReturn("smoke");
+        given(configProperties.getTargetFolder()).willReturn("target");
+
+        client.upload(sampleFileToUpload(), false);
+
+        verify(sftpFileTransfer)
+            .upload(
+                any(LocalSourceFile.class),
+                contains("target")
+            );
+    }
+
+    private ZippedDoc sampleFileToUpload() {
+        return new ZippedDoc("hello.zip", "hello".getBytes());
     }
 }
