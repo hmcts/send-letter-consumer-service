@@ -8,25 +8,25 @@ print_help() {
   ./run-in-docker.sh [OPTIONS]
 
   Options:
-    --clean, -c                   Clean and install current state of source code
-    --install, -i                 Install current state of source code
-    --param PARAM=, -p PARAM=     Parse script parameter
-    --help, -h                    Print this help block
+    --clean, -c                     Clean and install current state of source code
+    --install, -i                   Install current state of source code
+    --param PARAM=, -p PARAM=       Parse script parameter
+    --help, -h                      Print this help block
 
   Available parameters:
-    APPLICATION_INSIGHTS_IKEY     Defaults to '00000000-0000-0000-0000-000000000000'
-    FTP_FINGERPRINT               Defaults to 'fingerprint'
-    FTP_HOSTNAME                  Defaults to 'hostname'
-    FTP_PORT                      Defaults to '22'
-    FTP_PRIVATE_KEY               Defaults to 'private'
-    FTP_PUBLIC_KEY                Defaults to 'public'
-    FTP_REPORTS_FOLDER            Defaults to '/reports/'
-    FTP_TARGET_FOLDER             Defaults to '/target/'
-    FTP_USER                      Defaults to 'user'
-    PDF_SERVICE_URL               Defaults to 'http://localhost:5500'
-    S2S_SECRET                    Defaults to 'secret'
-    S2S_URL                       Defaults to 'false' - disables health check
-    SEND_LETTER_PRODUCER_URL      Defaults to 'http://localhost:8485'
+    APPINSIGHTS_INSTRUMENTATIONKEY  Defaults to '00000000-0000-0000-0000-000000000000'
+    FTP_FINGERPRINT                 Defaults to 'fingerprint'
+    FTP_HOSTNAME                    Defaults to 'hostname'
+    FTP_PORT                        Defaults to '22'
+    FTP_PRIVATE_KEY                 Defaults to 'private'
+    FTP_PUBLIC_KEY                  Defaults to 'public'
+    FTP_REPORTS_FOLDER              Defaults to '/reports/'
+    FTP_TARGET_FOLDER               Defaults to '/target/'
+    FTP_USER                        Defaults to 'user'
+    PDF_SERVICE_URL                 Defaults to 'http://localhost:5500'
+    S2S_SECRET                      Defaults to 'secret'
+    S2S_URL                         Defaults to 'false' - disables health check
+    SEND_LETTER_PRODUCER_URL        Defaults to 'http://localhost:8485'
   "
 }
 
@@ -35,7 +35,7 @@ GRADLE_CLEAN=false
 GRADLE_INSTALL=false
 
 # environment variables
-APPLICATION_INSIGHTS_IKEY="00000000-0000-0000-0000-000000000000"
+APPINSIGHTS_INSTRUMENTATIONKEY="00000000-0000-0000-0000-000000000000"
 FTP_FINGERPRINT="fingerprint"
 FTP_HOSTNAME="hostname"
 FTP_PORT=22
@@ -66,7 +66,7 @@ execute_script() {
 
   echo "Assigning environment variables.."
 
-  export APPLICATION_INSIGHTS_IKEY=${APPLICATION_INSIGHTS_IKEY}
+  export APPINSIGHTS_INSTRUMENTATIONKEY=${APPINSIGHTS_INSTRUMENTATIONKEY}
   export FTP_FINGERPRINT=${FTP_FINGERPRINT}
   export FTP_HOSTNAME=${FTP_HOSTNAME}
   export FTP_PORT=${FTP_PORT}
@@ -92,7 +92,7 @@ while true ; do
     -i|--install) GRADLE_INSTALL=true ; shift ;;
     -p|--param)
       case "$2" in
-        APPLICATION_INSIGHTS_IKEY=*) APPLICATION_INSIGHTS_IKEY="${2#*=}" ; shift 2 ;;
+        APPINSIGHTS_INSTRUMENTATIONKEY=*) APPINSIGHTS_INSTRUMENTATIONKEY="${2#*=}" ; shift 2 ;;
         FTP_FINGERPRINT=*) FTP_FINGERPRINT="${2#*=}" ; shift 2 ;;
         FTP_HOSTNAME=*) FTP_HOSTNAME="${2#*=}" ; shift 2 ;;
         FTP_PORT=*) FTP_PORT="${2#*=}" ; shift 2 ;;
