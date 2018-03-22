@@ -34,6 +34,7 @@ public class SendLetterClient {
     private final RestTemplate restTemplate;
     private final String healthUrl;
     private final String lettersUrl;
+    private final String letterReportsUrl;
     private final Supplier<ZonedDateTime> currentDateTimeSupplier;
     private final AuthTokenGenerator authTokenGenerator;
 
@@ -48,6 +49,7 @@ public class SendLetterClient {
         this.restTemplate = restTemplate;
         this.healthUrl = appendedUrl + "health";
         this.lettersUrl = appendedUrl + "letters/";
+        this.letterReportsUrl = appendedUrl + "letter-reports/";
         this.currentDateTimeSupplier = currentDateTimeSupplier;
         this.authTokenGenerator = authTokenGenerator;
     }
@@ -91,6 +93,14 @@ public class SendLetterClient {
         }
     }
 
+    public void checkPrintStatus() {
+        try {
+            callRestTemplate(letterReportsUrl + "print-status-check", HttpMethod.POST, null);
+        } catch (RestClientException exception) {
+            logger.error("Exception occurred while triggering print status check", exception);
+        }
+    }
+
     /**
      * Calls the Send Letter Producer service healthcheck.
      *
@@ -109,13 +119,17 @@ public class SendLetterClient {
         }
     }
 
-    private void restTemplatePut(String url, Object body) {
+    private void callRestTemplate(String url, HttpMethod method, Object body) {
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_UTF8_VALUE);
         headers.add(AUTHORIZATION_HEADER, authTokenGenerator.generate());
 
         HttpEntity<Object> entity = new HttpEntity<>(body, headers);
 
-        restTemplate.exchange(url, HttpMethod.PUT, entity, Void.class);
+        restTemplate.exchange(url, method, entity, Void.class);
+    }
+
+    private void restTemplatePut(String url, Object body) {
+        callRestTemplate(url, HttpMethod.PUT, body);
     }
 }
