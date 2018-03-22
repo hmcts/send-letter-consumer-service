@@ -37,6 +37,7 @@ module "consumer" {
 
   app_settings = {
 
+    BUG_FORCE_POWER = "Force terraform to apply delete me if you see this"
     // pdf
     PDF_SERVICE_URL = "http://cmc-pdf-service-${var.env}.service.${local.ase_name}.internal"
 
