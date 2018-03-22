@@ -183,4 +183,8 @@ dependencies {
 
 jar {
   archiveName 'send-letter-consumer-service.jar'
+
+  manifest {
+    attributes('Implementation-Version': project.version.toString())
+  }
 }
