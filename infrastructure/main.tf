@@ -2,8 +2,12 @@ provider "vault" {
   address = "https://vault.reform.hmcts.net:6200"
 }
 
-data "vault_generic_secret" "s2s_secret" {
+data "vault_generic_secret" "consumer_s2s_secret" {
   path = "secret/${var.vault_section}/ccidam/service-auth-provider/api/microservice-keys/send-letter-consumer"
+}
+
+data "vault_generic_secret" "tests_s2s_secret" {
+  path = "secret/${var.vault_section}/ccidam/service-auth-provider/api/microservice-keys/send-letter-tests"
 }
 
 data "vault_generic_secret" "ftp_user" {
@@ -25,6 +29,7 @@ data "vault_generic_secret" "servicebus_conn_string" {
 locals {
   ase_name = "${data.terraform_remote_state.core_apps_compute.ase_name[0]}"
   s2s_url = "http://rpe-service-auth-provider-${var.env}.service.${local.ase_name}.internal"
+  producer_url = "http://send-letter-producer-${var.env}.service.${local.ase_name}.internal"
 }
 
 module "consumer" {
@@ -42,7 +47,7 @@ module "consumer" {
 
     // s2s
     S2S_URL     = "${local.s2s_url}"
-    S2S_SECRET  = "${data.vault_generic_secret.s2s_secret.data["value"]}"
+    S2S_SECRET  = "${data.vault_generic_secret.consumer_s2s_secret.data["value"]}"
     S2S_NAME    = "${var.s2s_name}"
 
     // azure service bus
@@ -63,3 +68,40 @@ module "consumer" {
     FTP_PUBLIC_KEY            = "${replace(data.vault_generic_secret.ftp_public_key.data["value"], "\\n", "\n")}"
   }
 }
+
+module "key-vault" {
+  source              = "git@github.com:contino/moj-module-key-vault?ref=master"
+  product             = "${var.product}-consumer"
+  env                 = "${var.env}"
+  tenant_id           = "${var.tenant_id}"
+  object_id           = "${var.jenkins_AAD_objectId}"
+  resource_group_name = "${module.consumer.resource_group_name}"
+  # dcd_cc-dev group object ID
+  product_group_object_id = "38f9dea6-e861-4a50-9e73-21e64f563537"
+}
+
+# region smoke test config
+resource "azurerm_key_vault_secret" "s2s-url" {
+  name      = "s2s-url"
+  value     = "${local.s2s_url}"
+  vault_uri = "${module.key-vault.key_vault_uri}"
+}
+
+resource "azurerm_key_vault_secret" "test-s2s-name" {
+  name      = "test-s2s-name"
+  value     = "send_letter_tests"
+  vault_uri = "${module.key-vault.key_vault_uri}"
+}
+
+resource "azurerm_key_vault_secret" "test-s2s-secret" {
+  name      = "test-s2s-secret"
+  value     = "${data.vault_generic_secret.tests_s2s_secret.data["value"]}"
+  vault_uri = "${module.key-vault.key_vault_uri}"
+}
+
+resource "azurerm_key_vault_secret" "producer-url" {
+  name      = "send-letter-producer-url"
+  value     = "${local.producer_url}"
+  vault_uri = "${module.key-vault.key_vault_uri}"
+}
+# endregion
