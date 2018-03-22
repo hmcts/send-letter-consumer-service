@@ -25,6 +25,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static uk.gov.hmcts.reform.slc.services.servicebus.MessageHandlingResult.FAILURE;
@@ -52,7 +53,7 @@ public class MessageProcessorTest {
     public void should_complete_message_if_passed_function_returns_success() throws Exception {
         // given
         given(sendLetterService.send(any())).willReturn(SUCCESS);
-        given(messageReceiver.receive()).willReturn(message);
+        given(messageReceiver.receive()).willReturn(message).willReturn(null);
         given(message.getEnqueuedTimeUtc()).willReturn(Instant.now().minusSeconds(100));
 
         // when
@@ -71,7 +72,7 @@ public class MessageProcessorTest {
     public void should_send_message_to_deadletter_if_passed_function_returns_failure() throws Exception {
         // given
         given(sendLetterService.send(any())).willReturn(FAILURE);
-        given(messageReceiver.receive()).willReturn(message);
+        given(messageReceiver.receive()).willReturn(message).willReturn(null);
         given(message.getEnqueuedTimeUtc()).willReturn(Instant.now().minusSeconds(100));
 
         // when
@@ -83,6 +84,26 @@ public class MessageProcessorTest {
         verify(insights).trackMessageReceived(anyString(), any(Duration.class));
         verify(insights).markMessageNotHandled(anyString(), any(Duration.class));
         verify(insights).trackMessageDeadLetteredInServiceBus(any(Duration.class), eq(true));
+        verifyNoMoreInteractions(insights);
+    }
+
+    @Test
+    public void should_process_all_messages_from_queue() throws Exception {
+        // given
+        given(sendLetterService.send(any())).willReturn(SUCCESS);
+        given(messageReceiver.receive()).willReturn(message, message, message, null);
+        given(message.getEnqueuedTimeUtc()).willReturn(Instant.now().minusSeconds(100));
+
+        // when
+        processor.process();
+
+        // then
+        int numberOfMessages = 3;
+        verify(messageReceiver, times(numberOfMessages)).complete(any());
+        verify(insights, times(numberOfMessages)).trackMessageReceivedFromServiceBus(any(), eq(true));
+        verify(insights, times(numberOfMessages)).trackMessageReceived(anyString(), any());
+        verify(insights, times(numberOfMessages)).markMessageHandled(anyString(), any());
+        verify(insights, times(numberOfMessages)).trackMessageCompletedInServiceBus(any(), eq(true));
         verifyNoMoreInteractions(insights);
     }
 
@@ -106,27 +127,6 @@ public class MessageProcessorTest {
         ReflectionTestUtils.setField(processor, "insights", insights);
 
         doThrow(ConnectionException.class).when(receiverProvider).get();
-
-        //when
-        Throwable exception = catchThrowable(() -> {
-            processor.process();
-        });
-
-        //then
-        assertThat(exception).isNull();
-
-        verify(insights).trackException(any(ConnectionException.class));
-        verify(sendLetterService, never()).send(any());
-        verifyNoMoreInteractions(insights);
-    }
-
-    @Test
-    public void should_not_process_message_when_servicebus_exception_is_thrown_on_acquiring_sb_queue_connection() {
-        //given
-        processor = new MessageProcessor(receiverProvider, sendLetterService);
-        ReflectionTestUtils.setField(processor, "insights", insights);
-
-        doThrow(ServiceBusException.class).when(receiverProvider).get();
 
         //when
         Throwable exception = catchThrowable(() -> {

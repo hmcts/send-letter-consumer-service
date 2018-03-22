@@ -34,29 +34,38 @@ public class MessageProcessor {
     }
 
     public void process() {
+        logger.info("Processing messages from the queue...");
+
+        IMessageReceiver messageReceiver = null;
+
         try {
-            IMessageReceiver messageReceiver = receiverProvider.get();
-            Instant receiveStartTime = Instant.now();
+            messageReceiver = receiverProvider.get();
+            IMessage message = receiveMessage(messageReceiver);
 
-            processNextMessage(messageReceiver, receiveStartTime);
+            while (message != null) {
+                sendLetter(messageReceiver, message);
+                message = receiveMessage(messageReceiver);
+            }
 
-            messageReceiver.close();
-
+            logger.info("Finished processing queue");
         } catch (ConnectionException e) {
             insights.trackException(e);
-
             logger.error("Unable to connect to Service Bus", e);
-        } catch (ServiceBusException e) {
-            insights.trackException(e);
-
-            logger.error("Error closing connection");
+        } finally {
+            if (messageReceiver != null) {
+                try {
+                    messageReceiver.close();
+                } catch (ServiceBusException e) {
+                    insights.trackException(e);
+                    logger.error("Error closing connection", e);
+                }
+            }
         }
     }
 
-    private void processNextMessage(
-        IMessageReceiver messageReceiver,
-        Instant receiveStartTime
-    ) {
+    private IMessage receiveMessage(IMessageReceiver messageReceiver) {
+        Instant receiveStartTime = Instant.now();
+
         try {
             IMessage message = messageReceiver.receive();
 
@@ -67,17 +76,18 @@ public class MessageProcessor {
 
                 insights.trackMessageReceivedFromServiceBus(tookReceiving, true);
                 insights.trackMessageReceived(messageId, timeInQueue);
-
-                sendLetter(messageReceiver, message);
             } else {
-                logger.trace("No messages to process");
+                logger.info("No messages to process");
             }
+
+            return message;
         } catch (InterruptedException | ServiceBusException e) {
+            // TODO: change the event to "MessageReceivingFailed"
             Duration tookReceiving = Duration.between(receiveStartTime, Instant.now());
             insights.trackMessageReceivedFromServiceBus(tookReceiving, false);
             insights.trackException(e);
-
             logger.error("Unable to read message from queue", e);
+            return null;
         }
     }
 
