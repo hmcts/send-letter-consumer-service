@@ -173,6 +173,10 @@ dependencies {
 
   testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: versions.springBoot
 
+  functionalTestCompile sourceSets.main.runtimeClasspath
+  functionalTestCompile group: 'io.rest-assured', name: 'rest-assured', version: '3.0.7'
+  functionalTestCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: versions.springBoot
+
   integrationTestCompile sourceSets.main.runtimeClasspath
   integrationTestCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: versions.springBoot
 
