@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.slc.services.steps.sftpupload;
 
 import net.schmizz.sshj.SSHClient;
-import net.schmizz.sshj.sftp.RemoteResourceInfo;
 import net.schmizz.sshj.sftp.SFTPClient;
 import net.schmizz.sshj.sftp.SFTPFileTransfer;
 import net.schmizz.sshj.xfer.LocalSourceFile;
@@ -18,6 +17,7 @@ import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
+import java.util.Locale;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -80,7 +80,8 @@ public class FtpClient {
 
                 return sftp.ls(configProperties.getReportsFolder())
                     .stream()
-                    .filter(RemoteResourceInfo::isRegularFile)
+                    .filter(f -> f.isRegularFile())
+                    .filter(f -> f.getName().toLowerCase(Locale.getDefault()).endsWith(".csv"))
                     .map(file -> {
                         InMemoryDownloadedFile inMemoryFile = new InMemoryDownloadedFile();
                         try {
