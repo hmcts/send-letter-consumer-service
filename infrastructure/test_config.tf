@@ -44,7 +44,7 @@ resource "azurerm_key_vault_secret" "ftp-fingerprint-for-tests" {
 
 resource "azurerm_key_vault_secret" "ftp-target-folder-for-tests" {
   name      = "ftp-target-folder-for-tests"
-  value     = "${var.ftp_target_folder}"
+  value     = "${var.ftp_smoke_test_target_folder}"
   vault_uri = "${module.key-vault.key_vault_uri}"
 }
 
