@@ -95,6 +95,8 @@ public class FtpClientTest {
         // given
         RemoteResourceInfo rri = mock(RemoteResourceInfo.class);
         given(rri.isRegularFile()).willReturn(true);
+        given(rri.getName()).willReturn("test-report.csv");
+
         given(sftpClient.ls(anyString()))
             .willReturn(singletonList(rri));
 
@@ -124,6 +126,24 @@ public class FtpClientTest {
             .isInstanceOf(FtpStepException.class)
             .hasMessageContaining("Error while downloading reports");
     }
+
+    @Test
+    public void download_should_not_include_non_csv_files() throws Exception {
+        // given
+        RemoteResourceInfo nonCsvFile = mock(RemoteResourceInfo.class);
+        given(nonCsvFile.isRegularFile()).willReturn(true);
+        given(nonCsvFile.getName()).willReturn("test-report.pdf");
+
+        given(sftpClient.ls(anyString()))
+            .willReturn(singletonList(nonCsvFile));
+
+        // when
+        List<Report> reports = client.downloadReports();
+
+        // then
+        assertThat(reports).isEmpty();
+    }
+
 
     @Test
     public void download_should_return_an_empty_list_if_there_are_no_reports() throws Exception {
