@@ -97,7 +97,7 @@ jacocoTestReport {
   }
 }
 
-project.tasks['sonarqube'].dependsOn test, functional, integration
+project.tasks['sonarqube'].dependsOn test, integration
 sonarqube {
   properties {
     property "sonar.projectName", "Reform :: Send Letter Consumer"
@@ -136,10 +136,10 @@ repositories {
 }
 
 def versions = [
-  springBoot: plugins.getPlugin('org.springframework.boot').class.package.implementationVersion,
+  springBoot   : plugins.getPlugin('org.springframework.boot').class.package.implementationVersion,
   reformLogging: '2.0.2',
-  hystrix: '1.4.0.RELEASE',
-  logback: '1.2.3'
+  hystrix      : '1.4.0.RELEASE',
+  logback      : '1.2.3'
 ]
 
 configurations {
