@@ -5,7 +5,9 @@ import uk.gov.hmcts.reform.slc.model.LetterPrintStatus;
 import uk.gov.hmcts.reform.slc.services.steps.sftpupload.ParsedReport;
 import uk.gov.hmcts.reform.slc.services.steps.sftpupload.Report;
 
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 
 import static com.google.common.io.Resources.getResource;
 import static com.google.common.io.Resources.toByteArray;
@@ -14,20 +16,34 @@ import static org.assertj.core.api.Assertions.catchThrowable;
 
 public class ReportParserTest {
 
+    public static final String DATE_TIME_PATTERN = "dd-MM-yyyy'T'HH:mm'Z'";
+
     @Test
     public void should_parse_valid_csv_report() {
         String report =
-            "\"Date\",\"Time\",\"Filename\"\n"
-                + "2018-01-01,10:30:53,TE5A_TE5B_9364001\n"
-                + "2018-01-01,10:30:53,TE5A_TE5B_9364002\n";
+            "\"StartDate\",\"StartTime\",\"InputFileName\"\n"
+                + "27-03-2018,16:38,CMC001_cmcclaimstore_ff99f8ad-7ab8-43f8-9671-5397cbfa96a6.pdf\n"
+                + "27-03-2018,16:38,CMC001_cmcclaimstore_ff88f8ad-8ab8-44f8-9672-5398cbfa96a7.pdf\n";
 
         ParsedReport result = new ReportParser().parse(new Report("a.csv", report.getBytes()));
 
         assertThat(result.statuses)
             .usingFieldByFieldElementComparator()
             .containsExactlyInAnyOrder(
-                new LetterPrintStatus("9364001", ZonedDateTime.parse("2018-01-01T10:30:53Z")),
-                new LetterPrintStatus("9364002", ZonedDateTime.parse("2018-01-01T10:30:53Z"))
+                new LetterPrintStatus(
+                    "ff99f8ad-7ab8-43f8-9671-5397cbfa96a6",
+                    ZonedDateTime.parse(
+                        "27-03-2018T16:38Z",
+                        DateTimeFormatter.ofPattern("dd-MM-yyyy'T'HH:mm'Z'").withZone(ZoneOffset.UTC)
+                    )
+                ),
+                new LetterPrintStatus(
+                    "ff88f8ad-8ab8-44f8-9672-5398cbfa96a7",
+                    ZonedDateTime.parse(
+                        "27-03-2018T16:38Z",
+                        DateTimeFormatter.ofPattern("dd-MM-yyyy'T'HH:mm'Z'").withZone(ZoneOffset.UTC)
+                    )
+                )
             );
 
         assertThat(result.allRowsParsed).isTrue();
@@ -36,15 +52,21 @@ public class ReportParserTest {
     @Test
     public void should_filter_out_rows_with_invalid_file_name() {
         String report =
-            "\"Date\",\"Time\",\"Filename\"\n"
-                + "2018-01-01,10:30:53,invalidfilename\n"
-                + "2018-01-01,10:30:53,TE5A_TE5B_9364002\n";
+            "\"StartDate\",\"StartTime\",\"InputFileName\"\n"
+                + "27-03-2018,16:38,invalidfilename\n"
+                + "27-03-2018,16:38,CMC001_cmcclaimstore_ff88f8ad-8ab8-44f8-9672-5398cbfa96a7.pdf\n";
 
         ParsedReport result = new ReportParser().parse(new Report("a.csv", report.getBytes()));
 
         assertThat(result.statuses)
             .usingFieldByFieldElementComparator()
-            .containsExactly(new LetterPrintStatus("9364002", ZonedDateTime.parse("2018-01-01T10:30:53Z")));
+            .containsExactly(new LetterPrintStatus(
+                "ff88f8ad-8ab8-44f8-9672-5398cbfa96a7",
+                ZonedDateTime.parse(
+                    "27-03-2018T16:38Z",
+                    DateTimeFormatter.ofPattern(DATE_TIME_PATTERN).withZone(ZoneOffset.UTC)
+                )
+            ));
 
         assertThat(result.allRowsParsed).isFalse();
     }
@@ -52,15 +74,21 @@ public class ReportParserTest {
     @Test
     public void should_filter_out_rows_with_invalid_date() {
         String report =
-            "\"Date\",\"Time\",\"Filename\"\n"
-                + "20180101,10:30:53,TE5A_TE5B_9364001\n"
-                + "2018-01-01,10:30:53,TE5A_TE5B_9364002\n";
+            "\"StartDate\",\"StartTime\",\"InputFileName\"\n"
+                + "20180101,16:38,CMC001_cmcclaimstore_ff99f8ad-7ab8-43f8-9671-5397cbfa96a6.pdf\n"
+                + "27-03-2018,16:38,CMC001_cmcclaimstore_ff88f8ad-8ab8-44f8-9672-5398cbfa96a7.pdf\n";
 
         ParsedReport result = new ReportParser().parse(new Report("a.csv", report.getBytes()));
 
         assertThat(result.statuses)
             .usingFieldByFieldElementComparator()
-            .containsExactly(new LetterPrintStatus("9364002", ZonedDateTime.parse("2018-01-01T10:30:53Z")));
+            .containsExactly(new LetterPrintStatus(
+                "ff88f8ad-8ab8-44f8-9672-5398cbfa96a7",
+                ZonedDateTime.parse(
+                    "27-03-2018T16:38Z",
+                    DateTimeFormatter.ofPattern(DATE_TIME_PATTERN).withZone(ZoneOffset.UTC)
+                )
+            ));
 
         assertThat(result.allRowsParsed).isFalse();
     }
@@ -71,16 +99,17 @@ public class ReportParserTest {
 
         ParsedReport result = new ReportParser().parse(new Report("a.csv", report));
 
-        assertThat(result.statuses).hasSize(11);
+        assertThat(result.statuses).hasSize(3);
+
         assertThat(result.allRowsParsed).isTrue();
     }
 
     @Test
     public void should_throw_report_parsing_exception_when_csv_contains_semicolon_delimiter() {
         String report =
-            "\"Date\";\"Time\";\"Filename\"\n"
-                + "20180101;10:30:53;TE5A_TE5B_9364001\n"
-                + "2018-01-01;10:30:53;TE5A_TE5B_9364002\n";
+            "\"StartDate\";\"StartTime\";\"InputFileName\"\n"
+                + "27-03-2018;16:38;CMC001_cmcclaimstore_ff99f8ad-7ab8-43f8-9671-5397cbfa96a6.pdf\n"
+                + "27-03-2018;16:38;CMC001_cmcclaimstore_ff88f8ad-8ab8-44f8-9672-5398cbfa96a7.pdf\n";
 
         Throwable exc = catchThrowable(() ->
             new ReportParser().parse(new Report("a.csv", report.getBytes())));

@@ -14,7 +14,9 @@ import uk.gov.hmcts.reform.slc.services.steps.sftpupload.Report;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import static java.util.stream.Collectors.toList;
@@ -58,8 +60,9 @@ public class ReportParser {
     private LetterPrintStatus toPrintStatus(CSVRecord record) {
         try {
             return new LetterPrintStatus(
-                FileNameHelper.extractId(record.get("Filename")),
-                ZonedDateTime.parse(record.get("Date") + "T" + record.get("Time") + "Z")
+                FileNameHelper.extractId(record.get("InputFileName")),
+                ZonedDateTime.parse(record.get("StartDate") + "T" + record.get("StartTime") + "Z",
+                    DateTimeFormatter.ofPattern("dd-MM-yyyy'T'HH:mm'Z'").withZone(ZoneOffset.UTC))
             );
         } catch (Exception exc) {
             logger.error("Error parsing row: " + record, exc);
