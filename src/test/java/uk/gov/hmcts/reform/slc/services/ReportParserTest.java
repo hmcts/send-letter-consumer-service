@@ -5,9 +5,8 @@ import uk.gov.hmcts.reform.slc.model.LetterPrintStatus;
 import uk.gov.hmcts.reform.slc.services.steps.sftpupload.ParsedReport;
 import uk.gov.hmcts.reform.slc.services.steps.sftpupload.Report;
 
-import java.time.ZoneOffset;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 
 import static com.google.common.io.Resources.getResource;
 import static com.google.common.io.Resources.toByteArray;
@@ -16,7 +15,9 @@ import static org.assertj.core.api.Assertions.catchThrowable;
 
 public class ReportParserTest {
 
-    public static final String DATE_TIME_PATTERN = "dd-MM-yyyy'T'HH:mm'Z'";
+    private static final ZonedDateTime expectedZonedDateTime = ZonedDateTime.of(
+        2018, 3, 27, 16, 38, 0, 0,
+        ZoneId.of("Z"));
 
     @Test
     public void should_parse_valid_csv_report() {
@@ -32,17 +33,11 @@ public class ReportParserTest {
             .containsExactlyInAnyOrder(
                 new LetterPrintStatus(
                     "ff99f8ad-7ab8-43f8-9671-5397cbfa96a6",
-                    ZonedDateTime.parse(
-                        "27-03-2018T16:38Z",
-                        DateTimeFormatter.ofPattern("dd-MM-yyyy'T'HH:mm'Z'").withZone(ZoneOffset.UTC)
-                    )
+                    expectedZonedDateTime
                 ),
                 new LetterPrintStatus(
                     "ff88f8ad-8ab8-44f8-9672-5398cbfa96a7",
-                    ZonedDateTime.parse(
-                        "27-03-2018T16:38Z",
-                        DateTimeFormatter.ofPattern("dd-MM-yyyy'T'HH:mm'Z'").withZone(ZoneOffset.UTC)
-                    )
+                    expectedZonedDateTime
                 )
             );
 
@@ -62,10 +57,7 @@ public class ReportParserTest {
             .usingFieldByFieldElementComparator()
             .containsExactly(new LetterPrintStatus(
                 "ff88f8ad-8ab8-44f8-9672-5398cbfa96a7",
-                ZonedDateTime.parse(
-                    "27-03-2018T16:38Z",
-                    DateTimeFormatter.ofPattern(DATE_TIME_PATTERN).withZone(ZoneOffset.UTC)
-                )
+                expectedZonedDateTime
             ));
 
         assertThat(result.allRowsParsed).isFalse();
@@ -84,10 +76,7 @@ public class ReportParserTest {
             .usingFieldByFieldElementComparator()
             .containsExactly(new LetterPrintStatus(
                 "ff88f8ad-8ab8-44f8-9672-5398cbfa96a7",
-                ZonedDateTime.parse(
-                    "27-03-2018T16:38Z",
-                    DateTimeFormatter.ofPattern(DATE_TIME_PATTERN).withZone(ZoneOffset.UTC)
-                )
+                expectedZonedDateTime
             ));
 
         assertThat(result.allRowsParsed).isFalse();
