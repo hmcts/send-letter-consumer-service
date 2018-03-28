@@ -55,7 +55,7 @@ variable "ftp_reports_folder" {
 }
 
 variable "ftp_reports_cron" {
-  default = "0 30 * * * *"
+  default = "0 30 0 * * *"
 }
 
 variable "subscription" {
