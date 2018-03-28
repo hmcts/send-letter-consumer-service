@@ -79,17 +79,18 @@ public class UpdateLetterStatusJob {
     }
 
     private boolean processReport(ParsedReport report) {
-        boolean success = report
+        boolean updatedAll = report
             .statuses
             .stream()
             .map(this::trySendUpdate)
             .reduce(Boolean::logicalAnd)
             .orElse(true);
 
-        if (success) {
+        if (report.allRowsParsed && updatedAll) {
             ftpClient.deleteReport(report.path);
+            return true;
+        } else {
+            return false;
         }
-
-        return success;
     }
 }
