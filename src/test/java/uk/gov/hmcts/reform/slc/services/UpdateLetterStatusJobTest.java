@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.slc.services.steps.sftpupload.Report;
 
 import static java.time.ZonedDateTime.now;
 import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.mockito.BDDMockito.given;
@@ -72,6 +73,20 @@ public class UpdateLetterStatusJobTest {
     }
 
     @Test
+    public void should_not_remove_report_if_not_all_rows_were_parsed() {
+        // given
+        given(ftpAvailabilityChecker.isFtpAvailable(any())).willReturn(true);
+        given(ftpClient.downloadReports()).willReturn(singletonList(new Report("FROM/1.csv", null)));
+        given(parser.parse(any())).willReturn(new ParsedReport("FROM/1.csv", emptyList(), false));
+
+        // when
+        job.run();
+
+        // then
+        verify(ftpClient, never()).deleteReport(anyString());
+    }
+
+    @Test
     public void should_not_remove_report_if_sending_updates_failed() {
         // given
         given(ftpAvailabilityChecker.isFtpAvailable(any())).willReturn(true);
@@ -84,7 +99,8 @@ public class UpdateLetterStatusJobTest {
                     asList(
                         new LetterPrintStatus("abc", now()),
                         new LetterPrintStatus("xyz", now())
-                    )
+                    ),
+                    true
                 )
             );
 
@@ -114,7 +130,8 @@ public class UpdateLetterStatusJobTest {
                     asList(
                         new LetterPrintStatus("abc", now()),
                         new LetterPrintStatus("xyz", now())
-                    )
+                    ),
+                    true
                 )
             );
 
@@ -167,7 +184,8 @@ public class UpdateLetterStatusJobTest {
                     asList(
                         new LetterPrintStatus("abc", now()),
                         new LetterPrintStatus("xyz", now())
-                    )
+                    ),
+                    true
                 )
             );
 

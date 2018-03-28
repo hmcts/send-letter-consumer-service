@@ -29,6 +29,8 @@ public class ReportParserTest {
                 new LetterPrintStatus("9364001", ZonedDateTime.parse("2018-01-01T10:30:53Z")),
                 new LetterPrintStatus("9364002", ZonedDateTime.parse("2018-01-01T10:30:53Z"))
             );
+
+        assertThat(result.allRowsParsed).isTrue();
     }
 
     @Test
@@ -43,6 +45,8 @@ public class ReportParserTest {
         assertThat(result.statuses)
             .usingFieldByFieldElementComparator()
             .containsExactly(new LetterPrintStatus("9364002", ZonedDateTime.parse("2018-01-01T10:30:53Z")));
+
+        assertThat(result.allRowsParsed).isFalse();
     }
 
     @Test
@@ -57,6 +61,8 @@ public class ReportParserTest {
         assertThat(result.statuses)
             .usingFieldByFieldElementComparator()
             .containsExactly(new LetterPrintStatus("9364002", ZonedDateTime.parse("2018-01-01T10:30:53Z")));
+
+        assertThat(result.allRowsParsed).isFalse();
     }
 
     @Test
@@ -66,6 +72,7 @@ public class ReportParserTest {
         ParsedReport result = new ReportParser().parse(new Report("a.csv", report));
 
         assertThat(result.statuses).hasSize(11);
+        assertThat(result.allRowsParsed).isTrue();
     }
 
     @Test
