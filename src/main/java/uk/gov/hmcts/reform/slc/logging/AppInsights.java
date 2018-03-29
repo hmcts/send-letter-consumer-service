@@ -5,8 +5,10 @@ import com.microsoft.applicationinsights.TelemetryClient;
 import com.microsoft.applicationinsights.telemetry.Duration;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.logging.appinsights.AbstractAppInsights;
+import uk.gov.hmcts.reform.slc.model.Letter;
 
 import java.util.Map;
+import java.util.UUID;
 
 import static java.util.Collections.singletonMap;
 
@@ -94,8 +96,29 @@ public class AppInsights extends AbstractAppInsights {
         );
     }
 
-    public void trackMessageMappedToLetter(String messageId, String serviceName, String template, long bodyLength) {
+    public void trackLetterNotHandled(Letter letter) {
         Map<String, String> properties = ImmutableMap.of(
+            "letterId", letter.id.toString(),
+            "service", letter.service,
+            "type", letter.type
+        );
+
+        telemetry.trackEvent(
+            AppEvent.LETTER_HANDLED_UNSUCCESSFULLY,
+            properties,
+            singletonMap("numberOfDocuments", (double) letter.documents.size())
+        );
+    }
+
+    public void trackMessageMappedToLetter(
+        UUID letterId,
+        String messageId,
+        String serviceName,
+        String template,
+        long bodyLength
+    ) {
+        Map<String, String> properties = ImmutableMap.of(
+            "letterId", letterId.toString(),
             MESSAGE_ID, messageId,
             "service", serviceName,
             "template", template

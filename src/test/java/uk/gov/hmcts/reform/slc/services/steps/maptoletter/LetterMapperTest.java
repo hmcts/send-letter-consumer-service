@@ -66,7 +66,13 @@ public class LetterMapperTest {
         assertThat(letter.service).isEqualTo("some_service");
         assertThat(letter.id).isExactlyInstanceOf(UUID.class);
 
-        verify(insights).trackMessageMappedToLetter(anyString(), eq("some_service"), eq("whatever"), anyLong());
+        verify(insights).trackMessageMappedToLetter(
+            eq(letter.id),
+            anyString(),
+            eq("some_service"),
+            eq("whatever"),
+            anyLong()
+        );
         verifyNoMoreInteractions(insights);
     }
 

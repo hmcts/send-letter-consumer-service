@@ -4,6 +4,7 @@ import com.microsoft.azure.servicebus.IMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.slc.logging.AppInsights;
 import uk.gov.hmcts.reform.slc.model.Letter;
 import uk.gov.hmcts.reform.slc.services.servicebus.MessageHandlingResult;
 import uk.gov.hmcts.reform.slc.services.steps.getpdf.PdfCreator;
@@ -30,19 +31,22 @@ public class SendLetterService {
     private final Zipper zipper;
     private final FtpClient ftpClient;
     private final SendLetterClient sendLetterClient;
+    private final AppInsights insights;
 
     public SendLetterService(
         LetterMapper letterMapper,
         PdfCreator pdfCreator,
         Zipper zipper,
         FtpClient ftpClient,
-        SendLetterClient sendLetterClient
+        SendLetterClient sendLetterClient,
+        AppInsights insights
     ) {
         this.letterMapper = letterMapper;
         this.pdfCreator = pdfCreator;
         this.zipper = zipper;
         this.ftpClient = ftpClient;
         this.sendLetterClient = sendLetterClient;
+        this.insights = insights;
     }
 
     public MessageHandlingResult send(IMessage msg) {
@@ -61,10 +65,11 @@ public class SendLetterService {
             return SUCCESS;
 
         } catch (Exception exc) {
-            logger.error("Exception occurred while processing message ", exc);
+            logger.error("Exception occurred while processing message", exc);
 
             //update producer with is_failed status for reporting
             if (Objects.nonNull(letter)) {
+                insights.trackLetterNotHandled(letter);
                 sendLetterClient.updateIsFailedStatus(letter.id);
             } else {
                 logger.error("Unable to update is_failed status in producer for reporting");

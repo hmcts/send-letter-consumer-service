@@ -56,7 +56,13 @@ public class LetterMapper {
         }
 
         letter.documents.forEach(document ->
-            insights.trackMessageMappedToLetter(messageId, letter.service, document.template, bodyLength)
+            insights.trackMessageMappedToLetter(
+                letter.id,
+                messageId,
+                letter.service,
+                document.template,
+                bodyLength
+            )
         );
 
         return letter;

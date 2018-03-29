@@ -18,6 +18,11 @@ final class AppEvent {
     static final String MESSAGE_HANDLED_UNSUCCESSFULLY = "MessageHandleFailure";
 
     /**
+     * Failed letter handler process.
+     */
+    static final String LETTER_HANDLED_UNSUCCESSFULLY = "LetterHandleFailure";
+
+    /**
      * Successful message map.
      */
     static final String MESSAGE_MAPPED_SUCCESSFULLY = "MessageMapSuccess";
