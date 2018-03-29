@@ -129,9 +129,7 @@ public class MessageProcessorTest {
         doThrow(ConnectionException.class).when(receiverProvider).get();
 
         //when
-        Throwable exception = catchThrowable(() -> {
-            processor.process();
-        });
+        Throwable exception = catchThrowable(processor::process);
 
         //then
         assertThat(exception).isNull();
@@ -147,9 +145,7 @@ public class MessageProcessorTest {
         doThrow(InterruptedException.class).when(messageReceiver).receive();
 
         //when
-        Throwable exception = catchThrowable(() -> {
-            processor.process();
-        });
+        Throwable exception = catchThrowable(processor::process);
 
         // then
         assertThat(exception).isNull();
@@ -166,9 +162,7 @@ public class MessageProcessorTest {
         doThrow(ServiceBusException.class).when(messageReceiver).receive();
 
         //when
-        Throwable exception = catchThrowable(() -> {
-            processor.process();
-        });
+        Throwable exception = catchThrowable(processor::process);
 
         // then
         assertThat(exception).isNull();
