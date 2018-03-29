@@ -143,7 +143,7 @@ public class FtpClient {
         } catch (IOException exc) {
             insights.trackException(exc);
 
-            throw new FtpStepException("Unable to upload file.", exc);
+            throw new FtpStepException("Unable to connect to ftp.", exc);
         } finally {
             try {
                 if (ssh != null) {
