@@ -49,14 +49,12 @@ public class MessageProcessor {
 
             logger.info("Finished processing queue");
         } catch (ConnectionException e) {
-            insights.trackException(e);
             logger.error("Unable to connect to Service Bus", e);
         } finally {
             if (messageReceiver != null) {
                 try {
                     messageReceiver.close();
                 } catch (ServiceBusException e) {
-                    insights.trackException(e);
                     logger.error("Error closing connection", e);
                 }
             }
@@ -85,8 +83,8 @@ public class MessageProcessor {
             // TODO: change the event to "MessageReceivingFailed"
             Duration tookReceiving = Duration.between(receiveStartTime, Instant.now());
             insights.trackMessageReceivedFromServiceBus(tookReceiving, false);
-            insights.trackException(e);
             logger.error("Unable to read message from queue", e);
+
             return null;
         }
     }

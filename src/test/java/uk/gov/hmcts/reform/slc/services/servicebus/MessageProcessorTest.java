@@ -136,7 +136,6 @@ public class MessageProcessorTest {
         //then
         assertThat(exception).isNull();
 
-        verify(insights).trackException(any(ServiceBusException.class));
         verify(sendLetterService, never()).send(any());
         verifyNoMoreInteractions(insights);
     }
@@ -156,7 +155,6 @@ public class MessageProcessorTest {
         assertThat(exception).isNull();
 
         verify(insights).trackMessageReceivedFromServiceBus(any(Duration.class), eq(false));
-        verify(insights).trackException(any(InterruptedException.class));
         verify(sendLetterService, never()).send(any());
         verifyNoMoreInteractions(insights);
     }
@@ -176,7 +174,6 @@ public class MessageProcessorTest {
         assertThat(exception).isNull();
 
         verify(insights).trackMessageReceivedFromServiceBus(any(Duration.class), eq(false));
-        verify(insights).trackException(any(ServiceBusException.class));
         verify(sendLetterService, never()).send(any());
         verifyNoMoreInteractions(insights);
     }

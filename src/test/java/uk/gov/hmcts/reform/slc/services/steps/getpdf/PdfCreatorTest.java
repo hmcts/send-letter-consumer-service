@@ -122,7 +122,6 @@ public class PdfCreatorTest {
             .isInstanceOf(PDFServiceClientException.class);
 
         verify(insights).trackPdfGenerator(any(Duration.class), eq(false));
-        verify(insights).trackException(any(PDFServiceClientException.class));
         verifyNoMoreInteractions(insights);
     }
 

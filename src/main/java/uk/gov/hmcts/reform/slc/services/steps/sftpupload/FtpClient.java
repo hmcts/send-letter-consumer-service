@@ -63,7 +63,6 @@ public class FtpClient {
 
             } catch (IOException exc) {
                 insights.trackFtpUpload(Duration.between(start, Instant.now()), false);
-                insights.trackException(exc);
 
                 throw new FtpStepException("Unable to upload file.", exc);
             }
