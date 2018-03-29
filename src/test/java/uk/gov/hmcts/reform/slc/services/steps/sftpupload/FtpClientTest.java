@@ -4,7 +4,11 @@ import net.schmizz.sshj.SSHClient;
 import net.schmizz.sshj.sftp.RemoteResourceInfo;
 import net.schmizz.sshj.sftp.SFTPClient;
 import net.schmizz.sshj.sftp.SFTPFileTransfer;
+import net.schmizz.sshj.transport.TransportException;
+import net.schmizz.sshj.userauth.UserAuthException;
+import net.schmizz.sshj.userauth.keyprovider.KeyProvider;
 import net.schmizz.sshj.xfer.LocalSourceFile;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -57,6 +61,11 @@ public class FtpClientTest {
         );
 
         ReflectionTestUtils.setField(client, "insights", insights);
+    }
+
+    @After
+    public void tearDown() {
+        reset(sshClient);
     }
 
     @Test
@@ -229,6 +238,38 @@ public class FtpClientTest {
                 any(LocalSourceFile.class),
                 contains("target")
             );
+    }
+
+    @Test
+    public void should_throw_auth_exception_when_user_authentication_failed_while_connecting_to_ftp()
+        throws UserAuthException, TransportException {
+        // given
+        doThrow(UserAuthException.class).when(sshClient).authPublickey(anyString(), any(KeyProvider.class));
+
+        // when
+        Throwable exception = catchThrowable(client::testConnection);
+
+        // then
+        assertThat(exception)
+            .isInstanceOf(FtpStepException.class)
+            .hasMessage("Unable to authenticate with public key")
+            .hasCauseInstanceOf(UserAuthException.class);
+    }
+
+    @Test
+    public void should_throw_transportation_exception_when_user_authentication_failed_while_connecting_to_ftp()
+        throws UserAuthException, TransportException {
+        // given
+        doThrow(TransportException.class).when(sshClient).authPublickey(anyString(), any(KeyProvider.class));
+
+        // when
+        Throwable exception = catchThrowable(client::testConnection);
+
+        // then
+        assertThat(exception)
+            .isInstanceOf(FtpStepException.class)
+            .hasMessage("Unable to authenticate with public key")
+            .hasCauseInstanceOf(TransportException.class);
     }
 
     private ZippedDoc sampleFileToUpload() {

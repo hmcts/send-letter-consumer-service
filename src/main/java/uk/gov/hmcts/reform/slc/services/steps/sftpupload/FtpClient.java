@@ -3,6 +3,8 @@ package uk.gov.hmcts.reform.slc.services.steps.sftpupload;
 import net.schmizz.sshj.SSHClient;
 import net.schmizz.sshj.sftp.SFTPClient;
 import net.schmizz.sshj.sftp.SFTPFileTransfer;
+import net.schmizz.sshj.transport.TransportException;
+import net.schmizz.sshj.userauth.UserAuthException;
 import net.schmizz.sshj.xfer.LocalSourceFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -134,6 +136,10 @@ public class FtpClient {
             try (SFTPClient sftp = ssh.newSFTPClient()) {
                 return action.apply(sftp);
             }
+        } catch (UserAuthException | TransportException exc) {
+            insights.trackException(exc);
+
+            throw new FtpStepException("Unable to authenticate with public key", exc);
         } catch (IOException exc) {
             insights.trackException(exc);
 
