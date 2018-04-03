@@ -9,8 +9,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import uk.gov.hmcts.reform.slc.model.Document;
+import uk.gov.hmcts.reform.slc.model.Letter;
 
+import java.util.Collections;
 import java.util.Map;
+import java.util.UUID;
 
 import static java.util.Collections.singletonMap;
 import static org.mockito.Matchers.any;
@@ -24,6 +28,8 @@ import static org.mockito.Mockito.when;
 public class AppInsightsTest {
 
     private static final java.time.Duration TIME_TOOK = java.time.Duration.ofMinutes(1);
+
+    private static final String LETTER_ID_KEY = "letterId";
 
     private static final String MESSAGE_ID_KEY = "messageId";
 
@@ -157,10 +163,33 @@ public class AppInsightsTest {
     }
 
     @Test
+    public void should_track_letter_not_handled() {
+        Letter letter = new Letter(
+            UUID.randomUUID(),
+            Collections.nCopies(5, new Document(TEMPLATE, Collections.emptyMap())),
+            "type",
+            SERVICE_NAME
+        );
+        insights.trackLetterNotHandled(letter);
+
+        verify(client).trackEvent(
+            AppEvent.LETTER_HANDLED_UNSUCCESSFULLY,
+            ImmutableMap.of(
+                LETTER_ID_KEY, letter.id.toString(),
+                "service", SERVICE_NAME,
+                "type", "type"
+            ),
+            singletonMap("numberOfDocuments", 5.0)
+        );
+    }
+
+    @Test
     public void should_track_message_mapped_to_letter() {
-        insights.trackMessageMappedToLetter(MESSAGE_ID, SERVICE_NAME, TEMPLATE, BODY_LENGTH);
+        UUID id = UUID.randomUUID();
+        insights.trackMessageMappedToLetter(id, MESSAGE_ID, SERVICE_NAME, TEMPLATE, BODY_LENGTH);
 
         Map<String, String> properties = ImmutableMap.of(
+            LETTER_ID_KEY, id.toString(),
             MESSAGE_ID_KEY, MESSAGE_ID,
             "service", SERVICE_NAME,
             "template", TEMPLATE

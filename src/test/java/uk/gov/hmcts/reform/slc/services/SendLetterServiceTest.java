@@ -7,6 +7,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import uk.gov.hmcts.reform.pdf.service.client.exception.PDFServiceClientException;
+import uk.gov.hmcts.reform.slc.logging.AppInsights;
 import uk.gov.hmcts.reform.slc.model.Document;
 import uk.gov.hmcts.reform.slc.model.Letter;
 import uk.gov.hmcts.reform.slc.services.servicebus.MessageHandlingResult;
@@ -37,14 +38,15 @@ public class SendLetterServiceTest {
     @Mock private Zipper zipper;
     @Mock private FtpClient ftpClient;
     @Mock private SendLetterClient sendLetterClient;
+    @Mock private AppInsights insights;
 
     @Mock private IMessage message;
 
     private SendLetterService service;
 
     @Before
-    public void setUp() throws Exception {
-        service = new SendLetterService(letterMapper, pdfCreator, zipper, ftpClient, sendLetterClient);
+    public void setUp() {
+        service = new SendLetterService(letterMapper, pdfCreator, zipper, ftpClient, sendLetterClient, insights);
     }
 
     @Test

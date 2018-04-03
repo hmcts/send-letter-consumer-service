@@ -59,7 +59,6 @@ public class PdfCreator {
             return pdf;
         } catch (PDFServiceClientException exception) {
             insights.trackPdfGenerator(Duration.between(start, Instant.now()), false);
-            insights.trackException(exception);
 
             throw exception;
         }

@@ -129,14 +129,11 @@ public class MessageProcessorTest {
         doThrow(ConnectionException.class).when(receiverProvider).get();
 
         //when
-        Throwable exception = catchThrowable(() -> {
-            processor.process();
-        });
+        Throwable exception = catchThrowable(processor::process);
 
         //then
         assertThat(exception).isNull();
 
-        verify(insights).trackException(any(ServiceBusException.class));
         verify(sendLetterService, never()).send(any());
         verifyNoMoreInteractions(insights);
     }
@@ -148,15 +145,12 @@ public class MessageProcessorTest {
         doThrow(InterruptedException.class).when(messageReceiver).receive();
 
         //when
-        Throwable exception = catchThrowable(() -> {
-            processor.process();
-        });
+        Throwable exception = catchThrowable(processor::process);
 
         // then
         assertThat(exception).isNull();
 
         verify(insights).trackMessageReceivedFromServiceBus(any(Duration.class), eq(false));
-        verify(insights).trackException(any(InterruptedException.class));
         verify(sendLetterService, never()).send(any());
         verifyNoMoreInteractions(insights);
     }
@@ -168,15 +162,12 @@ public class MessageProcessorTest {
         doThrow(ServiceBusException.class).when(messageReceiver).receive();
 
         //when
-        Throwable exception = catchThrowable(() -> {
-            processor.process();
-        });
+        Throwable exception = catchThrowable(processor::process);
 
         // then
         assertThat(exception).isNull();
 
         verify(insights).trackMessageReceivedFromServiceBus(any(Duration.class), eq(false));
-        verify(insights).trackException(any(ServiceBusException.class));
         verify(sendLetterService, never()).send(any());
         verifyNoMoreInteractions(insights);
     }
