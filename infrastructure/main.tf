@@ -37,7 +37,7 @@ locals {
 
 module "consumer" {
   source        = "git@github.com:contino/moj-module-webapp.git"
-  product       = "${var.product}-consumer"
+  product       = "${var.product}-${var.component}"
   location      = "${var.location}"
   env           = "${var.env}"
   ilbIp         = "${var.ilbIp}"
