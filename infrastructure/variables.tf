@@ -3,6 +3,10 @@ variable "product" {
   default = "send-letter"
 }
 
+variable "component" {
+  type = "string"
+}
+
 variable "location" {
   type    = "string"
   default = "UK South"
