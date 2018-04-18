@@ -137,4 +137,9 @@
     <gav regex="true">^org\.apache\.tomcat:tomcat-annotations-api:.*$</gav>
     <cpe>cpe:/a:apache:tomcat</cpe>
   </suppress>
+  <suppress>
+    <notes><![CDATA[Incorrect update to description of the search algorithm used by the CGI Servlet]]></notes>
+    <gav regex="true">^org\.apache\.tomcat:tomcat-embed-core:.*$</gav>
+    <cve>CVE-2017-15706</cve>
+  </suppress>
 </suppressions>
