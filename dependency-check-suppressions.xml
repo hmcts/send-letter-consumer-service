@@ -132,4 +132,9 @@
     <gav regex="true">^org\.springframework:spring-test:.*$</gav>
     <cpe>cpe:/a:pivotal_software:spring_framework</cpe>
   </suppress>
+  <suppress>
+    <notes><![CDATA[Tomcat does not restrict access to the /admin context.]]></notes>
+    <gav regex="true">^org\.apache\.tomcat:tomcat-annotations-api:.*$</gav>
+    <cpe>cpe:/a:apache:tomcat</cpe>
+  </suppress>
 </suppressions>
