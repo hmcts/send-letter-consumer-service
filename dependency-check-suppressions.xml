@@ -138,8 +138,13 @@
     <cpe>cpe:/a:apache:tomcat</cpe>
   </suppress>
   <suppress>
-    <notes><![CDATA[Incorrect update to description of the search algorithm used by the CGI Servlet]]></notes>
-    <gav regex="true">^org\.apache\.tomcat:tomcat-embed-core:.*$</gav>
+    <notes><![CDATA[Incorrect documentation related search algorithm used by the CGI Servlet]]></notes>
+    <gav regex="true">^org\.apache\.tomcat\.embed:tomcat-embed-websocket:.*$</gav>
+    <cve>CVE-2017-15706</cve>
+  </suppress>
+  <suppress>
+    <notes><![CDATA[Incorrect documentation related search algorithm used by the CGI Servlet]]></notes>
+    <gav regex="true">^org\.apache\.tomcat\.embed:tomcat-embed-core:.*$</gav>
     <cve>CVE-2017-15706</cve>
   </suppress>
 </suppressions>
