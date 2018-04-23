@@ -21,14 +21,12 @@
     <cve>CVE-2014-3488</cve>
   </suppress>
   <suppress>
-    <notes>
-      <![CDATA[something to do with oracle, doesn't look like it applies file name: jersey-apache-client4-1.19.1.jar]]></notes>
+    <notes><![CDATA[something to do with oracle, doesn't look like it applies file name: jersey-apache-client4-1.19.1.jar]]></notes>
     <gav regex="true">^com\.sun\.jersey\.contribs:jersey-apache-client4:.*$</gav>
     <cve>CVE-2006-0550</cve>
   </suppress>
   <suppress>
-    <notes>
-      <![CDATA[only applies when tomcat is run as a service, file name: tomcat-annotations-api-8.5.27.jar]]></notes>
+    <notes><![CDATA[only applies when tomcat is run as a service, file name: tomcat-annotations-api-8.5.27.jar]]></notes>
     <gav regex="true">^org\.apache\.tomcat:tomcat-annotations-api:.*$</gav>
     <cve>CVE-2016-6325</cve>
   </suppress>
@@ -123,6 +121,11 @@
     <cpe>cpe:/a:pivotal_software:spring_framework</cpe>
   </suppress>
   <suppress>
+    <notes><![CDATA[file name: spring-boot-test-autoconfigure-1.5.9.RELEASE.jar]]></notes>
+    <gav regex="true">^org\.springframework\.boot:spring-boot-test-autoconfigure:.*$</gav>
+    <cpe>cpe:/a:pivotal_software:spring_boot</cpe>
+  </suppress>
+  <suppress>
     <notes><![CDATA[related to spring security not considering url path params]]></notes>
     <gav regex="true">^org\.springframework\.security:spring-security-crypto:.*$</gav>
     <cpe>cpe:/a:pivotal_software:spring_security</cpe>
@@ -146,5 +149,65 @@
     <notes><![CDATA[Incorrect documentation related search algorithm used by the CGI Servlet]]></notes>
     <gav regex="true">^org\.apache\.tomcat\.embed:tomcat-embed-core:.*$</gav>
     <cve>CVE-2017-15706</cve>
+  </suppress>
+  <suppress>
+    <notes><![CDATA[Spring Boot application that are not using the embedded launch script are not susceptible]]></notes>
+    <gav regex="true">^org\.springframework\.boot:spring-boot-starter-actuator:.*$</gav>
+    <cpe>cpe:/a:pivotal_software:spring_boot</cpe>
+  </suppress>
+  <suppress>
+    <notes><![CDATA[Spring Boot application that are not using the embedded launch script are not susceptible]]></notes>
+    <gav regex="true">^org\.springframework\.boot:spring-boot-starter-aop:.*$</gav>
+    <cpe>cpe:/a:pivotal_software:spring_boot</cpe>
+  </suppress>
+  <suppress>
+    <notes><![CDATA[Spring Boot application that are not using the embedded launch script are not susceptible]]></notes>
+    <gav regex="true">^org\.springframework\.boot:spring-boot-starter-freemarker:.*$</gav>
+    <cpe>cpe:/a:pivotal_software:spring_boot</cpe>
+  </suppress>
+  <suppress>
+    <notes><![CDATA[Spring Boot application that are not using the embedded launch script are not susceptible]]></notes>
+    <gav regex="true">^org\.springframework\.boot:spring-boot-starter-web:.*$</gav>
+    <cpe>cpe:/a:pivotal_software:spring_boot</cpe>
+  </suppress>
+  <suppress>
+    <notes><![CDATA[Spring Boot application that are not using the embedded launch script are not susceptible]]></notes>
+    <gav regex="true">^org\.springframework\.boot:spring-boot-starter:.*$</gav>
+    <cpe>cpe:/a:pivotal_software:spring_boot</cpe>
+  </suppress>
+  <suppress>
+    <notes><![CDATA[Spring Boot application that are not using the embedded launch script are not susceptible]]></notes>
+    <gav regex="true">^org\.springframework\.boot:spring-boot-starter-logging:.*$</gav>
+    <cpe>cpe:/a:pivotal_software:spring_boot</cpe>
+  </suppress>
+  <suppress>
+    <notes><![CDATA[Spring Boot application that are not using the embedded launch script are not susceptible]]></notes>
+    <gav regex="true">^org\.springframework\.boot:spring-boot-actuator:.*$</gav>
+    <cpe>cpe:/a:pivotal_software:spring_boot</cpe>
+  </suppress>
+  <suppress>
+    <notes><![CDATA[Spring Boot application that are not using the embedded launch script are not susceptible]]></notes>
+    <gav regex="true">^org\.springframework\.boot:spring-boot-autoconfigure:.*$</gav>
+    <cpe>cpe:/a:pivotal_software:spring_boot</cpe>
+  </suppress>
+  <suppress>
+    <notes><![CDATA[Spring Boot application that are not using the embedded launch script are not susceptible]]></notes>
+    <gav regex="true">^org\.springframework\.boot:spring-boot:.*$</gav>
+    <cpe>cpe:/a:pivotal_software:spring_boot</cpe>
+  </suppress>
+  <suppress>
+    <notes><![CDATA[Spring Boot application that are not using the embedded launch script are not susceptible]]></notes>
+    <gav regex="true">^org\.springframework\.boot:spring-boot-starter-tomcat:.*$</gav>
+    <cpe>cpe:/a:pivotal_software:spring_boot</cpe>
+  </suppress>
+  <suppress>
+    <notes><![CDATA[Spring Boot application that are not using the embedded launch script are not susceptible]]></notes>
+    <gav regex="true">^org\.springframework\.boot:spring-boot-starter-test:.*$</gav>
+    <cpe>cpe:/a:pivotal_software:spring_boot</cpe>
+  </suppress>
+  <suppress>
+    <notes><![CDATA[Spring Boot application that are not using the embedded launch script are not susceptible]]></notes>
+    <gav regex="true">^org\.springframework\.boot:spring-boot-test:.*$</gav>
+    <cpe>cpe:/a:pivotal_software:spring_boot</cpe>
   </suppress>
 </suppressions>
